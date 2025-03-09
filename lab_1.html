@@ -13098,18 +13098,41 @@ div#notebook {
 <li><a href="https://numpy.org/doc/stable/">Dokumentacja NumPy</a></li>
 </ul>
 <h2 id="NumPy">NumPy<a class="anchor-link" href="#NumPy">¶</a></h2><p>Zapoznaj się z podstawowymi funkcjami biblioteki NumPy: <a href="https://numpy.org/doc/stable/user/absolute_beginners.html">Numpy: the absolute basics for beginners</a>.</p>
+<p>W zadaniach poniżej wykorzystaj:</p>
+<ul>
+<li><code>np.random.normal()</code> do generowania zmiennych losowych,</li>
+<li>wektoryzację operacji arytmetycznych, np. jeśli <code>A</code> i <code>B</code> to tablice numeryczne NumPy o takich samych wymiarach, to <code>A + B</code> zwraca tablicę, której elementy to sumy odpowiadających elementów tablic <code>A</code> i <code>B</code>,</li>
+<li>operator <code>@</code> do mnożenia macierzy,</li>
+<li><code>np.linalg.inv()</code> do obliczenia odwrotności macierzy,</li>
+<li><code>np.linalg.svd()</code> do rozkładu SVD macierzy,</li>
+<li><code>np.transpose()</code> lub <code>.T</code> do transpozycji macierzy,</li>
+<li><code>@</code> do mnożenia macierzy.</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Regresja-liniowa-z-wykorzystaniem-NumPy">Regresja liniowa z wykorzystaniem NumPy<a class="anchor-link" href="#Regresja-liniowa-z-wykorzystaniem-NumPy">¶</a></h2><p>Celem ćwiczenia jest implementacja regresji liniowej z wykorzystaniem biblioteki NumPy. Zamiast gotowych narzędzi jak sklearn, wykorzystamy operacje algebraiczne do obliczenia współczynników modelu oraz oceny jego jakości.</p>
-<h3 id="1.-Generowanie-danych">1. Generowanie danych<a class="anchor-link" href="#1.-Generowanie-danych">¶</a></h3><ol>
+<h2 id="1.-Regresja-liniowa-z-wykorzystaniem-NumPy">1. Regresja liniowa z wykorzystaniem NumPy<a class="anchor-link" href="#1.-Regresja-liniowa-z-wykorzystaniem-NumPy">¶</a></h2><p>Celem ćwiczenia jest implementacja regresji liniowej z wykorzystaniem biblioteki NumPy. Zamiast gotowych narzędzi jak sklearn, wykorzystamy operacje algebraiczne do obliczenia współczynników modelu oraz oceny jego jakości.</p>
+<p>Zaczniemy od wygenerowania sztucznych danych, które posłużą nam do przetestowania implementacji.</p>
+<h3 id="1.1-Generowanie-danych">1.1 Generowanie danych<a class="anchor-link" href="#1.1-Generowanie-danych">¶</a></h3><p>Niech $w_0,w_1,\ldots,w_p$, $X_1,X_2,\ldots,X_p$ oraz $\varepsilon$ będą niezależnymi zmiennymi losowymi o rozkładach:</p>
+<p>\begin{align*}
+w_i&amp;\sim\mathcal{N}(0,1),\ i=0,1,\ldots,p,\\
+X_j&amp;\sim\mathcal{N}(0,1),\ j=1,2,\ldots,p,\\
+\varepsilon&amp;\sim\mathcal{N}(0,\sigma^2),
+\end{align*}</p>
+<p>gdzie $\mathcal{N}(\mu,\sigma^2)$ oznacza rozkład normalny o średniej $\mu$ i wariancji $\sigma^2$.</p>
+<p>Gdy parametry $w_0,w_1,\ldots,w_p$ są znane, to zmienną zależną $Y$ definiujemy wzorem:</p>
+<p>\begin{equation}
+Y = w_0 + w_1 X_1 + w_2 X_2 + \ldots + w_p X_p + \varepsilon.
+\end{equation}</p>
+<p>Wygeneruj w Numpy zbiór danych zgodnie z powyższym modelem:</p>
+<ol>
 <li>Zaimportuj bibliotekę NumPy.</li>
-<li>Utwórz zbiór obserwacji zmiennych niezależnych <code>X</code> składający się z $N=1000$ obserwacji i $p=5$ zmiennych niezależnych, korzystając z generatora liczb losowych z rozkładu normalnego.</li>
-<li>Wygeneruj losowy wektor współczynników <code>w</code> o długości $p+1$ (uwzględniając wyraz wolny).</li>
-<li>Stwórz zmienną zależną <code>y</code> zgodnie z modelem: $y = X \cdot \mathbf{w} + \text{szum losowy}$, gdzie <code>szum losowy</code> to wektor zmiennych losowych z rozkładu normalnego o średniej 0 i wybranej wariancji.</li>
+<li>Wygeneruj losowy wektor współczynników <code>w</code> o długości $p+1$ (uwzględniając wyraz wolny). Przyjmij $p=5$.</li>
+<li>Utwórz zbiór obserwacji zmiennych niezależnych <code>X</code> składający się z $N=1000$ obserwacji i $p=5$ zmiennych niezależnych.</li>
+<li>Stwórz zmienną zależną <code>y</code> zgodnie z podanym wyżej modelem. Przyjmij $\sigma=2.0$.</li>
 </ol>
 </div>
 </div>
@@ -13139,7 +13162,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="2.-Obliczenie-ca%C5%82kowitej-sumy-kwadrat%C3%B3w-(TSS)">2. Obliczenie całkowitej sumy kwadratów (TSS)<a class="anchor-link" href="#2.-Obliczenie-ca%C5%82kowitej-sumy-kwadrat%C3%B3w-(TSS)">¶</a></h3><p>TSS (<em>Total Sum of Squares</em>) to suma kwadratów różnic między wartościami zmiennej zależnej <code>y</code> a ich średnią:</p>
+<h3 id="1.2-Obliczenie-ca%C5%82kowitej-sumy-kwadrat%C3%B3w-(TSS)">1.2 Obliczenie całkowitej sumy kwadratów (TSS)<a class="anchor-link" href="#1.2-Obliczenie-ca%C5%82kowitej-sumy-kwadrat%C3%B3w-(TSS)">¶</a></h3><p>TSS (<em>Total Sum of Squares</em>) to suma kwadratów różnic między wartościami zmiennej zależnej <code>y</code> a ich średnią:</p>
 <p>\begin{equation*}
 \text{TSS} = \sum_{i=1}^{N} (y_i - \bar{y})^2
 \end{equation*}</p>
@@ -13176,10 +13199,10 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="3.-Implementacja-regresji-liniowej">3. Implementacja regresji liniowej<a class="anchor-link" href="#3.-Implementacja-regresji-liniowej">¶</a></h3><ol>
+<h3 id="1.3-Implementacja-regresji-liniowej">1.3 Implementacja regresji liniowej<a class="anchor-link" href="#1.3-Implementacja-regresji-liniowej">¶</a></h3><ol>
 <li>Dodaj kolumnę jedynek do macierzy <code>X</code> jako pierwszą kolumnę (odpowiadającą wyrazowi wolnemu).</li>
-<li>Oblicz estymator współczynników regresji <code>w_ML</code> korzystając ze wzoru z wykładu 1.</li>
-<li>Oblicz przewidywane wartości <code>y_hat</code> dla modelu.</li>
+<li>Oblicz estymator współczynników regresji $\mathbf{w}_{\text{ML}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}$, gdzie $\mathbf{X}$ to macierz obserwacji zmiennych $X_i$ rozszerzona o kolumnę jedynek, a $\mathbf{y}$ to wektor wartości zmiennej $Y$. Zobacz jak duże, co do wartości bezwzględnej, są wpisy w macierzy $(\mathbf{X}^T\mathbf{X})^{-1}$. Jak wygląda struktura wartości własnych tej macierzy?</li>
+<li>Porównaj wartości estymowanych parametrów z wartościami rzeczywistymi. Oblicz błędy względne.</li>
 </ol>
 </div>
 </div>
@@ -13209,7 +13232,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="4.-Ocena-jako%C5%9Bci-modelu">4. Ocena jakości modelu<a class="anchor-link" href="#4.-Ocena-jako%C5%9Bci-modelu">¶</a></h3><p>RSS (<em>Residual Sum of Squares</em>) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami <code>y</code> a przewidywanymi <code>y_hat</code>:</p>
+<h3 id="1.4-Ocena-jako%C5%9Bci-modelu">1.4 Ocena jakości modelu<a class="anchor-link" href="#1.4-Ocena-jako%C5%9Bci-modelu">¶</a></h3><p>RSS (<em>Residual Sum of Squares</em>) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami $y_i$ a przewidywanymi $\hat{y}_i$ (jak wygląda wzór na $\hat{y}_i$?):</p>
 <p>\begin{equation*}
 \text{RSS} = \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
 \end{equation*}</p>
@@ -13219,6 +13242,7 @@ div#notebook {
 R^2 = \frac{\text{TSS} - \text{RSS}}{\text{TSS}}= 1 - \frac{\text{RSS}}{\text{TSS}}
 \end{equation*}</p>
 <ol>
+<li>Oblicz przewidywane wartości $\hat{y_i}$, $i=1,\ldots,N$.</li>
 <li>Oblicz RSS.</li>
 <li>Oblicz współczynnik determinacji $R^2$.</li>
 </ol>
@@ -13256,6 +13280,161 @@ R^2 = \frac{\text{TSS} - \text{RSS}}{\text{TSS}}= 1 - \frac{\text{RSS}}{\text{TS
 <li>liczby obserwacji $N$,</li>
 <li>liczby zmiennych niezależnych $p$.</li>
 </ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.-Przypadek-wyst%C4%99powania-zale%C5%BCno%C5%9Bci-mi%C4%99dzy-zmiennymi">2. Przypadek występowania zależności między zmiennymi<a class="anchor-link" href="#2.-Przypadek-wyst%C4%99powania-zale%C5%BCno%C5%9Bci-mi%C4%99dzy-zmiennymi">¶</a></h2><p>W poprzednim zadaniu zakładaliśmy, że zmienne losowe $X_1,\ldots,X_p$ są niezależne, co powodowało, że macierz $\mathbf{X}^T\mathbf{X}$ była odwracalna a estymator $\mathbf{w}_{\text{ML}}$ dobrze aproksymował parametry modelu. Teraz załóżmy, że jedna ze zmiennych, powiedzmy $X_p$, wyraża, z pewnym błędem, jako liniowa kombinacja innych zmiennych, np:</p>
+<p>\begin{equation}
+X_p = 2X_1 - X_2 + \varepsilon_p,
+\end{equation}</p>
+<p>gdzie $\varepsilon_p\sim\mathcal{N}(0,\sigma_p^2)$.</p>
+<p>Przeprowadź analogiczne analizy jak w poprzednim zadaniu. Czy zmiana struktury zmiennych niezależnych wpływa na jakość modelu? Jak teraz wygląda macierz $(\mathbf{X}^T\mathbf{X})^{-1}$? Jak wyglądają wartości własne macierzy $\mathbf{X}^T\mathbf{X}$?</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.-Schemat-aktywno%C5%9Bci-S%C5%82o%C5%84ca">3. Schemat aktywności Słońca<a class="anchor-link" href="#3.-Schemat-aktywno%C5%9Bci-S%C5%82o%C5%84ca">¶</a></h2><p>Na <a href="https://sidc.be/SILSO/datafiles">Solar Influences Data Analysis Center (SIDC)</a> znajduje się baza danych dotycząca aktywności Słońca. Celem zadania jest wyznaczenie przeciętnej liczby plam słonecznych w zależności od czasu.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="3.1.-Wczytanie-danych">3.1. Wczytanie danych<a class="anchor-link" href="#3.1.-Wczytanie-danych">¶</a></h3><p>Pobierz <a href="https://sidc.be/SILSO/INFO/sndtotcsv.php">dane (Sunspot Number)</a> w formacie CSV. Dane te są dostępne od roku 1818. Dane możesz pobrać ręcznie, ale wygodniej będzie zrobić to wykorzystując bibliotekę <code>requests</code>:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s1">'https://sidc.be/SILSO/INFO/sndtotcsv.php'</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'sunspots.csv'</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="3.2.-Przygotowanie-i-wizualizacja">3.2. Przygotowanie i wizualizacja<a class="anchor-link" href="#3.2.-Przygotowanie-i-wizualizacja">¶</a></h3><ol>
+<li>Dane wczytaj do obiektu DataFrame biblioteki Pandas.</li>
+<li>Sprawdź typy danych i usuń ewentualne braki (zobacz dokumentację zbioru na stronie SIDC).</li>
+<li>Wyświetl wykres rozproszenia liczby plam słonecznych w zależności od czasu.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="3.3-Regresja-liniowa">3.3 Regresja liniowa<a class="anchor-link" href="#3.3-Regresja-liniowa">¶</a></h3><ol>
+<li>Stwórz tablicę <code>X</code> zawierającą rok jako zmienną niezależną oraz tablicę <code>y</code> zawierającą liczbę plam słonecznych jako zmienną zależną.</li>
+<li>Zastosuj regresję liniową do wyznaczenia przeciętnej liczby plam słonecznych w zależności od roku. Wykorzystaj bazę funkcji składających się z wyrazu wolnego oraz funkcji bazowych Gaussa:
+\begin{equation*}
+\phi_i(x) = \exp\left(-\frac{(x - c_i)^2}{\sigma^2}\right),
+\end{equation*}
+gdzie $c_i$ to równo odległe punkty na odcinku $[X_{\text{min}},X_{\text{max}}]$ oraz $\sigma&gt;0$ to parametr kontrolujący szerokość funkcji Gaussa.</li>
+<li>Wyświetl wykres przeciętnej liczby plam słonecznych w zależności od roku wraz z wykresem rozproszenia danych.</li>
+<li>Przetestuj inne typy funkcji bazowych, np. funkcję sigmoidalną
+\begin{equation*}
+\phi_i(x) = \frac{1}{1 + \exp\left(-\frac{x - c_i}{\sigma}\right)}
+\end{equation*}
+lub ReLU
+\begin{equation*}
+\phi_i(x) = \max(0, x - c_i).
+\end{equation*}</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
 </div>
 </div>
 </div>
