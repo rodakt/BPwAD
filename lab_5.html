@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>wyklad_5</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+<title>lab_5</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
   import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });
 </script>
@@ -13089,368 +13089,34 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Biblioteki-Pythona-w-analizie-danych">Biblioteki Pythona w analizie danych<a class="anchor-link" href="#Biblioteki-Pythona-w-analizie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><p>Wykład 5</p>
+<h1 id="Biblioteki-Pythona-w-analizie-danych">Biblioteki Pythona w analizie danych<a class="anchor-link" href="#Biblioteki-Pythona-w-analizie-danych">¶</a></h1><h3 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h3><p>Lab 5</p>
 <hr/>
-<p>Literatura:</p>
-<ul>
-<li><a href="https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf">PRML</a> Christopher M. Bishop, "Pattern Recognition and Machine Learning", 2006.</li>
-<li><a href="https://probml.github.io/pml-book/">PML-1</a> Kevin P. Murphy, "Probabilistic Machine Learning: An Introduction", 2022.</li>
-<li><a href="https://numpy.org/doc/stable/">Dokumentacja NumPy</a></li>
-<li><a href="https://scikit-learn.org/stable/">Dokumentacja scikit-learn</a></li>
-</ul>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="scikit-learn---estymatory,-transformatory-i-potoki">scikit-learn - estymatory, transformatory i potoki<a class="anchor-link" href="#scikit-learn---estymatory,-transformatory-i-potoki">¶</a></h2><p>Biblioteka scikit-learn wprowadza następujące wysokopoziomowe pojęcia:</p>
-<ul>
-<li><strong>estymator</strong> (<em>estimator</em>) - obiekt tworzący deterministyczną funkcję na podstawie danych zgodnie z reprezentowanym w nim modelem.</li>
-<li><strong>transformator</strong> (<em>transformer</em>) - estymator posiadający metodę <code>transform()</code>.</li>
-<li><strong>potok</strong> (<em>pipeline</em>) - sekwencja transformatorów i estymatorów, które są stosowane w kolejności.</li>
-</ul>
+<h3 id="Zadanie-5.1">Zadanie 5.1<a class="anchor-link" href="#Zadanie-5.1">¶</a></h3><p>Dobór modelu regresji wielomianowej z regularyzacją przy użyciu potoków (pipelines) w scikit-learn oraz optymalizacji hiperparametrów z wykorzystaniem Optuny i kroswalidacji</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Estymatory-i-transformatory">Estymatory i transformatory<a class="anchor-link" href="#Estymatory-i-transformatory">¶</a></h3><p>Estymator to obiekt reprezentujący model. Każdy estymator powien posiadać metodę <code>fit()</code>, która przyjmuje dane i uczy model, czyli tworzy deterministyczną funkcję na podstawie danych i zgodnie z reprezentowanym w nim modelem. Estymatory posiadają również metodę <code>predict()</code> lub <code>transform()</code> i ewentualnie <code>fit_predict()</code> lub <code>fit_transform()</code>.</p>
-<h4 id="Metoda-fit()">Metoda <code>fit()</code><a class="anchor-link" href="#Metoda-fit()">¶</a></h4><p>Metoda <code>fit()</code> zwykle przyjmuje dwa argumenty:</p>
-<ul>
-<li><code>X</code> - dane wejściowe (np. cechy, obrazy, teksty)</li>
-<li><code>y</code> - dane wyjściowe (np. etykiety, wartości docelowe)
-Metoda <code>fit()</code> modyfikuje stan estymatora "w miejscu" oraz zwraca dopasowany estymator - pozwala to na łączenie wielu wywołań w potoku.</li>
+<h4 id="5.1.1-Generowanie-danych">5.1.1 Generowanie danych<a class="anchor-link" href="#5.1.1-Generowanie-danych">¶</a></h4><ul>
+<li>Wygeneruj sztuczne dane przeznaczone do problemu regresyjnego. Ponieważ celem jest regresja wielomianowa, więc dane powinny być nieliniowe.</li>
+<li>Podziel dane na zbiór treningowy i testowy.</li>
 </ul>
-<p>Jeśli uczenie jest nienadzorowane, to argument <code>y</code> nie jest wymagany, zwykle automatycznie ustawiany jest na wartość <code>None</code>.</p>
-<p>Częstym efektem wywołania metody <code>fit()</code> jest utworzenie atrybutów w estymatorze o nazwach kończących się na <code>_</code> (np. <code>coef_</code>, <code>intercept_</code>, <code>n_features_in_</code>, <code>n_classes_</code>), które przechowują różne informacje o stanie estymatora po wywołaniu metody <code>fit()</code>.</p>
-<h4 id="Metoda-predict()">Metoda <code>predict()</code><a class="anchor-link" href="#Metoda-predict()">¶</a></h4><p>Metoda <code>predict()</code> przyjmuje dane wejściowe <code>X</code> i zwraca przewidywane wartości wyjściowe <code>y</code>. Jest to metoda, która jest wywoływana po <code>fit()</code> - model musi być najpierw wyuczony na danych, aby można było przewidywać nowe wartości.</p>
-<h4 id="Metoda-transform()">Metoda <code>transform()</code><a class="anchor-link" href="#Metoda-transform()">¶</a></h4><p>Metoda <code>transform()</code> przyjmuje dane wejściowe <code>X</code> i zwraca ich przekształcenie na jakąś nową przestrzeń. Zwrócone dane oznacza się często jako <code>Xt</code>. Jest to metoda, która również jest wywoływana po <code>fit()</code>.</p>
-<h4 id="Metody-fit_transform()-i-fit_predict()">Metody <code>fit_transform()</code> i <code>fit_predict()</code><a class="anchor-link" href="#Metody-fit_transform()-i-fit_predict()">¶</a></h4><p>Metody <code>fit_transform()</code> i <code>fit_predict()</code> są skrótami dla wywołania <code>fit()</code> i następnie <code>transform()</code> lub <code>predict()</code>.
-Metoda <code>fit_transform()</code> przyjmuje dane wejściowe <code>X</code>, uczy estymator na tych danych wywołując <code>fit()</code> i zwraca przekształcone dane wyjściowe <code>Xt</code> wywołując <code>transform()</code>. Podobnie <code>fit_predict()</code> przyjmuje dane wejściowe <code>X</code>, uczy estymator na tych danych wywołując <code>fit()</code> i zwraca przewidywane wartości wyjściowe <code>y</code> wywołując <code>predict()</code>.</p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Przyk%C5%82ady-estymator%C3%B3w-wbudowanych-w-scikit-learn">Przykłady estymatorów wbudowanych w scikit-learn<a class="anchor-link" href="#Przyk%C5%82ady-estymator%C3%B3w-wbudowanych-w-scikit-learn">¶</a></h3><h4 id="Regresja-logistyczna">Regresja logistyczna<a class="anchor-link" href="#Regresja-logistyczna">¶</a></h4><p>Model regresji logistycznej jest implementowany w <code>sklearn.linear_model.LogisticRegression</code>. Jest to przykład estymatora uczenia nadzorowanego. Spośród metod opisanych powyżej posiada:</p>
-<ul>
-<li><code>fit(X, y)</code> - uczy model na danych <code>X</code> i etykietach <code>y</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty:<ul>
-<li><code>coef_</code> - współczynniki regresji</li>
-<li><code>intercept_</code> - wyraz wolny</li>
-<li><code>n_features_in_</code> - liczba cech w danych wejściowych</li>
-<li><code>feature_names_in_</code> - nazwy cech w danych wejściowych</li>
-<li><code>classes_</code> - etykiety klas</li>
-<li><code>n_iter</code> - liczba iteracji w procesie uczenia</li>
-</ul>
-</li>
-<li><code>predict(X)</code> - przewiduje etykiety klas dla nowych danych <code>X</code></li>
-</ul>
-<p>Dodatkowo, model ten, tak jak i wiele innych modeli szacujących prawdopodobieństwo przynależności do klas, posiada metodę <code>predict_proba(X)</code>, która zwraca prawdopodobieństwa przynależności do klas dla danych <code>X</code>.</p>
-<h4 id="K-means">K-means<a class="anchor-link" href="#K-means">¶</a></h4><p>Model K-średnich (<em>K-means</em>) jest implementowany w <code>sklearn.cluster.KMeans</code>. Jest to przykład estymatora uczenia nienadzorowanego. Posiada wszystkie metody opisane powyżej:</p>
-<ul>
-<li><code>fit(X)</code> - uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty:<ul>
-<li><code>cluster_centers_</code> - współrzędne centroidów klastrów</li>
-<li><code>labels_</code> - etykiety klastrów dla każdego punktu danych</li>
-<li><code>inertia_</code> - suma kwadratów odległości punktów danych do ich centroidów</li>
-</ul>
-</li>
-<li><code>predict(X)</code> - przewiduje etykiety klastrów dla nowych danych <code>X</code></li>
-<li><code>fit_predict(X)</code> - uczy model na danych <code>X</code> i zwraca etykiety klastrów dla tych danych</li>
-<li><code>transform(X)</code> - przekształca dane <code>X</code> na przestrzeń odległości do centroidów klastrów</li>
-<li><code>fit_transform(X)</code> - uczy model na danych <code>X</code> i zwraca <code>X</code> przekształcone na przestrzeń odległości do centroidów klastrów.</li>
-</ul>
-<h4 id="PCA">PCA<a class="anchor-link" href="#PCA">¶</a></h4><p>Model analizy głównych składowych (<em>PCA</em>) jest implementowany w <code>sklearn.decomposition.PCA</code>. Jest to przykład estymatora uczenia nienadzorowanego. Spośród metod opisanych powyżej posiada:</p>
-<ul>
-<li><code>fit(X)</code> - uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty:<ul>
-<li><code>components_</code> - macierz głównych składowych</li>
-<li><code>explained_variance_</code> - wariancja wyjaśniona przez każdą główną składową</li>
-<li><code>singular_values_</code> - wartości osobliwe</li>
-</ul>
-</li>
-<li><code>transform(X)</code> - przekształca dane <code>X</code> na przestrzeń głównych składowych</li>
-<li><code>fit_transform(X)</code> - uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni głównych składowych</li>
-</ul>
-<p>Dodatkowo, model ten, tak jak i wiele innych modeli transformujących dane, posiada metodę <code>inverse_transform(Xt)</code>, która przekształca dane <code>Xt</code> z powrotem do oryginalnej przestrzeni. Ponieważ PCA nie jest transformatorem różnowartościowym (podczas transformacji zmienia się liczba cech i część informacji jest tracona), to metoda <code>inverse_transform(Xt)</code> nie zwraca danych oryginalnych, a jedynie ich przybliżenie.</p>
-<h4 id="MinMaxScaler"><code>MinMaxScaler</code><a class="anchor-link" href="#MinMaxScaler">¶</a></h4><p>Model <code>MinMaxScaler</code> jest implementowany w <code>sklearn.preprocessing.MinMaxScaler</code>. Jest to przykład nienadzorowanego transformatora. Spośród metod opisanych powyżej posiada:</p>
-<ul>
-<li><code>fit(X)</code> - uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty:<ul>
-<li><code>data_max_</code> - maksymalne wartości cech w danych</li>
-<li><code>data_min_</code> - minimalne wartości cech w danych</li>
-<li><code>data_range_</code> - zakres wartości cech w danych</li>
-<li><code>n_features_in_</code> - liczba cech w danych wejściowych</li>
-<li>...</li>
-</ul>
-</li>
-<li><code>transform(X)</code> - przekształca dane <code>X</code> na przestrzeń znormalizowaną do przedziału [0, 1]</li>
-<li><code>fit_transform(X)</code> - uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przedziale [0, 1]</li>
-</ul>
-<p>Dodatkowo, model ten, tak jak i wiele innych modeli transformujących dane, posiada metodę <code>inverse_transform(Xt)</code>, która przekształca dane <code>Xt</code> z powrotem do oryginalnej przestrzeni.</p>
-<h4 id="PolynomialFeatures"><code>PolynomialFeatures</code><a class="anchor-link" href="#PolynomialFeatures">¶</a></h4><p>Model <code>PolynomialFeatures</code> jest implementowany w <code>sklearn.preprocessing.PolynomialFeatures</code>. Jest to przykład nienadzorowanego transformatora służącego do generowania cech wielomianowych. Spośród metod opisanych powyżej posiada:</p>
-<ul>
-<li><code>fit(X)</code> - uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty:<ul>
-<li><code>powers_</code> - wykładniki cech wejściowych w wyjściu</li>
-<li><code>n_features_in_</code> - liczba cech w danych wejściowych</li>
-<li><code>n_output_features_</code> - liczba cech wyjściowych</li>
-<li>...</li>
-</ul>
-</li>
-<li><code>transform(X)</code> - przekształca dane <code>X</code> na przestrzeń cech wielomianowych</li>
-<li><code>fit_transform(X)</code> - uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni cech wielomianowych</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Typowy-schemat-wykorzystania-estymatora">Typowy schemat wykorzystania estymatora<a class="anchor-link" href="#Typowy-schemat-wykorzystania-estymatora">¶</a></h3><ol>
-<li>Inicjalizacja. Polega na stworzeniu obiektu estymatora, który reprezentuje model. Parametry estymatora są hiperparametrami modelu i są ustalane przed rozpoczęciem uczenia.</li>
-<li>Uczenie. Polega na wywołaniu metody <code>fit()</code> na obiekcie estymatora, co prowadzi do dopasowania modelu do danych.</li>
-<li>Przewidywanie lub transformacja. Polega na wywołaniu metody <code>predict()</code> lub <code>transform()</code> na obiekcie estymatora, co prowadzi do uzyskania przewidywanych wartości wyjściowych lub przekształconych danych wejściowych.</li>
-</ol>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Tworzenie-w%C5%82asnych-estymator%C3%B3w-w-scikit-learn">Tworzenie własnych estymatorów w scikit-learn<a class="anchor-link" href="#Tworzenie-w%C5%82asnych-estymator%C3%B3w-w-scikit-learn">¶</a></h3><p>Tworzenie własnych estymatorów w scikit-learn wymaga zrozumienia interfejsu API biblioteki oraz konwencji, które ściśle definiują, jak powinien zachowywać się estymator.</p>
-<h4 id="Podstawowe-zasady">Podstawowe zasady<a class="anchor-link" href="#Podstawowe-zasady">¶</a></h4><ol>
-<li><p><strong>Dziedziczenie po odpowiednich klasach bazowych</strong>:</p>
-<ul>
-<li><code>BaseEstimator</code>: zapewnia funkcje pomocnicze, np. ustawianie parametrów</li>
-<li>Odpowiedni <em>mixin</em> w zależności od typu estymatora:<ul>
-<li><code>ClassifierMixin</code>: dla klasyfikatorów</li>
-<li><code>RegressorMixin</code>: dla algorytmów regresji</li>
-<li><code>TransformerMixin</code>: dla transformatorów danych</li>
-<li><code>ClusterMixin</code>: dla algorytmów klasteryzacji</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Implementacja wymaganych metod</strong>:</p>
-<ul>
-<li><code>fit(X, y)</code>: trenuje model na podstawie danych</li>
-<li>Zależnie od typu estymatora:<ul>
-<li>Klasyfikatory/regresory: <code>predict(X)</code></li>
-<li>Transformatory: <code>transform(X)</code> i opcjonalnie <code>fit_transform(X, y)</code></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Konwencje nazewnictwa</strong>:</p>
-<ul>
-<li>Parametry jako atrybuty inicjalizacji (np. <code>self.param = param</code> w <code>__init__</code>)</li>
-<li>Atrybuty wyuczone kończą się podkreślnikiem (np. <code>self.coef_</code>)</li>
-<li>Metody opakowujące powinny zwracać <code>self</code> dla umożliwienia łańcuchowania</li>
-</ul>
-</li>
-</ol>
-<h4 id="Szczeg%C3%B3%C5%82owa-implementacja">Szczegółowa implementacja<a class="anchor-link" href="#Szczeg%C3%B3%C5%82owa-implementacja">¶</a></h4><h5 id="1.-Struktura-klasy-i-inicjalizacja">1. Struktura klasy i inicjalizacja<a class="anchor-link" href="#1.-Struktura-klasy-i-inicjalizacja">¶</a></h5><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span><span class="p">,</span> <span class="n">check_is_fitted</span>
-
-<span class="k">class</span> <span class="nc">MojEstymator</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parametr1</span><span class="o">=</span><span class="n">domyslna_wartosc1</span><span class="p">,</span> <span class="n">parametr2</span><span class="o">=</span><span class="n">domyslna_wartosc2</span><span class="p">):</span>
-        <span class="c1"># Zapisz wszystkie parametry inicjalizacyjne</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parametr1</span> <span class="o">=</span> <span class="n">parametr1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parametr2</span> <span class="o">=</span> <span class="n">parametr2</span>
-</pre></div>
-<h5 id="2.-Metoda-fit">2. Metoda fit<a class="anchor-link" href="#2.-Metoda-fit">¶</a></h5><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="c1"># Walidacja danych wejściowych</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
-    <span class="c1"># Zachowaj wymiary danych</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    
-    <span class="c1"># Zaimplementuj logikę trenowania</span>
-    <span class="c1"># ... (twój algorytm)</span>
-    
-    <span class="c1"># Zdefiniuj atrybuty wyuczone (z podkreślnikiem)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="o">...</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">intercept_</span> <span class="o">=</span> <span class="o">...</span>
-    
-    <span class="c1"># Oznacz, że model został wytrenowany</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">is_fitted_</span> <span class="o">=</span> <span class="kc">True</span>
-    
-    <span class="c1"># Zwróć self dla umożliwienia łańcuchowania</span>
-    <span class="k">return</span> <span class="bp">self</span>
-</pre></div>
-<h5 id="3.-Metoda-predict-(dla-regresor%C3%B3w/klasyfikator%C3%B3w)">3. Metoda predict (dla regresorów/klasyfikatorów)<a class="anchor-link" href="#3.-Metoda-predict-(dla-regresor%C3%B3w/klasyfikator%C3%B3w)">¶</a></h5><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-    <span class="c1"># Sprawdź, czy model został wytrenowany</span>
-    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'is_fitted_'</span><span class="p">)</span>
-    
-    <span class="c1"># Walidacja danych wejściowych</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
-    <span class="c1"># Sprawdź, czy wymiar danych jest zgodny z modelem</span>
-    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"X ma </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> cech, ale </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> "</span>
-                         <span class="sa">f</span><span class="s2">"został wytrenowany z </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span><span class="si">}</span><span class="s2"> cechami."</span><span class="p">)</span>
-    
-    <span class="c1"># Zastosuj model do predykcji</span>
-    <span class="c1"># ... (twój algorytm)</span>
-    <span class="k">return</span> <span class="n">y_pred</span>
-</pre></div>
-<h5 id="4.-Dla-transformator%C3%B3w---metoda-transform">4. Dla transformatorów - metoda transform<a class="anchor-link" href="#4.-Dla-transformator%C3%B3w---metoda-transform">¶</a></h5><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-    <span class="c1"># Sprawdź, czy model został wytrenowany</span>
-    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'is_fitted_'</span><span class="p">)</span>
-    
-    <span class="c1"># Walidacja danych wejściowych</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">accept_sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
-    <span class="c1"># Zastosuj transformację</span>
-    <span class="c1"># ... (twoja logika)</span>
-    <span class="k">return</span> <span class="n">X_transformed</span>
-</pre></div>
-<h4 id="Integracja-z-ekosystemem-scikit-learn">Integracja z ekosystemem scikit-learn<a class="anchor-link" href="#Integracja-z-ekosystemem-scikit-learn">¶</a></h4><p>Prawidłowo zaimplementowany estymator można:</p>
-<ul>
-<li>Używać w potokach (<code>Pipeline</code>)</li>
-<li>Stosować w walidacji krzyżowej (<code>cross_val_score</code>)</li>
-<li>Optymalizować za pomocą narzędzi wyszukiwania hiperparametrów (<code>GridSearchCV</code>, <code>RandomizedSearchCV</code>)</li>
-<li>Serializować za pomocą <code>pickle</code> lub <code>joblib</code></li>
-</ul>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Przyk%C5%82ad">Przykład<a class="anchor-link" href="#Przyk%C5%82ad">¶</a></h3><p>Klasa <code>RegresjaLiniowa</code> jest przykładem własnego estymatora regresji liniowej zgodnego z API scikit-learn.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [1]:</div>
+<div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span><span class="p">,</span> <span class="n">check_is_fitted</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">r2_score</span>
-
-<span class="k">class</span> <span class="nc">RegresjaLiniowa</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Prosty estymator regresji liniowej zaimplementowany ręcznie.</span>
-<span class="sd">    </span>
-<span class="sd">    Parametry</span>
-<span class="sd">    ---------</span>
-<span class="sd">    fit_intercept : bool, domyślnie=True</span>
-<span class="sd">        Czy dopasować wyraz wolny.</span>
-<span class="sd">    learning_rate : float, domyślnie=0.01</span>
-<span class="sd">        Współczynnik uczenia używany w metodzie gradientu prostego.</span>
-<span class="sd">    n_iterations : int, domyślnie=1000</span>
-<span class="sd">        Liczba iteracji algorytmu gradientu prostego.</span>
-<span class="sd">    """</span>
-    
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">n_iterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span> <span class="o">=</span> <span class="n">fit_intercept</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="n">learning_rate</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span> <span class="o">=</span> <span class="n">n_iterations</span>
-    
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Dopasowanie estymatora do danych treningowych.</span>
-<span class="sd">        </span>
-<span class="sd">        Parametry</span>
-<span class="sd">        ---------</span>
-<span class="sd">        X : {array-like, sparse matrix} o kształcie (n_próbek, n_cech)</span>
-<span class="sd">            Dane treningowe.</span>
-<span class="sd">        y : array-like o kształcie (n_próbek,)</span>
-<span class="sd">            Wartości docelowe.</span>
-<span class="sd">            </span>
-<span class="sd">        Zwraca</span>
-<span class="sd">        -------</span>
-<span class="sd">        self : obiekt</span>
-<span class="sd">            Zwraca samego siebie.</span>
-<span class="sd">        """</span>
-        <span class="c1"># Sprawdzenie poprawności danych wejściowych</span>
-        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        
-        <span class="c1"># Inicjalizacja atrybutów</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
-        
-        <span class="c1"># Dodanie kolumny jedynek dla wyrazu wolnego</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">:</span>
-            <span class="n">X_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples_</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">X</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">X_b</span> <span class="o">=</span> <span class="n">X</span>
-        
-        <span class="c1"># Inicjalizacja wag (współczynników) jako zera</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        
-        <span class="c1"># Trening za pomocą gradientu prostego</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_iterations</span><span class="p">):</span>
-            <span class="c1"># Przewidywanie</span>
-            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
-            
-            <span class="c1"># Obliczenie błędu</span>
-            <span class="n">error</span> <span class="o">=</span> <span class="n">y_pred</span> <span class="o">-</span> <span class="n">y</span>
-            
-            <span class="c1"># Aktualizacja wag</span>
-            <span class="n">gradients</span> <span class="o">=</span> <span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples_</span> <span class="o">*</span> <span class="n">X_b</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">gradients</span>
-        
-        <span class="c1"># Rozdzielenie wyrazu wolnego i współczynników, jeśli fit_intercept=True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">intercept_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">intercept_</span> <span class="o">=</span> <span class="mi">0</span>
-        
-        <span class="c1"># Oznaczenie, że model został wytrenowany</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_fitted_</span> <span class="o">=</span> <span class="kc">True</span>
-        
-        <span class="c1"># Zwrócenie samego siebie zgodnie z konwencją scikit-learn</span>
-        <span class="k">return</span> <span class="bp">self</span>
-    
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Predykcja wartości dla X.</span>
-<span class="sd">        </span>
-<span class="sd">        Parametry</span>
-<span class="sd">        ---------</span>
-<span class="sd">        X : {array-like, sparse matrix} o kształcie (n_próbek, n_cech)</span>
-<span class="sd">            Próbki.</span>
-<span class="sd">            </span>
-<span class="sd">        Zwraca</span>
-<span class="sd">        -------</span>
-<span class="sd">        y : array o kształcie (n_próbek,)</span>
-<span class="sd">            Przewidziane wartości.</span>
-<span class="sd">        """</span>
-        <span class="c1"># Sprawdzenie czy model został wytrenowany</span>
-        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'is_fitted_'</span><span class="p">)</span>
-        
-        <span class="c1"># Sprawdzenie poprawności X</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        
-        <span class="c1"># Przewidywanie</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">intercept_</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Zwraca współczynnik determinacji R^2 predykcji.</span>
-<span class="sd">        </span>
-<span class="sd">        Parametry</span>
-<span class="sd">        ---------</span>
-<span class="sd">        X : array-like o kształcie (n_próbek, n_cech)</span>
-<span class="sd">            Próbki testowe.</span>
-<span class="sd">        y : array-like o kształcie (n_próbek,)</span>
-<span class="sd">            Prawdziwe wartości dla X.</span>
-<span class="sd">            </span>
-<span class="sd">        Zwraca</span>
-<span class="sd">        -------</span>
-<span class="sd">        score : float</span>
-<span class="sd">            R^2 predykcji.</span>
-<span class="sd">        """</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 </div>
 </div>
@@ -13458,39 +13124,11 @@ Metoda <code>fit_transform()</code> przyjmuje dane wejściowe <code>X</code>, uc
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [2]:</div>
+<div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [3]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-
-<span class="n">model_sklearn</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
-<span class="n">model_sklearn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">predictions_sklearn</span> <span class="o">=</span> <span class="n">model_sklearn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Współczynnik determinacji R^2 (sklearn):"</span><span class="p">,</span> <span class="n">model_sklearn</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="output_wrapper">
-<div class="output">
-<div class="output_area">
-<div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Współczynnik determinacji R^2 (sklearn): 0.9085743526951848
-</pre>
-</div>
 </div>
 </div>
 </div>
@@ -13498,114 +13136,100 @@ Metoda <code>fit_transform()</code> przyjmuje dane wejściowe <code>X</code>, uc
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Potoki-(Pipeline)">Potoki (<em>Pipeline</em>)<a class="anchor-link" href="#Potoki-(Pipeline)">¶</a></h2><p>Potoki to mechanizm, który umożliwia łączenie wielu kroków przetwarzania danych w jedną spójną jednostkę.</p>
-<h3 id="Podstawowa-idea">Podstawowa idea<a class="anchor-link" href="#Podstawowa-idea">¶</a></h3><p>Potok w scikit-learn pozwala na sekwencyjne łączenie różnych transformatorów i jednego estymatora końcowego w jedną całość. Zapewnia to:</p>
-<ol>
-<li><strong>Spójny interfejs</strong> - cały potok zachowuje się jak pojedynczy estymator scikit-learn z metodami <code>fit()</code>, <code>predict()</code>, itd.</li>
-<li><strong>Automatyczne przekazywanie danych</strong> - dane są automatycznie przekazywane między etapami</li>
-<li><strong>Eliminację wycieków danych</strong> - potok zapewnia, że transformacje (np. skalowanie) są dopasowywane tylko do danych treningowych</li>
-</ol>
-<h2 id="Tworzenie-potoku">Tworzenie potoku<a class="anchor-link" href="#Tworzenie-potoku">¶</a></h2><p>Podstawowy potok tworzy się przy użyciu klasy <code>Pipeline</code>:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
-
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
-    <span class="p">(</span><span class="s1">'classifier'</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
-<span class="p">])</span>
-
-<span class="c1"># Cały potok można trenować jak pojedynczy estymator</span>
-<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-
-<span class="c1"># I używać do predykcji</span>
-<span class="n">predictions</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<h4 id="5.1.2-Przygotowanie-modelu">5.1.2 Przygotowanie modelu<a class="anchor-link" href="#5.1.2-Przygotowanie-modelu">¶</a></h4><p>Zbuduj potok (<em>pipeline</em>) w scikit-learn, który będzie zawierał przynajmniej następujące etapy:</p>
+<ul>
+<li>Transformację cech przy użyciu funkcji umożliwiającej rozbudowę cech o wyższe potęgi (np. <code>PolynomialFeatures</code>).</li>
+<li>Dopasowanie modelu regresyjnego z regularyzacją (np. <code>Ridge</code> lub <code>Lasso</code>).</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-<h3 id="G%C5%82%C3%B3wne-zalety-potok%C3%B3w">Główne zalety potoków<a class="anchor-link" href="#G%C5%82%C3%B3wne-zalety-potok%C3%B3w">¶</a></h3><h4 id="1.-Organizacja-kodu">1. Organizacja kodu<a class="anchor-link" href="#1.-Organizacja-kodu">¶</a></h4><p>Potoki organizują kod w zrozumiały i łatwy do utrzymania sposób - ważne, gdy łańcuch przetwarzania jest złożony.</p>
-<h4 id="2.-Zapobieganie-wyciekom-danych">2. Zapobieganie wyciekom danych<a class="anchor-link" href="#2.-Zapobieganie-wyciekom-danych">¶</a></h4><p>Jednym z najważniejszych zastosowań potoków jest zapobieganie wyciekom danych podczas preprocesingu:</p>
-<p>Niepoprawne podejście (wyciek informacji):</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-
-<span class="c1"># Skalowanie przed kroswalidacją - BŁĄD!</span>
-<span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
-<span class="n">X_scaled</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>  <span class="c1"># Wyciek danych, bo skalujemy całość</span>
-
-<span class="c1"># Kroswalidacja</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
-<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_scaled</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">'neg_root_mean_squared_error'</span><span class="p">)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-<p>Poprawne podejście z potokiem:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
-
-<span class="c1"># Tworzymy pipeline, który najpierw skaluje dane, a potem trenuje model</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span> 
-    <span class="p">(</span><span class="s1">'model'</span><span class="p">,</span> <span class="n">LinearRegression</span><span class="p">())</span>
-<span class="p">])</span>
-
-<span class="c1"># Kroswalidacja - skalowanie odbywa się osobno w każdym foldzie!</span>
-<span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">'neg_root_mean_squared_error'</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"RMSE dla każdego folda:"</span><span class="p">,</span> <span class="o">-</span><span class="n">scores</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Średni RMSE:"</span><span class="p">,</span> <span class="o">-</span><span class="n">scores</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="5.1.3-Optymalizacja-hiperparametr%C3%B3w">5.1.3 Optymalizacja hiperparametrów<a class="anchor-link" href="#5.1.3-Optymalizacja-hiperparametr%C3%B3w">¶</a></h4><p>Zaimplementuj optymalizację hiperparametrów modelu przy użyciu Optuny.</p>
+<ul>
+<li>Użyj kroswalidacji (np. <code>KFold</code> lub <code>cross_val_score</code> z scikit-learn) aby oszacować błąd testowy modelu dla różnych kombinacji hiperparametrów.</li>
+<li>Jako hiperparametry rozważ między innymi:<ul>
+<li>Stopień wielomianu (parametr <code>degree</code> w <code>PolynomialFeatures</code>).</li>
+<li>Wartość parametru regularyzacji (np. <code>alpha</code> w modelach Ridge/Lasso).</li>
+<li>Rodzaj modelu (np. Ridge vs Lasso).</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-<h3 id="3.-Optymalizacja-hiperparametr%C3%B3w">3. Optymalizacja hiperparametrów<a class="anchor-link" href="#3.-Optymalizacja-hiperparametr%C3%B3w">¶</a></h3><p>Potoki są szczególnie przydatne w połączeniu z technikami przeszukiwania hiperparametrów:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
-
-<span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'scaler__with_mean'</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>  <span class="c1"># parametry dla transformatora</span>
-    <span class="s1">'classifier__C'</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>    <span class="c1"># parametry dla klasyfikatora</span>
-<span class="p">}</span>
-
-<span class="n">search</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">param_grid</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-<p>Zauważ, że parametry dla poszczególnych kroków potoku mają format: <code>nazwa_kroku__nazwa_parametru</code>.</p>
-<h3 id="4.-Serializacja-i-wdra%C5%BCanie">4. Serializacja i wdrażanie<a class="anchor-link" href="#4.-Serializacja-i-wdra%C5%BCanie">¶</a></h3><p>Cały potok można zapisać jako jeden obiekt:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">dump</span><span class="p">,</span> <span class="n">load</span>
-
-<span class="c1"># Zapisz cały potok</span>
-<span class="n">dump</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="s1">'model_pipeline.joblib'</span><span class="p">)</span>
-
-<span class="c1"># Załaduj go później</span>
-<span class="n">loaded_pipe</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">'model_pipeline.joblib'</span><span class="p">)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="5.1.4-Ocena-modelu">5.1.4 Ocena modelu<a class="anchor-link" href="#5.1.4-Ocena-modelu">¶</a></h4><p>Po optymalizacji hiperparametrów, wybierz model o najlepszych wynikach kroswalidacji i oceń ostateczną jakość modelu na zbiorze testowym.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-<h2 id="Zaawansowane-funkcje-potok%C3%B3w">Zaawansowane funkcje potoków<a class="anchor-link" href="#Zaawansowane-funkcje-potok%C3%B3w">¶</a></h2><h3 id="ColumnTransformer">ColumnTransformer<a class="anchor-link" href="#ColumnTransformer">¶</a></h3><p><code>ColumnTransformer</code> umożliwia zastosowanie różnych transformacji do różnych kolumn:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">StandardScaler</span>
-
-<span class="n">preprocessor</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">(</span>
-    <span class="n">transformers</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="s1">'num'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">(),</span> <span class="p">[</span><span class="s1">'wiek'</span><span class="p">,</span> <span class="s1">'dochod'</span><span class="p">]),</span>
-        <span class="p">(</span><span class="s1">'cat'</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">(),</span> <span class="p">[</span><span class="s1">'kategoria'</span><span class="p">,</span> <span class="s1">'region'</span><span class="p">])</span>
-    <span class="p">])</span>
-
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">'preprocess'</span><span class="p">,</span> <span class="n">preprocessor</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'classifier'</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
-<span class="p">])</span>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
-<h3 id="FeatureUnion">FeatureUnion<a class="anchor-link" href="#FeatureUnion">¶</a></h3><p><code>FeatureUnion</code> pozwala na równoległe przetwarzanie danych przez różne transformatory:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">FeatureUnion</span>
-<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectKBest</span>
-
-<span class="n">features</span> <span class="o">=</span> <span class="n">FeatureUnion</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">'pca'</span><span class="p">,</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s1">'select_best'</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-<span class="p">])</span>
-
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s1">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
-    <span class="p">(</span><span class="s1">'features'</span><span class="p">,</span> <span class="n">features</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'classifier'</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">())</span>
-<span class="p">])</span>
-</pre></div>
+</div>
 </div>
 </div>
 </div>
