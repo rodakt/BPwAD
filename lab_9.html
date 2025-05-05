@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>lab_8</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+<title>lab_9</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
   import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });
 </script>
@@ -13089,7 +13089,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Biblioteki-Pythona-w-analizie-danych">Biblioteki Pythona w analizie danych<a class="anchor-link" href="#Biblioteki-Pythona-w-analizie-danych">¶</a></h1><h3 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h3><p>Lab 8</p>
+<h1 id="Biblioteki-Pythona-w-analizie-danych">Biblioteki Pythona w analizie danych<a class="anchor-link" href="#Biblioteki-Pythona-w-analizie-danych">¶</a></h1><h3 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h3><p>Lab 9</p>
 <hr/>
 </div>
 </div>
@@ -13097,65 +13097,186 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Sieci-neuronowe-w-PyTorch">Sieci neuronowe w PyTorch<a class="anchor-link" href="#Sieci-neuronowe-w-PyTorch">¶</a></h2>
+<h2 id="Sieci-konwolucyjne---podstawy">Sieci konwolucyjne - podstawy<a class="anchor-link" href="#Sieci-konwolucyjne---podstawy">¶</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.">1.<a class="anchor-link" href="#1.">¶</a></h3><p>Zaprojektuj architekturę sieci neuronowej w PyTorch, która wyznaczy aproksymację funkcji ze zbioru <a href="https://github.com/rodakt/BPwAD/tree/main/data/D1">D1</a>.</p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
+<h3 id="1.">1.<a class="anchor-link" href="#1.">¶</a></h3><p>Oblicz $\mathbf{I} \ast \mathbf{K}$ dla:</p>
+<p>\begin{equation*}
+\mathbf{I} = \begin{bmatrix}
+2 &amp; 5 &amp; -3 &amp; 0 \\
+0 &amp; 6 &amp; 0 &amp; -4 \\
+-1 &amp; -3 &amp; 0 &amp; 2 \\
+5 &amp; 0 &amp; 0 &amp; 3
+\end{bmatrix}
+\text{ oraz } \mathbf{K} = \begin{bmatrix}
+-2 &amp; 0 \\
+4 &amp; 6
+\end{bmatrix}
+\end{equation*}</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="2.">2.<a class="anchor-link" href="#2.">¶</a></h3><p>Zaprojektuj architekturę sieci neuronowej w PyTorch, która wykona klasyfikację na zbiorze <a href="https://github.com/rodakt/BPwAD/tree/main/data/D2_class">D2_class</a>.</p>
+<h3 id="2.">2.<a class="anchor-link" href="#2.">¶</a></h3><p>Rozważmy fragment sieci konwolucyjnej o architekturze:</p>
+<p><strong>Wejście:</strong> Obraz $x$ o rozmiarze $1 \times 224 \times 224$</p>
+<table>
+<thead>
+<tr>
+<th>Nr</th>
+<th>Warstwa</th>
+<th>Parametry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>$\mathrm{Conv}$ C1</td>
+<td>filtr $5\times5$, stride=1, padding=0 i padding=2 (warianty), 6 filtrów, ReLU</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$\mathrm{Conv}$ C2</td>
+<td>filtr $3\times3$, stride=1, padding=0 i padding=1 (warianty), 16 filtrów, ReLU</td>
+</tr>
+</tbody>
+</table>
+<p>Oblicz:</p>
+<ol>
+<li>Rozmiar wyjścia z warstwy C1.</li>
+<li>Rozmiar wyjścia z warstwy C2.</li>
+<li>Rozmiar okna (<em>receptive field</em>) na obrazie $x$ "widzianego" przez filtr konwolucyjny z warstwy C2.</li>
+<li>Dokładną liczbę parametrów (zarówno wag, jak i biasów) w warstwach C1 oraz C2.</li>
+</ol>
+<p>Zbuduj ten fragment sieci konwolucyjnej w PyTorch i zweryfikuj poprawność obliczeń.</p>
+<p>Rozwiąż to samo zadanie dla architektury:</p>
+<p><strong>Wejście:</strong> Obraz $x$ o rozmiarze $1 \times 224 \times 224$</p>
+<table>
+<thead>
+<tr>
+<th>Nr</th>
+<th>Warstwa</th>
+<th>Parametry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>$\mathrm{Conv}$ C1</td>
+<td>filtr $5\times5$, stride=2, padding=0 i padding=2 (warianty), 6 filtrów, ReLU</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$\mathrm{Conv}$ C2</td>
+<td>filtr $3\times3$, stride=2, padding=0 i padding=1 (warianty), 16 filtrów, ReLU</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="3.">3.<a class="anchor-link" href="#3.">¶</a></h3><p>Dany jest fragment sieci konwolucyjnej o architekturze:</p>
+<p><strong>Wejście:</strong> Obraz $x$ o rozmiarze $1 \times 224 \times 224$.</p>
+<table>
+<thead>
+<tr>
+<th>Nr</th>
+<th>Warstwa</th>
+<th>Parametry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>$\mathrm{Conv}$ C1</td>
+<td>filtr $5\times5$, stride=1, padding=0, 6 filtrów, ReLU</td>
+</tr>
+<tr>
+<td>2</td>
+<td>MaxPool P1</td>
+<td>okno $2\times2$, stride=2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>$\mathrm{Conv}$ C2</td>
+<td>filtr $3\times3$, stride=1, padding=0, 16 filtrów, ReLU</td>
+</tr>
+<tr>
+<td>4</td>
+<td>MaxPool P2</td>
+<td>okno $2\times2$, stride=2</td>
+</tr>
+</tbody>
+</table>
+<p>Oblicz:</p>
+<ol>
+<li>Rozmiary wyjścia z każdej kolejnej warstwy.</li>
+<li>Rozmiar okna na obrazie $x$ "widzianego" przez okno poolingu z warstwy P1.</li>
+<li>Rozmiar okna na obrazie $x$ "widzianego" przez filtr konwolucyjny z warstwy C2.</li>
+<li>Rozmiar okna na obrazie $x$ "widzianego" przez okno pooling z warstwy P2.</li>
+<li>Dokładną liczbę parametrów w sieci.</li>
+</ol>
+<p>Zbuduj ten fragment sieci konwolucyjnej w PyTorch i zweryfikuj poprawność obliczeń.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="4.">4.<a class="anchor-link" href="#4.">¶</a></h3><p>Zaproponuj własną architekturę sieci CNN do klasyfikacji obrazów CIFAR-10. Są to obrazy kolorowe o rozmiarze $32 \times 32$ pikseli i 10 klasach.</p>
+<p>Wykonaj testowy trening, aby upewnić się, że dane są poprawnie wczytywane i architektura działa. Dane można wczytać z repozytoriów PyTorch:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
+
+<span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="p">])</span>
+<span class="n">trainset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">'./data'</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+<span class="n">testset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">'./data'</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="5.">5.<a class="anchor-link" href="#5.">¶</a></h3><p>Oblicz ręcznie liczbę parametrów w sieci VGG16. Architekturę sieci znajdziesz w <a href="https://www.bishopbook.com/">C. Bishop, Deep Learning</a>, strona 300.</p>
+<p>Potwierdź poprawność obliczeń w PyTorch. Model z losowymi wagami (szybciej się ładuje) możesz pobrać przy pomocy:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
+
+<span class="n">vgg16</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">vgg16</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
+<p>Zobacz <a href="https://pytorch.org/vision/stable/models.html#torchvision.models.vgg16">torchvision.models</a>.</p>
 </div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="6.">6.<a class="anchor-link" href="#6.">¶</a></h3><p>Zaimplementuj w PyTorch własną sekwencyjną sieć konwolucyjną (bez pretrenowanych wag) do klasyfikacji zbioru Fashion-MNIST. Architektura powinna zawierać:</p>
+<ol>
+<li>Co najmniej 2 warstwy konwolucyjne</li>
+<li>Warstwę <code>BatchNorm2d</code> po każdej konwolucji</li>
+<li>Funkcje aktywacji <code>ReLU</code></li>
+<li>Pooling do redukcji wymiarowości</li>
+<li>Klasyfikator w pełni połączony na końcu sieci</li>
+</ol>
+<p>Zadanie obejmuje:</p>
+<ul>
+<li>Implementację modelu</li>
+<li>Przygotowanie danych treningowych i testowych</li>
+<li>Napisanie funkcji trenującej</li>
+<li>Ewaluację dokładności na zbiorze testowym</li>
+</ul>
 </div>
 </div>
 </div>
