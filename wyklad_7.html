@@ -13466,7 +13466,7 @@ H_{\text{out}}=H_{\text{in}}+2p-h+1, \quad W_{\text{out}}=W_{\text{in}}+2p-w+1.
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Stride">Stride<a class="anchor-link" href="#Stride">¶</a></h2><p><em>Stride</em> to krok, o jaki przesuwamy okno filtra po obrazie. Domyślnie jest równy 1, co oznacza, że filtr przesuwa się o jeden piksel w prawo lub w dół. Im większy krok, tym mniejszy rozmiar wyjściowy. Dla kroku $s$ i paddingu $p$ mamy:</p>
 <p>\begin{equation*}
-H_{\text{out}}=\left\lfloor\frac{H_{\text{in}}+2p-h}{s}\right\rfloor-1, \quad W_{\text{out}}=\left\lfloor\frac{W_{\text{in}}+2p-w}{s}\right\rfloor-1.
+H_{\text{out}}=\left\lfloor\frac{H_{\text{in}}+2p-h}{s}\right\rfloor+1, \quad W_{\text{out}}=\left\lfloor\frac{W_{\text{in}}+2p-w}{s}\right\rfloor+1.
 \end{equation*}</p>
 </div>
 </div>
