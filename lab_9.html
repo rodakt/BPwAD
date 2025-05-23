@@ -13137,12 +13137,12 @@ div#notebook {
 <tr>
 <td>1</td>
 <td>$\mathrm{Conv}$ C1</td>
-<td>filtr $5\times5$, stride=1, padding=0 i padding=2 (warianty), 6 filtrów, ReLU</td>
+<td>filtr $5\times5$, stride=1, padding=0, 6 filtrów, ReLU</td>
 </tr>
 <tr>
 <td>2</td>
 <td>$\mathrm{Conv}$ C2</td>
-<td>filtr $3\times3$, stride=1, padding=0 i padding=1 (warianty), 16 filtrów, ReLU</td>
+<td>filtr $3\times3$, stride=1, padding=0, 16 filtrów, ReLU</td>
 </tr>
 </tbody>
 </table>
@@ -13154,29 +13154,7 @@ div#notebook {
 <li>Dokładną liczbę parametrów (zarówno wag, jak i biasów) w warstwach C1 oraz C2.</li>
 </ol>
 <p>Zbuduj ten fragment sieci konwolucyjnej w PyTorch i zweryfikuj poprawność obliczeń.</p>
-<p>Rozwiąż to samo zadanie dla architektury:</p>
-<p><strong>Wejście:</strong> Obraz $x$ o rozmiarze $1 \times 224 \times 224$</p>
-<table>
-<thead>
-<tr>
-<th>Nr</th>
-<th>Warstwa</th>
-<th>Parametry</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>$\mathrm{Conv}$ C1</td>
-<td>filtr $5\times5$, stride=2, padding=0 i padding=2 (warianty), 6 filtrów, ReLU</td>
-</tr>
-<tr>
-<td>2</td>
-<td>$\mathrm{Conv}$ C2</td>
-<td>filtr $3\times3$, stride=2, padding=0 i padding=1 (warianty), 16 filtrów, ReLU</td>
-</tr>
-</tbody>
-</table>
+<p>Rozwiąż to samo zadanie dla tej samej architektury z różnymi wariantami parametrów <code>stride</code> i <code>padding</code>.</p>
 </div>
 </div>
 </div>
@@ -13231,7 +13209,21 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="4.">4.<a class="anchor-link" href="#4.">¶</a></h3><p>Zaproponuj własną architekturę sieci CNN do klasyfikacji obrazów CIFAR-10. Są to obrazy kolorowe o rozmiarze $32 \times 32$ pikseli i 10 klasach.</p>
+<h3 id="4.">4.<a class="anchor-link" href="#4.">¶</a></h3><p>Oblicz ręcznie liczbę parametrów w sieci VGG16. Architekturę sieci znajdziesz w <a href="https://www.bishopbook.com/">C. Bishop, Deep Learning</a>, strona 300.</p>
+<p>Potwierdź poprawność obliczeń w PyTorch. Model z losowymi wagami (szybciej się ładuje) możesz pobrać przy pomocy:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
+
+<span class="n">vgg16</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">vgg16</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+<p>Zobacz <a href="https://pytorch.org/vision/stable/models.html#torchvision.models.vgg16">torchvision.models</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="5.">5.<a class="anchor-link" href="#5.">¶</a></h3><p>Zaproponuj własną architekturę sieci CNN do klasyfikacji obrazów CIFAR-10. Są to obrazy kolorowe o rozmiarze $32 \times 32$ pikseli i 10 klasach.</p>
 <p>Wykonaj testowy trening, aby upewnić się, że dane są poprawnie wczytywane i architektura działa. Dane można wczytać z repozytoriów PyTorch:</p>
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
 
@@ -13242,20 +13234,6 @@ div#notebook {
 <span class="n">trainset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">'./data'</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 <span class="n">testset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">'./data'</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="5.">5.<a class="anchor-link" href="#5.">¶</a></h3><p>Oblicz ręcznie liczbę parametrów w sieci VGG16. Architekturę sieci znajdziesz w <a href="https://www.bishopbook.com/">C. Bishop, Deep Learning</a>, strona 300.</p>
-<p>Potwierdź poprawność obliczeń w PyTorch. Model z losowymi wagami (szybciej się ładuje) możesz pobrać przy pomocy:</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
-
-<span class="n">vgg16</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">vgg16</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-<p>Zobacz <a href="https://pytorch.org/vision/stable/models.html#torchvision.models.vgg16">torchvision.models</a>.</p>
 </div>
 </div>
 </div>
