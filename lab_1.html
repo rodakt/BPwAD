@@ -13100,7 +13100,7 @@ div#notebook {
 <h2 id="NumPy">NumPy<a class="anchor-link" href="#NumPy">¶</a></h2><p>Zapoznaj się z podstawowymi funkcjami biblioteki NumPy: <a href="https://numpy.org/doc/stable/user/absolute_beginners.html">Numpy: the absolute basics for beginners</a>.</p>
 <p>W zadaniach poniżej wykorzystaj:</p>
 <ul>
-<li><code>np.random.normal()</code> do generowania zmiennych losowych,</li>
+<li><code>rng = np.random.default_rng()</code> do generowania zmiennych losowych,</li>
 <li>wektoryzację operacji arytmetycznych, np. jeśli <code>A</code> i <code>B</code> to tablice numeryczne NumPy o takich samych wymiarach, to <code>A + B</code> zwraca tablicę, której elementy to sumy odpowiadających elementów tablic <code>A</code> i <code>B</code>,</li>
 <li>operator <code>@</code> do mnożenia macierzy,</li>
 <li><code>np.linalg.inv()</code> do obliczenia odwrotności macierzy,</li>
@@ -13236,7 +13236,7 @@ Y = w_0 + w_1 X_1 + w_2 X_2 + \ldots + w_p X_p + \varepsilon.
 <p>\begin{equation*}
 \text{RSS} = \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
 \end{equation*}</p>
-<p>Wielkość ta jest miarą dopasowania modelu do danych. Parametry modelu są tak dobrane, aby minimalizować RSS na zbiorze treningowym.</p>
+<p>Wielkość ta jest miarą dopasowania modelu do danych. Wyliczone w poprzednich krokach parametry modelu minimalizują RSS.</p>
 <p>Współczynnik determinacji $R^2$ to stosunek wariancji wyjaśnionej przez model do całkowitej wariancji zmiennej zależnej:</p>
 <p>\begin{equation*}
 R^2 = \frac{\text{TSS} - \text{RSS}}{\text{TSS}}= 1 - \frac{\text{RSS}}{\text{TSS}}
