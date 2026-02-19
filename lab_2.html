@@ -13089,17 +13089,58 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Biblioteki-Pythona-w-analizie-danych">Biblioteki Pythona w analizie danych<a class="anchor-link" href="#Biblioteki-Pythona-w-analizie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><p>Lab II</p>
+<h1 id="Biblioteki-Pythona-w-analizie-danych">Biblioteki Pythona w analizie danych<a class="anchor-link" href="#Biblioteki-Pythona-w-analizie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><p>Lab 2</p>
 <hr/>
-<p>W tym arkuszu będziemy przetwarzać w NumPy obrazy rastrowe. Obrazy rastrowe to tablice pikseli, z których każdy ma przypisaną wartość koloru. W przypadku obrazów RGB, każdy piksel ma trzy wartości: intensywność koloru czerwonego, zielonego i niebieskiego. Wartości te są zazwyczaj z zakresu 0-255, gdzie 0 oznacza brak danego koloru, a 255 - jego maksymalną intensywność. Zakres 0-255 to dokładnie jeden bajt, w NumPy reprezentowany jako <code>uint8</code>. Istnieją również obrazy w skali szarości, gdzie każdy piksel ma jedną wartość z zakresu 0-255 i oznacza ona jasność piksela oraz obrazy binarne (czarno-białe), gdzie piksel może przyjmować jedną z dwóch wartości: 0 (czarny) lub 255 (biały).</p>
-<p>Pomostem między obrazem reprezentowanym jako tablica NumPy a obrazem wyświetlanym na ekranie będzie dla nas biblioteka <a href="https://pillow.readthedocs.io/en/stable/index.html">Pillow</a> (<code>PIL</code> - <em>Python Imaging Library</em>), która jest interfejsem języka Python do przetwarzania plików graficznych.</p>
-<h2 id="1.">1.<a class="anchor-link" href="#1.">¶</a></h2><p>Celem tego zadania jest wymiana mapy kolorów w obrazku RGB.</p>
-<h3 id="1.1">1.1<a class="anchor-link" href="#1.1">¶</a></h3><p>Pobierz obrazek RGB (np. <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/HepaticaNobilisSLO_flower.JPG/1024px-HepaticaNobilisSLO_flower.JPG">ten</a>) i wyświetl na ekranie. Wykorzystaj funkcje <code>Image.open()</code> z biblioteki <code>PIL</code>.</p>
+<p>W tym arkuszu będziemy przetwarzać w NumPy obrazy rastrowe. Obrazy rastrowe to tablice pikseli, z których każdy ma przypisaną wartość koloru. W przypadku obrazów RGB każdy piksel ma trzy wartości: intensywność koloru czerwonego, zielonego i niebieskiego. Wartości te są zazwyczaj z zakresu 0–255, gdzie 0 oznacza brak danego koloru, a 255 — jego maksymalną intensywność. Zakres 0–255 to dokładnie jeden bajt, w NumPy reprezentowany jako <code>uint8</code>.</p>
+<p>Pomostem między obrazem reprezentowanym jako tablica NumPy a obrazem wyświetlanym na ekranie będzie dla nas biblioteka <a href="https://pillow.readthedocs.io/en/stable/index.html">Pillow</a> (<code>PIL</code> — <em>Python Imaging Library</em>).</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Konwencja wyświetlania:</strong> Do wyświetlania obrazów używamy <code>Image.fromarray()</code> — obiekt PIL wyświetla się automatycznie w Jupyterze jako ostatnie wyrażenie w komórce. Matplotlib (<code>plt.imshow()</code>, <code>plt.subplots()</code>) stosujemy tam, gdzie potrzebujemy porównań obok siebie, colormap (np. <code>cmap='gray'</code> dla tablic 2D) lub wykresów (histogramy).</p>
+<h2 id="1.-Obraz-jako-tablica-NumPy">1. Obraz jako tablica NumPy<a class="anchor-link" href="#1.-Obraz-jako-tablica-NumPy">¶</a></h2><h3 id="1.1-Wczytanie-obrazu">1.1 Wczytanie obrazu<a class="anchor-link" href="#1.1-Wczytanie-obrazu">¶</a></h3><p>Pobierz dowolny kolorowy obraz RGB z internetu (np. <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/HepaticaNobilisSLO_flower.JPG/1024px-HepaticaNobilisSLO_flower.JPG">ten</a>) i wczytaj go za pomocą <code>Image.open()</code>. Możesz pobrać obraz ręcznie lub skorzystać z biblioteki <code>requests</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s1">'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/HepaticaNobilisSLO_flower.JPG/1024px-HepaticaNobilisSLO_flower.JPG'</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'kwiatek.jpg'</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Wczytaj obraz i wyświetl go w notatniku.</p>
 <ol>
-<li>Jakie są wymiary obrazka?</li>
-<li>Ile ma pikseli?</li>
-<li>Jaki jest jego "tryb" (<em>mode</em>)?</li>
-<li>Jaki jest jego format?</li>
+<li>Jakie są wymiary obrazu (<code>img.size</code>)?</li>
+<li>Jaki jest tryb kolorów (<code>img.mode</code>)?</li>
+<li>Jaki jest format pliku (<code>img.format</code>)?</li>
 </ol>
 </div>
 </div>
@@ -13109,18 +13150,7 @@ div#notebook {
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -13129,7 +13159,13 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.2">1.2<a class="anchor-link" href="#1.2">¶</a></h3><p>Zamień obrazek na dwuwymiarową tablicę NumPy o trzech kolumnach, gdzie każda kolumna reprezentuje składową RGB (czerwony, zielony, niebieski). Ile unikalnych kolorów występuje w obrazku?</p>
+<h3 id="1.2-Konwersja-do-tablicy-NumPy">1.2 Konwersja do tablicy NumPy<a class="anchor-link" href="#1.2-Konwersja-do-tablicy-NumPy">¶</a></h3><p>Przekształć obiekt <code>Image</code> do tablicy NumPy za pomocą <code>np.array()</code>.</p>
+<ol>
+<li>Jaki jest kształt (<code>shape</code>) powstałej tablicy? Zinterpretuj każdy wymiar.</li>
+<li>Jaki jest typ danych (<code>dtype</code>)?</li>
+<li>Ile wymiarów (<code>ndim</code>) ma tablica?</li>
+<li>Ile łącznie wartości (<code>size</code>) zawiera tablica?</li>
+</ol>
 </div>
 </div>
 </div>
@@ -13138,47 +13174,7 @@ div#notebook {
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.3">1.3<a class="anchor-link" href="#1.3">¶</a></h3><p>Stwórz tablicę <code>kolory</code> będącą mapą kolorów o kształcie <code>(liczba_kolorów_w_mapie, 3)</code>. Każdy wiersz w tej tablicy powinien zawierać wartości RGB jednego koloru z mapy. Liczbę kolorów w mapie i wartości RGB wybierz dowolnie. Możesz skorzystać z tablicy kolorów z <a href="https://www.rapidtables.com/web/color/RGB_Color.html">tej strony</a>.</p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -13187,13 +13183,8 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.4">1.4<a class="anchor-link" href="#1.4">¶</a></h3><p>Dla każdego piksela w obrazku:</p>
-<ul>
-<li>Oblicz odległość euklidesową między wartościami RGB piksela a wartościami RGB każdego koloru z mapy kolorów.</li>
-<li>Znajdź kolor z mapy kolorów, dla którego odległość euklidesowa jest minimalna.</li>
-<li>Zamień wartości RGB piksela na wartości RGB znalezionego koloru.</li>
-</ul>
-<p><em>Wskazówka</em>: <code>(N, 3), (k, 3) -&gt; (N, 1, 3), (1, k, 3) -&gt; (N, k, 3) -&gt; (N, k) -&gt; (N, )</code> gdzie <code>N</code> to liczba pikseli, a <code>k</code> to liczba kolorów w mapie.</p>
+<h3 id="1.3-Dost%C4%99p-do-kana%C5%82%C3%B3w">1.3 Dostęp do kanałów<a class="anchor-link" href="#1.3-Dost%C4%99p-do-kana%C5%82%C3%B3w">¶</a></h3><p>Każdy piksel obrazu RGB jest opisany trzema wartościami — kanałami R, G, B — zapisanymi w ostatnim wymiarze tablicy. Wyodrębnij poszczególne kanały i wyświetl je jako osobne obrazy w skali szarości obok siebie.</p>
+<p><em>Wskazówka:</em> Kanał czerwony to <code>img_array[:, :, 0]</code>, zielony — <code>img_array[:, :, 1]</code>, niebieski — <code>img_array[:, :, 2]</code>. Ponieważ pojedynczy kanał jest tablicą 2D, PIL nie wyświetli go poprawnie jako obraz RGB — tutaj wygodniej jest użyć <code>plt.subplots()</code> z <code>plt.imshow(..., cmap='gray')</code>, aby matplotlib potraktował tablicę 2D jako obraz szaroodcieniowy.</p>
 </div>
 </div>
 </div>
@@ -13202,18 +13193,7 @@ div#notebook {
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -13222,8 +13202,11 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.5">1.5<a class="anchor-link" href="#1.5">¶</a></h3><p>Zamień dwuwymiarową tablicę NumPy z powrotem na obrazek <code>Image</code> za pomocą funkcji <code>Image.fromarray()</code>.
-Wyświetl nowy obrazek.</p>
+<h2 id="2.-Konwersja-do-skali-szaro%C5%9Bci">2. Konwersja do skali szarości<a class="anchor-link" href="#2.-Konwersja-do-skali-szaro%C5%9Bci">¶</a></h2><p>Konwersja obrazu RGB do skali szarości polega na zastąpieniu trzech wartości (R, G, B) każdego piksela jedną wartością jasności. Standardowy wzór, uwzględniający percepcję ludzkiego oka, to:</p>
+<p>$$L = 0{,}2126 \cdot R + 0{,}7152 \cdot G + 0{,}0722 \cdot B$$</p>
+<h3 id="2.1-Implementacja-wektoryzowana">2.1 Implementacja wektoryzowana<a class="anchor-link" href="#2.1-Implementacja-wektoryzowana">¶</a></h3><p>Zaimplementuj konwersję RGB → skala szarości za pomocą jednej operacji NumPy, bez pętli. Wynik powinien być tablicą 2D typu <code>uint8</code>.</p>
+<p><em>Wskazówka:</em> Zdefiniuj wektor wag <code>w = np.array([0.2126, 0.7152, 0.0722])</code>. Broadcasting pozwoli pomnożyć tablicę o kształcie <code>(H, W, 3)</code> przez wektor o kształcie <code>(3,)</code> — jaka operacja da sumę ważoną po ostatniej osi?</p>
+<p>Wyświetl wynik za pomocą <code>Image.fromarray()</code> (PIL automatycznie rozpoznaje tablicę 2D <code>uint8</code> jako obraz w skali szarości).</p>
 </div>
 </div>
 </div>
@@ -13232,18 +13215,7 @@ Wyświetl nowy obrazek.</p>
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span> 
+<div class="highlight hl-ipython3"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -13252,17 +13224,386 @@ Wyświetl nowy obrazek.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="2.">2.<a class="anchor-link" href="#2.">¶</a></h2><p>Napisz program, który utworzy obrazek szachownicy 8x8 pól.
-<br/><br/></p>
-<center>
-<img alt="No description has been provided for this image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAAAAADuvYBWAAAE4ElEQVR4nO3dwW0DMQwAQZ+RUnVVpVinhVCPs4DZ+RMSsOCb13pF8/72B/K8ooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOign/nI73jiGk98euPf5rc52nRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHTQxmWHM+8buG/c44k2HVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHbRx2eHM+wbuG2s80aaDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDNi47nHnfwH3jHk+06aCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCNyw5n3jdw31jjiTYdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdVHRQ0UFFBxUdtHHZ4cz7Bu4b93iiTQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQcVHVR0UNFBRQdtXHY4876B+8YaT7TpoKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooKKDig4qOqjooI3LDmfeN3DfuMcTbTqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjqo6KCig4oOKjroWt/+QR7XpoOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooOKDio6qOigooP+ABtfJ39Gqc5xAAAAAElFTkSuQmCC"/>
-</center>
+<h3 id="2.2-Por%C3%B3wnanie-z-p%C4%99tl%C4%85">2.2 Porównanie z pętlą<a class="anchor-link" href="#2.2-Por%C3%B3wnanie-z-p%C4%99tl%C4%85">¶</a></h3><p>Napisz drugą implementację konwersji — za pomocą podwójnej pętli <code>for</code> iterującej po pikselach. Zmierz czas wykonania obu wersji za pomocą <code>%%timeit</code> (lub <code>time.time()</code> jeśli obraz jest duży). Jaka jest różnica?</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.-Operacje-punktowe-na-obrazach">3. Operacje punktowe na obrazach<a class="anchor-link" href="#3.-Operacje-punktowe-na-obrazach">¶</a></h2><p>Operacje punktowe to przekształcenia, w których nowa wartość piksela zależy wyłącznie od jego starej wartości (a nie od sąsiadów).</p>
+<h3 id="3.1-Negatyw">3.1 Negatyw<a class="anchor-link" href="#3.1-Negatyw">¶</a></h3><p>Negatyw obrazu w skali szarości powstaje przez odwrócenie jasności: $L' = 255 - L$. Utwórz negatyw obrazu szaroodcieniowego z zadania 2. Wyświetl oryginał i negatyw obok siebie (tu wygodnie jest użyć <code>plt.subplots()</code> z <code>cmap='gray'</code>, albo złożyć oba obrazy obok siebie za pomocą <code>np.hstack()</code> i wyświetlić przez <code>Image.fromarray()</code>).</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="3.2-Progowanie-(thresholding)">3.2 Progowanie (thresholding)<a class="anchor-link" href="#3.2-Progowanie-(thresholding)">¶</a></h3><p>Progowanie zamienia obraz szaroodcieniowy na obraz binarny (czarno-biały):</p>
+<p>$$L'(x,y) = \begin{cases} 255 &amp; \text{jeśli } L(x,y) &gt; t \\ 0 &amp; \text{w przeciwnym razie} \end{cases}$$</p>
+<p>gdzie $t$ to próg.</p>
+<ol>
+<li>Zaimplementuj progowanie za pomocą porównania tablicowego (wynikiem porównania <code>gray &gt; t</code> jest tablica boolowska — jak zamienić ją na <code>uint8</code>?).</li>
+<li>Wyświetl wyniki dla kilku wartości progu: $t \in \{64, 128, 192\}$.</li>
+<li><strong>Automatyczny próg Otsu.</strong> Zamiast dobierać próg ręcznie, można go wyznaczyć algorytmicznie. Metoda Otsu szuka progu $t^*$, który minimalizuje sumę ważonych wariancji wewnątrzklasowych:
+$$\sigma_w^2(t) = \frac{n_0(t)}{N}\,\sigma_0^2(t) + \frac{n_1(t)}{N}\,\sigma_1^2(t)$$
+gdzie $n_0(t)$ to liczba pikseli o jasności $\leq t$, $n_1(t) = N - n_0(t)$, a $\sigma_0^2(t), \sigma_1^2(t)$ to wariancje jasności w każdej z dwóch klas.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Aby znaleźć $t^*$, trzeba obliczyć $\sigma_w^2(t)$ dla każdego progu $t \in \{0,1,\ldots,254\}$ i wybrać $\arg\min$. Naiwnie wymagałoby to dla każdego $t$ przejrzenia wszystkich $N$ pikseli (koszt $O(255 \times N)$). Trik polega na tym, żeby najpierw skompresować dane do histogramu — tablicy 256 liczb — a potem liczyć wszystko z histogramu:</p>
+<pre><code>1. Oblicz histogram jasności: `h = np.bincount(gray.ravel(), minlength=256)`, gdzie `h[i]` to liczba pikseli o jasności $i$.
+2. Zdefiniuj wektor jasności `bins = np.arange(256)`.
+3. Dla każdego progu $t$ statystyki obu klas wynikają z sum po histogramie:
+$$n_0(t) = \sum_{i=0}^{t} h[i], \qquad \mu_0(t) = \frac{\sum_{i=0}^{t} i \cdot h[i]}{n_0(t)}, \qquad \sigma_0^2(t) = \frac{\sum_{i=0}^{t} h[i]\,(i - \mu_0(t))^2}{n_0(t)}$$
+i analogicznie dla klasy 1 (jasności $i &gt; t$). Każda z tych sum operuje na wektorze 256-elementowym, nie na milionach pikseli.
+4. Wybierz $t^* = \arg\min_t \sigma_w^2(t)$.
+
+*Wskazówka:* Sumy kumulacyjne `np.cumsum(h)` i `np.cumsum(bins * h)` dają $n_0(t)$ i $\sum_{i=0}^{t} i \cdot h[i]$ dla wszystkich progów jednocześnie — pozwala to uniknąć pętli po $t$.</code></pre>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="3.3-Rozci%C4%85ganie-histogramu">3.3 Rozciąganie histogramu<a class="anchor-link" href="#3.3-Rozci%C4%85ganie-histogramu">¶</a></h3><p>Rozciąganie histogramu (<em>contrast stretching</em>) poprawia kontrast obrazu, mapując zakres jasności $[\min L, \max L]$ na pełen zakres $[0, 255]$:</p>
+<p>$$L' = \frac{L - \min L}{\max L - \min L} \cdot 255$$</p>
+<p>Zaimplementuj tę operację na tablicy szaroodcieniowej. Wyświetl obraz przed i po rozciągnięciu za pomocą <code>Image.fromarray()</code>. Wyświetl histogramy jasności przed i po rozciągnięciu za pomocą <code>plt.hist()</code> (tu matplotlib jest naturalnym wyborem, bo rysujemy wykres, nie obraz).</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.-Wymiana-palety-kolor%C3%B3w-(broadcasting-3D)">4. Wymiana palety kolorów (broadcasting 3D)<a class="anchor-link" href="#4.-Wymiana-palety-kolor%C3%B3w-(broadcasting-3D)">¶</a></h2><p>Celem tego zadania jest zamiana kolorów obrazu RGB na najbliższe kolory z zadanej palety. To kluczowe ćwiczenie z broadcastingu na tablicach trójwymiarowych.</p>
+<h3 id="4.1-Definicja-palety">4.1 Definicja palety<a class="anchor-link" href="#4.1-Definicja-palety">¶</a></h3><p>Stwórz tablicę <code>paleta</code> o kształcie <code>(k, 3)</code>, gdzie <code>k</code> to liczba kolorów w palecie. Każdy wiersz zawiera wartości RGB jednego koloru. Możesz wybrać kolory dowolnie lub skorzystać z tablicy kolorów, np. <a href="https://www.rapidtables.com/web/color/RGB_Color.html">stąd</a>.</p>
+<p>Przykładowa paleta 8-kolorowa:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">paleta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">],</span>    <span class="c1"># czarny</span>
+    <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span>  <span class="c1"># biały</span>
+    <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">],</span>    <span class="c1"># czerwony</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>    <span class="c1"># zielony</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">0</span><span class="p">,</span>   <span class="mi">255</span><span class="p">],</span>  <span class="c1"># niebieski</span>
+    <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>    <span class="c1"># żółty</span>
+    <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>   <span class="mi">255</span><span class="p">],</span>  <span class="c1"># magenta</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>   <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span>  <span class="c1"># cyan</span>
+<span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="4.2-Reshaping">4.2 Reshaping<a class="anchor-link" href="#4.2-Reshaping">¶</a></h3><p>Zamień tablicę obrazu o kształcie <code>(H, W, 3)</code> na tablicę 2D o kształcie <code>(N, 3)</code>, gdzie <code>N = H * W</code>. Każdy wiersz to wartości RGB jednego piksela.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="4.3-Obliczenie-odleg%C5%82o%C5%9Bci-(broadcasting)">4.3 Obliczenie odległości (broadcasting)<a class="anchor-link" href="#4.3-Obliczenie-odleg%C5%82o%C5%9Bci-(broadcasting)">¶</a></h3><p>Dla każdego piksela oblicz odległość euklidesową do każdego koloru z palety. Powinno to dać tablicę o kształcie <code>(N, k)</code>.</p>
+<p><em>Wskazówka:</em> Wykorzystaj broadcasting. Przeanalizuj transformację kształtów:</p>
+<pre><code>piksele:  (N, 3)    →  (N, 1, 3)
+paleta:   (k, 3)    →  (1, k, 3)
+różnica:               (N, k, 3)
+kwadrat + suma po osi 2:  (N, k)
+</code></pre>
+<p>Użyj <code>np.newaxis</code> (lub <code>None</code>) do dodania wymiaru i <code>np.sum()</code> z parametrem <code>axis</code> do redukcji.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="4.4-Mapowanie-pikseli-na-palet%C4%99">4.4 Mapowanie pikseli na paletę<a class="anchor-link" href="#4.4-Mapowanie-pikseli-na-palet%C4%99">¶</a></h3><p>Dla każdego piksela znajdź indeks najbliższego koloru w palecie (<code>np.argmin()</code> z odpowiednim <code>axis</code>). Następnie za pomocą indeksowania złożonego (<em>fancy indexing</em>) utwórz nową tablicę pikseli, w której każdy piksel ma wartości RGB najbliższego koloru z palety.</p>
+<p>Przywróć kształt <code>(H, W, 3)</code> i wyświetl wynikowy obraz za pomocą <code>Image.fromarray()</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="4.5-Eksperymenty">4.5 Eksperymenty<a class="anchor-link" href="#4.5-Eksperymenty">¶</a></h3><ol>
+<li>Przetestuj palety o różnej liczbie kolorów: 2, 4, 8, 16, 32. Jak zmienia się jakość obrazu?</li>
+<li>Zamiast ręcznej palety, wylosuj <code>k</code> kolorów z rozkładu jednostajnego na $[0, 255]^3$. Porównaj wynik z paletą dobraną ręcznie.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="5.-Generowanie-wzor%C3%B3w">5. Generowanie wzorów<a class="anchor-link" href="#5.-Generowanie-wzor%C3%B3w">¶</a></h2><h3 id="5.1-Szachownica">5.1 Szachownica<a class="anchor-link" href="#5.1-Szachownica">¶</a></h3><p>Napisz program, który utworzy obrazek szachownicy 8×8 pól na tle o wymiarach 500×500 pikseli.</p>
 <p>Wymiary:</p>
 <ul>
-<li>pola - 50x50 pikseli czarne i białe;</li>
-<li>tło - 500x500 pikseli w szarości 100.</li>
+<li>pola — 50×50 pikseli, czarne i białe,</li>
+<li>tło — szarość o wartości 100,</li>
+<li>szachownica wycentrowana, czarne pole w lewym dolnym rogu.</li>
 </ul>
-<p>Szachownica powinna znajdować się w centrum rysunku, czarne pole w lewym dolnym rogu.</p>
+<p><em>Wskazówka:</em> Utwórz tablicę wypełnioną wartością tła. Następnie za pomocą indeksowania z przypisaniem (<code>A[slice] = value</code>) wypełnij odpowiednie fragmenty tablicy. Alternatywnie: skorzystaj z <code>np.tile()</code> na wzorcu 2×2. Wyświetl wynik za pomocą <code>Image.fromarray()</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="5.2-Gradient">5.2 Gradient<a class="anchor-link" href="#5.2-Gradient">¶</a></h3><p>Wygeneruj obraz o wymiarach 256×256 pikseli przedstawiający gradient kolorów:</p>
+<ul>
+<li>w kierunku poziomym — od czarnego (0) do czerwonego (255, 0, 0),</li>
+<li>w kierunku pionowym — od czarnego (0) do niebieskiego (0, 0, 255).</li>
+</ul>
+<p>W efekcie prawy dolny róg powinien być magentą (255, 0, 255).</p>
+<p><em>Wskazówka:</em> Utwórz tablicę <code>(256, 256, 3)</code> wypełnioną zerami. Kanał czerwony to funkcja kolumny, kanał niebieski — funkcja wiersza. Broadcasting z <code>np.arange()</code> lub <code>np.linspace()</code> pozwoli uniknąć pętli. Wyświetl wynik za pomocą <code>Image.fromarray()</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="6.-Widoki-i-kopie">6. Widoki i kopie<a class="anchor-link" href="#6.-Widoki-i-kopie">¶</a></h2><h3 id="6.1-Modyfikacja-in-place-przez-widok">6.1 Modyfikacja in-place przez widok<a class="anchor-link" href="#6.1-Modyfikacja-in-place-przez-widok">¶</a></h3><ol>
+<li>Utwórz kopię tablicy obrazu (<code>img_copy = img_array.copy()</code>).</li>
+<li>Za pomocą wycinków wyodrębnij prostokątny fragment obrazu (np. lewy górny kwadrant).</li>
+<li>Sprawdź, czy wyodrębniony fragment jest widokiem (<code>np.shares_memory()</code>).</li>
+<li>Ustaw wszystkie piksele fragmentu na kolor czerwony <code>[255, 0, 0]</code>. Czy oryginalna tablica <code>img_copy</code> też się zmieniła?</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="6.2-Indeksowanie-z%C5%82o%C5%BCone-%E2%80%94-kopia">6.2 Indeksowanie złożone — kopia<a class="anchor-link" href="#6.2-Indeksowanie-z%C5%82o%C5%BCone-%E2%80%94-kopia">¶</a></h3><ol>
+<li>Utwórz tablicę boolowską (maskę) wskazującą piksele, których kanał czerwony jest większy niż 200.</li>
+<li>Wyodrębnij te piksele za pomocą maski. Czy wynik jest widokiem czy kopią? Sprawdź za pomocą <code>np.shares_memory()</code>.</li>
+<li>Ustaw kolor wyodrębnionych pikseli na zielony. Czy oryginalna tablica się zmieniła?</li>
+<li>Jak osiągnąć modyfikację oryginału za pomocą maski? (<em>Wskazówka:</em> <code>img_array[maska] = [0, 255, 0]</code>.)</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="7.-Zadania-dodatkowe">7. Zadania dodatkowe<a class="anchor-link" href="#7.-Zadania-dodatkowe">¶</a></h2><h3 id="7.1-Wymiana-kana%C5%82%C3%B3w">7.1 Wymiana kanałów<a class="anchor-link" href="#7.1-Wymiana-kana%C5%82%C3%B3w">¶</a></h3><p>Utwórz wersję obrazu, w której kanały R i B są zamienione miejscami. Wyświetl wynik. Czy potrzebujesz kopii, czy wystarczy widok? Co się stanie, jeśli użyjesz <code>img_array[:, :, [2, 1, 0]]</code> a co jeśli napiszesz <code>img_array[:, :, ::-1]</code>? Sprawdź, które z tych podejść zwraca widok, a które kopię.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="7.2-Mozaika-z-np.tile()">7.2 Mozaika z <code>np.tile()</code><a class="anchor-link" href="#7.2-Mozaika-z-np.tile()">¶</a></h3><p>Utwórz mozaikę 3×3 z pomniejszonego obrazu. Aby pomniejszyć obraz, weź co <code>n</code>-ty piksel w obu kierunkach (np. <code>img_array[::4, ::4]</code>). Następnie użyj <code>np.tile()</code> do powielenia tablicy.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
