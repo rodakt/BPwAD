@@ -60,8 +60,11 @@ Thumbs.db
 # files containing `solved` in the name
 *solved*
 
-# projekty folder
+#  foldery
 projekty/
-
-# markdown folder
 markdown/
+misc/
+
+/.quarto/
+**/*.quarto_ipynb
+/_site/
