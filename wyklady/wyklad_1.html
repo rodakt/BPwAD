@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-998bc67fc564509d0c0a19893f2ca1aa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-81161df70946103be4ff68a34233701c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -307,7 +307,7 @@ window.Quarto = {
 <p>Dokumentacja: <a href="https://numpy.org/doc/stable/">https://numpy.org/doc/stable/</a></p>
 <p>Biblioteka do przetwarzania numerycznego dużych wielowymiarowych tablic liczbowych. Dostarcza typ <code>ndarray</code> (homogeniczna tablica wielowymiarowa), mechanizmy indeksowania, wektoryzacji i broadcastingu oraz zestaw funkcji do algebry liniowej.</p>
 <p>Typowy import:</p>
-<div id="cell-3" class="cell" data-execution_count="1">
+<div id="842c3eac" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="tablica-ndarray" class="level2">
@@ -324,7 +324,7 @@ window.Quarto = {
 <section id="np.array" class="level3">
 <h3 class="anchored" data-anchor-id="np.array"><code>np.array()</code></h3>
 <p>Tworzy tablice z <a href="https://numpy.org/doc/stable/user/basics.creation.html?highlight=array_like">“tablicopodobnych”</a> obiektów, np. z list:</p>
-<div id="cell-7" class="cell" data-execution_count="2">
+<div id="e7c80d0b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]])</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
@@ -336,14 +336,14 @@ window.Quarto = {
 <section id="dtype" class="level3">
 <h3 class="anchored" data-anchor-id="dtype"><code>dtype</code></h3>
 <p>Wspólny typ dla wszystkich wartości w tablicy:</p>
-<div id="cell-9" class="cell" data-execution_count="3">
+<div id="c98952b6" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>a.dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>dtype('int64')</code></pre>
 </div>
 </div>
-<div id="cell-10" class="cell" data-execution_count="4">
+<div id="f180eff1" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">3.14</span>])</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>a.dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -473,7 +473,7 @@ window.Quarto = {
 <h4 class="anchored" data-anchor-id="argument-shape">Argument <code>shape</code></h4>
 <p>Podane wyżej funkcje, jak i wiele innych generujących tablice, przyjmują argument <code>shape</code> (czasem <code>size</code>, np. <code>np.random.normal()</code>), który określa kształt tablicy wynikowej.</p>
 <p>Pouczającym ćwiczeniem jest próba własnej implementacji funkcji generującej tablicę w postaci listy list o zadanym kształcie. Oto przykład implementacji funkcji <code>np.full()</code>:</p>
-<div id="cell-16" class="cell" data-execution_count="5">
+<div id="67596b92" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f(shape, fill<span class="op">=</span><span class="dv">0</span>):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''Zwraca tablicę o kształcie shape wypełnioną wartością fill.'''</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(shape) <span class="op">==</span> <span class="dv">0</span>:</span>
@@ -510,7 +510,7 @@ window.Quarto = {
 <section id="użycie-np.linspace-do-generowania-punktów-na-wykresie" class="level4">
 <h4 class="anchored" data-anchor-id="użycie-np.linspace-do-generowania-punktów-na-wykresie">Użycie <code>np.linspace()</code> do generowania punktów na wykresie</h4>
 <p>Funkcje rysujące wykresy, np. <code>matplotlib.pyplot.plot()</code> czy <code>seaborn.lineplot()</code>, pobierają współrzędne punktów z tablic dla poszczególnych osi. Zatem jeśli chcemy narysować wykres funkcji na płaszczyźnie, to musimy dostarczyć dwie tablice: jedną ze współrzędnymi x, drugą ze współrzędnymi y. Funkcja <code>np.linspace()</code> pozwala na wygodne generowanie tablicy 1D z równomiernie rozmieszczonymi punktami na zadanym przedziale. W ten sposób możemy wygenerować tablicę z punktami na osi x, a następnie obliczyć wartości funkcji dla tych punktów i zapisać je w tablicy z punktami na osi y.</p>
-<div id="cell-21" class="cell" data-execution_count="6">
+<div id="e019829b" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -532,10 +532,14 @@ window.Quarto = {
 <section id="użycie-np.meshgrid-do-generowania-siatki-punktów" class="level4">
 <h4 class="anchored" data-anchor-id="użycie-np.meshgrid-do-generowania-siatki-punktów">Użycie <code>np.meshgrid()</code> do generowania siatki punktów</h4>
 <p>Aby narysować wykres funkcji <span class="math inline">\(z=f(x,y)\)</span> na płaszczyźnie postępujemy podobnie jak w przypadku rysowania wykresu funkcji jednej zmiennej. Tym razem jednak potrzebujemy tablic z punktami na osi x i y oraz tablicę z wartościami funkcji dla tych punktów. Do wygenerowania tablic argumentów x i y możemy użyć funkcji <code>np.linspace()</code> i <code>np.meshgrid()</code>. Funkcja <code>np.meshgrid()</code> przyjmuje jako argumenty dwie tablice z punktami na osi x i y, a zwraca dwie tablice 2D, w których elementy to współrzędne punktów.</p>
-<p>Dokładniej działa to tak: jeśli <code>x</code> to tablica z punktami na osi x, a <code>y</code> to tablica z punktami na osi y, to <code>X, Y = np.meshgrid(x, y)</code> zwraca dwie tablice <code>X</code> i <code>Y</code> takie, że * <code>X[i, j]</code> to <code>x[j]</code>, * <code>Y[i, j]</code> to <code>y[i]</code>.</p>
+<p>Dokładniej działa to tak: jeśli <code>x</code> to tablica z punktami na osi x, a <code>y</code> to tablica z punktami na osi y, to <code>X, Y = np.meshgrid(x, y)</code> zwraca dwie tablice <code>X</code> i <code>Y</code> takie, że</p>
+<ul>
+<li><code>X[i, j]</code> to <code>x[j]</code>,</li>
+<li><code>Y[i, j]</code> to <code>y[i]</code>.</li>
+</ul>
 <p>Gdy mamy <code>X</code> i <code>Y</code>, to możemy obliczyć wartości <code>Z</code> wstawiając <code>X</code> i <code>Y</code> do <code>f()</code>: <code>Z = f(X, Y)</code>.</p>
 <p>Demonstracja działania <code>np.meshgrid()</code> na przykładzie funkcji <span class="math inline">\(f(x,y)=xy\)</span> w prostokącie <span class="math inline">\([1,4]\times[1,3]\)</span>:</p>
-<div id="cell-23" class="cell" data-execution_count="7">
+<div id="280f9e8e" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
@@ -557,7 +561,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Wykres konturowy funkcji <span class="math inline">\(f(x,y)=y^2-x^2(1+x)\)</span> w prostokącie <span class="math inline">\([-1,1]\times[-1,1]\)</span>:</p>
-<div id="cell-25" class="cell" data-execution_count="8">
+<div id="bce430f5" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -592,7 +596,7 @@ window.Quarto = {
 <section id="wartości-losowe" class="level3">
 <h3 class="anchored" data-anchor-id="wartości-losowe"><a href="https://numpy.org/doc/stable/reference/random/generator.html">Wartości losowe</a></h3>
 <p><strong>Uwaga:</strong> Od NumPy 1.17 zalecanym sposobem generowania liczb losowych jest nowe API oparte na generatorach. Zamiast <code>np.random.function()</code> używamy obiektu <code>Generator</code>:</p>
-<div id="cell-27" class="cell" data-execution_count="9">
+<div id="8f229b5f" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(seed<span class="op">=</span><span class="dv">42</span>)  <span class="co"># powtarzalność wyników</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>rng.integers(<span class="dv">0</span>, <span class="dv">10</span>, size<span class="op">=</span><span class="dv">5</span>)           <span class="co"># zamiast np.random.randint()</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>rng.random(size<span class="op">=</span><span class="dv">5</span>)                    <span class="co"># zamiast np.random.random()</span></span>
@@ -632,7 +636,7 @@ window.Quarto = {
 <li><strong><code>rng.binomial(n, p, size)</code></strong> — Rozkład dwumianowy o zadanym prawdopodobieństwie sukcesu i liczbie prób.</li>
 <li>itp.</li>
 </ul>
-<div id="cell-32" class="cell" data-execution_count="10">
+<div id="543c60a5" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(seed<span class="op">=</span><span class="dv">0</span>)</span>
@@ -669,7 +673,12 @@ window.Quarto = {
 </section>
 <section id="indeksowanie-złożone" class="level3">
 <h3 class="anchored" data-anchor-id="indeksowanie-złożone">Indeksowanie złożone</h3>
-<p><code>A[obj]</code> uruchamia indeksowanie złożone, gdy: * <code>obj</code> jest sekwencją inną niż krotka, * <code>obj</code> jest tablicą NumPy o typie całkowitym lub logicznym, * <code>obj</code> jest krotką z przynajmniej jedną sekwencją lub tablicą NumPy o typie całkowitym lub logicznym.</p>
+<p><code>A[obj]</code> uruchamia indeksowanie złożone, gdy:</p>
+<ul>
+<li><code>obj</code> jest sekwencją inną niż krotka,</li>
+<li><code>obj</code> jest tablicą NumPy o typie całkowitym lub logicznym,</li>
+<li><code>obj</code> jest krotką z przynajmniej jedną sekwencją lub tablicą NumPy o typie całkowitym lub logicznym.</li>
+</ul>
 <p>Wartość zwracana podczas indeksowania złożonego <strong>jest kopią</strong>.</p>
 </section>
 <section id="indeksowanie-i-instrukcja-przypisania" class="level3">
@@ -680,7 +689,7 @@ window.Quarto = {
 </section>
 <section id="przykład-widok-vs-kopia" class="level3">
 <h3 class="anchored" data-anchor-id="przykład-widok-vs-kopia">Przykład: widok vs kopia</h3>
-<div id="cell-40" class="cell" data-execution_count="11">
+<div id="967468cf" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>])</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Indeksowanie proste (wycinki) → widok</span></span>
@@ -691,7 +700,7 @@ window.Quarto = {
 <pre><code>array([ 10, 999,  30,  40,  50])</code></pre>
 </div>
 </div>
-<div id="cell-41" class="cell" data-execution_count="12">
+<div id="cf2a785f" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>])</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Indeksowanie złożone (lista indeksów) → kopia</span></span>
@@ -709,12 +718,12 @@ window.Quarto = {
 <section id="wektoryzacja" class="level3">
 <h3 class="anchored" data-anchor-id="wektoryzacja">Wektoryzacja</h3>
 <p>Wektoryzacja polega na zastąpieniu jawnych pętli Pythona operacjami NumPy wykonywanymi na całych tablicach. Dzięki temu kod jest szybszy (operacje realizowane w skompilowanym C) i bardziej czytelny.</p>
-<div id="cell-44" class="cell" data-execution_count="13">
+<div id="33cda658" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Porównanie: suma kwadratów elementów tablicy</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.arange(<span class="dv">1_000_000</span>, dtype<span class="op">=</span>np.float64)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="cell-45" class="cell" data-execution_count="14">
+<div id="4e9a9cf0" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>timeit</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Pętla Pythona</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> <span class="fl">0.0</span></span>
@@ -724,7 +733,7 @@ window.Quarto = {
 <pre><code>84.7 ms ± 1.55 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</code></pre>
 </div>
 </div>
-<div id="cell-46" class="cell" data-execution_count="15">
+<div id="df5b25bc" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>timeit</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Wektoryzacja NumPy</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">sum</span>(a <span class="op">**</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -760,13 +769,13 @@ window.Quarto = {
 <section id="przykład" class="level4">
 <h4 class="anchored" data-anchor-id="przykład">Przykład</h4>
 <p>Wykres funkcji <span class="math inline">\(z=\sin(\exp(2x^2)) + \sin(\exp(2y^2))\)</span> w kwadracie <span class="math inline">\([-1, 1]\times[-1, 1]\)</span>:</p>
-<div id="cell-52" class="cell" data-execution_count="16">
+<div id="695dc01c" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">500</span>)</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">500</span>)[:, np.newaxis]</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> np.sin(np.exp(<span class="dv">2</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span>)) <span class="op">+</span> np.cos(np.exp(<span class="dv">2</span><span class="op">*</span>y<span class="op">**</span><span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="cell-53" class="cell" data-execution_count="17">
+<div id="1193a1a6" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">'3d'</span>)</span>
@@ -785,7 +794,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="np.tile"><code>np.tile()</code></h3>
 <p>Funkcja <code>np.tile()</code> służy do tworzenia nowej tablicy przez powtarzanie istniejącej tablicy określoną liczbę razy wzdłuż każdego wymiaru. Pozwala na “kafelkowanie” (tiling) danych w uporządkowany sposób.</p>
 <p>Składnia podstawowa:</p>
-<div id="cell-55" class="cell" data-execution_count="18">
+<div id="6e330659" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">3</span>, <span class="dv">4</span>]])</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> (<span class="dv">2</span>, <span class="dv">3</span>) <span class="co"># powtórz 2 razy wzdłuż pierwszego wymiaru i 3 razy wzdłuż drugiego</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>np.tile(A, reps)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -796,8 +805,12 @@ window.Quarto = {
        [3, 4, 3, 4, 3, 4]])</code></pre>
 </div>
 </div>
-<p>Gdzie: - <code>A</code> to tablica wejściowa (lub skalar) - <code>reps</code> to liczba powtórzeń (pojedyncza liczba lub krotka określająca liczbę powtórzeń w każdym wymiarze)</p>
-<div id="cell-57" class="cell" data-execution_count="19">
+<p>Gdzie:</p>
+<ul>
+<li><code>A</code> to tablica wejściowa (lub skalar)</li>
+<li><code>reps</code> to liczba powtórzeń (pojedyncza liczba lub krotka określająca liczbę powtórzeń w każdym wymiarze)</li>
+</ul>
+<div id="ab34f7b0" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Powtórz 1D tablicę 3 razy</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>np.tile(a, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -805,7 +818,7 @@ window.Quarto = {
 <pre><code>array([1, 2, 3, 1, 2, 3, 1, 2, 3])</code></pre>
 </div>
 </div>
-<div id="cell-58" class="cell" data-execution_count="20">
+<div id="6dde113d" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Powtórz tablicę 2 razy wzdłuż pierwszego wymiaru i 3 razy wzdłuż drugiego</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>np.tile(a, (<span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="20">
@@ -870,7 +883,7 @@ window.Quarto = {
 <h4 class="anchored" data-anchor-id="przykład-rozwiązywanie-układu-równań">Przykład: rozwiązywanie układu równań</h4>
 <p>Rozwiązujemy układ <span class="math inline">\(Ax = b\)</span>:</p>
 <p><span class="math display">\[\begin{cases} 2x + y = 5 \\ x + 3y = 7 \end{cases}\]</span></p>
-<div id="cell-67" class="cell" data-execution_count="21">
+<div id="b1ab3c5d" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">2</span>, <span class="dv">1</span>],</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">1</span>, <span class="dv">3</span>]])</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="dv">5</span>, <span class="dv">7</span>])</span>
@@ -881,7 +894,7 @@ window.Quarto = {
 <pre><code>array([1.6, 1.8])</code></pre>
 </div>
 </div>
-<div id="cell-68" class="cell" data-execution_count="22">
+<div id="705535bb" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Weryfikacja: A @ x powinno dać b</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">@</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
@@ -892,7 +905,7 @@ window.Quarto = {
 <section id="przykład-pseudoodwrotność-układ-nadokreślony" class="level4">
 <h4 class="anchored" data-anchor-id="przykład-pseudoodwrotność-układ-nadokreślony">Przykład: pseudoodwrotność (układ nadokreślony)</h4>
 <p>Gdy mamy więcej równań niż niewiadomych, <code>np.linalg.lstsq()</code> znajduje rozwiązanie w sensie najmniejszych kwadratów:</p>
-<div id="cell-70" class="cell" data-execution_count="23">
+<div id="4974a11f" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3 równania, 2 niewiadome (układ nadokreślony)</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">1</span>],</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">1</span>, <span class="dv">2</span>],</span>
@@ -1006,7 +1019,7 @@ window.Quarto = {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
