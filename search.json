@@ -1,0 +1,216 @@
+[
+  {
+    "objectID": "laby/lab_1.html",
+    "href": "laby/lab_1.html",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "",
+    "text": "Open In Colab",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#numpy",
+    "href": "laby/lab_1.html#numpy",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "NumPy",
+    "text": "NumPy\nPodstawowy NumPy: Numpy: the absolute basics for beginners.\nW zadaniach poniżej wykorzystaj: - rng = np.random.default_rng() do generowania zmiennych losowych, - wektoryzację operacji arytmetycznych, np. jeśli A i B to tablice numeryczne NumPy o takich samych wymiarach, to A + B zwraca tablicę, której elementy to sumy odpowiadających elementów tablic A i B, - operator @ do mnożenia macierzy, - np.linalg.inv() do obliczenia odwrotności macierzy, - np.linalg.svd() do rozkładu SVD macierzy, - np.transpose() lub .T do transpozycji macierzy, - @ do mnożenia macierzy.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#regresja-liniowa-z-wykorzystaniem-numpy",
+    "href": "laby/lab_1.html#regresja-liniowa-z-wykorzystaniem-numpy",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "1. Regresja liniowa z wykorzystaniem NumPy",
+    "text": "1. Regresja liniowa z wykorzystaniem NumPy\nCelem ćwiczenia jest implementacja regresji liniowej z wykorzystaniem biblioteki NumPy. Zamiast gotowych narzędzi jak sklearn, wykorzystamy operacje algebraiczne do obliczenia współczynników modelu oraz oceny jego jakości.\nZaczniemy od wygenerowania sztucznych danych, które posłużą nam do przetestowania implementacji.\n\n1.1 Generowanie danych\nNiech \\(w_0,w_1,\\ldots,w_p\\), \\(X_1,X_2,\\ldots,X_p\\) oraz \\(\\varepsilon\\) będą niezależnymi zmiennymi losowymi o rozkładach:\n\\[\\begin{align*}\nw_i&\\sim\\mathcal{N}(0,1),\\ i=0,1,\\ldots,p,\\\\\nX_j&\\sim\\mathcal{N}(0,1),\\ j=1,2,\\ldots,p,\\\\\n\\varepsilon&\\sim\\mathcal{N}(0,\\sigma^2),\n\\end{align*}\\]\ngdzie \\(\\mathcal{N}(\\mu,\\sigma^2)\\) oznacza rozkład normalny o średniej \\(\\mu\\) i wariancji \\(\\sigma^2\\).\nGdy parametry \\(w_0,w_1,\\ldots,w_p\\) są znane, to zmienną zależną \\(Y\\) definiujemy wzorem:\n\\[\\begin{equation}\nY = w_0 + w_1 X_1 + w_2 X_2 + \\ldots + w_p X_p + \\varepsilon.\n\\end{equation}\\]\nWygeneruj w Numpy zbiór danych zgodnie z powyższym modelem:\n\nZaimportuj bibliotekę NumPy.\nWygeneruj losowy wektor współczynników w o długości \\(p+1\\) (uwzględniając wyraz wolny). Przyjmij \\(p=5\\).\nUtwórz zbiór obserwacji zmiennych niezależnych X składający się z \\(N=1000\\) obserwacji i \\(p=5\\) zmiennych niezależnych.\nStwórz zmienną zależną y zgodnie z podanym wyżej modelem. Przyjmij \\(\\sigma=2.0\\).\n\n\n\n1.2 Obliczenie całkowitej sumy kwadratów (TSS)\nTSS (Total Sum of Squares) to suma kwadratów różnic między wartościami zmiennej zależnej y a ich średnią:\n\\[\\begin{equation*}\n\\text{TSS} = \\sum_{i=1}^{N} (y_i - \\bar{y})^2\n\\end{equation*}\\]\ngdzie \\(\\bar{y}\\) to średnia wartość zmiennej y. Wielkość tę można interpretować jako całkowitą wariancję zmiennej zależnej. Można też powiedzieć, że jest to ocena bazowego modelu wyznaczonego przez średnią wartość zmiennej zależnej.\n\nOblicz średnią wartość zmiennej y.\nKorzystając z definicji oblicz TSS.\n\n\n\n1.3 Implementacja regresji liniowej\n\nDodaj kolumnę jedynek do macierzy X jako pierwszą kolumnę (odpowiadającą wyrazowi wolnemu).\nOblicz estymator współczynników regresji \\(\\mathbf{w}_{\\text{ML}} = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}\\), gdzie \\(\\mathbf{X}\\) to macierz obserwacji zmiennych \\(X_i\\) rozszerzona o kolumnę jedynek, a \\(\\mathbf{y}\\) to wektor wartości zmiennej \\(Y\\). Zobacz jak duże, co do wartości bezwzględnej, są wpisy w macierzy \\((\\mathbf{X}^T\\mathbf{X})^{-1}\\). Jak wygląda struktura wartości własnych tej macierzy?\nPorównaj wartości estymowanych parametrów z wartościami rzeczywistymi. Oblicz błędy względne.\n\n\n\n1.4 Ocena jakości modelu\nRSS (Residual Sum of Squares) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami \\(y_i\\) a przewidywanymi \\(\\hat{y}_i\\) (jak wygląda wzór na \\(\\hat{y}_i\\)?):\n\\[\\begin{equation*}\n\\text{RSS} = \\sum_{i=1}^{N} (y_i - \\hat{y}_i)^2\n\\end{equation*}\\]\nWielkość ta jest miarą dopasowania modelu do danych. Wyliczone w poprzednich krokach parametry modelu minimalizują RSS.\nWspółczynnik determinacji \\(R^2\\) to stosunek wariancji wyjaśnionej przez model do całkowitej wariancji zmiennej zależnej:\n\\[\\begin{equation*}\nR^2 = \\frac{\\text{TSS} - \\text{RSS}}{\\text{TSS}}= 1 - \\frac{\\text{RSS}}{\\text{TSS}}\n\\end{equation*}\\]\n\nOblicz przewidywane wartości \\(\\hat{y_i}\\), \\(i=1,\\ldots,N\\).\nOblicz RSS.\nOblicz współczynnik determinacji \\(R^2\\).\n\n\n\nPytania dodatkowe\nZobacz jak zmienia się wartość TSS, RSS i \\(R^2\\) w zależności od: 1. wariancji szumu, 2. liczby obserwacji \\(N\\), 3. liczby zmiennych niezależnych \\(p\\).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#przypadek-występowania-zależności-między-zmiennymi",
+    "href": "laby/lab_1.html#przypadek-występowania-zależności-między-zmiennymi",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "2. Przypadek występowania zależności między zmiennymi",
+    "text": "2. Przypadek występowania zależności między zmiennymi\nW poprzednim zadaniu zakładaliśmy, że zmienne losowe \\(X_1,\\ldots,X_p\\) są niezależne, co powodowało, że macierz \\(\\mathbf{X}^T\\mathbf{X}\\) była odwracalna a estymator \\(\\mathbf{w}_{\\text{ML}}\\) dobrze aproksymował parametry modelu. Teraz załóżmy, że jedna ze zmiennych, powiedzmy \\(X_p\\), wyraża, z pewnym błędem, jako liniowa kombinacja innych zmiennych, np:\n\\[\\begin{equation}\nX_p = 2X_1 - X_2 + \\varepsilon_p,\n\\end{equation}\\]\ngdzie \\(\\varepsilon_p\\sim\\mathcal{N}(0,\\sigma_p^2)\\).\nPrzeprowadź analogiczne analizy jak w poprzednim zadaniu. Czy zmiana struktury zmiennych niezależnych wpływa na jakość modelu? Jak teraz wygląda macierz \\((\\mathbf{X}^T\\mathbf{X})^{-1}\\)? Jak wyglądają wartości własne macierzy \\(\\mathbf{X}^T\\mathbf{X}\\)?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#schemat-aktywności-słońca",
+    "href": "laby/lab_1.html#schemat-aktywności-słońca",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "3. Schemat aktywności Słońca",
+    "text": "3. Schemat aktywności Słońca\nNa Solar Influences Data Analysis Center (SIDC) znajduje się baza danych dotycząca aktywności Słońca. Celem zadania jest wyznaczenie przeciętnej liczby plam słonecznych w zależności od czasu.\n\n3.1. Wczytanie danych\nPobierz dane (Sunspot Number) w formacie CSV. Dane te są dostępne od roku 1818. Dane możesz pobrać ręcznie, ale wygodniej będzie zrobić to wykorzystując bibliotekę requests:\nimport requests\n\nurl = 'https://sidc.be/SILSO/INFO/sndtotcsv.php'\nr = requests.get(url)\nwith open('sunspots.csv', 'wb') as f:\n    f.write(r.content)\n\n\n3.2. Przygotowanie i wizualizacja\n\nDane wczytaj do obiektu DataFrame biblioteki Pandas.\nSprawdź typy danych i usuń ewentualne braki (zobacz dokumentację zbioru na stronie SIDC).\nWyświetl wykres rozproszenia liczby plam słonecznych w zależności od czasu.\n\n\n\n3.3 Regresja liniowa\n\nStwórz tablicę X zawierającą rok jako zmienną niezależną oraz tablicę y zawierającą liczbę plam słonecznych jako zmienną zależną.\nZastosuj regresję liniową do wyznaczenia przeciętnej liczby plam słonecznych w zależności od roku. Wykorzystaj bazę funkcji składających się z wyrazu wolnego oraz funkcji bazowych Gaussa:\n\n\\[\\begin{equation*}\n\\phi_i(x) = \\exp\\left(-\\frac{(x - c_i)^2}{\\sigma^2}\\right),\n\\end{equation*}\\]\ngdzie \\(c_i\\) to równo odległe punkty na odcinku \\([X_{\\text{min}},X_{\\text{max}}]\\) oraz \\(\\sigma&gt;0\\) to parametr kontrolujący szerokość funkcji Gaussa. 3. Wyświetl wykres przeciętnej liczby plam słonecznych w zależności od roku wraz z wykresem rozproszenia danych. 4. Przetestuj inne typy funkcji bazowych, np. funkcję sigmoidalną\n\\[\\begin{equation*}\n\\phi_i(x) = \\frac{1}{1 + \\exp\\left(-\\frac{x - c_i}{\\sigma}\\right)}\n\\end{equation*}\\]\nlub ReLU\n\\[\\begin{equation*}\n\\phi_i(x) = \\max(0, x - c_i).\n\\end{equation*}\\]",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "",
+    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#opis-przedmiotu",
+    "href": "index.html#opis-przedmiotu",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "",
+    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#wykłady",
+    "href": "index.html#wykłady",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Wykłady",
+    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nWykład 1: NumPy\n🔗 HTML\n\n📥 .ipynb",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#laboratoria",
+    "href": "index.html#laboratoria",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Laboratoria",
+    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nLab 1: NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#zaliczenie",
+    "href": "index.html#zaliczenie",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Zaliczenie",
+    "text": "Zaliczenie\n\nĆwiczenia: zaliczenie na podstawie pracy domowej oraz jej indywidualnej obrony.\nWykład: test sprawdzający wiedzę, przeprowadzany w formie tradycyjnej (arkusz papierowy), bez dostępu do urządzeń elektronicznych i materiałów pomocniczych.",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#literatura",
+    "href": "index.html#literatura",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Literatura",
+    "text": "Literatura\n\nBaza teoretyczna\n\nPRML Christopher M. Bishop, “Pattern Recognition and Machine Learning”, 2006.\nDL Ian Goodfellow, Yoshua Bengio, Aaron Courville, “Deep Learning”, 2016.\nBishop DL Christopher M. Bishop, “Deep Learning”, 2022.\nPML-1 Kevin P. Murphy, “Probabilistic Machine Learning: An Introduction”, 2022.\nFrom Python to NumPy Nicolas P. Rougier, 2017.\nPython Data Science Handbook Jake VanderPlas\n\n\n\nDokumentacja i tutoriale\n\nDokumentacja NumPy\nScikit-learn: User Guide\nMatplotlib: Tutorials",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html",
+    "href": "wyklady/wyklad_1.html",
+    "title": "Wykład 1: NumPy",
+    "section": "",
+    "text": "Open In Colab",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#tablica-ndarray",
+    "href": "wyklady/wyklad_1.html#tablica-ndarray",
+    "title": "Wykład 1: NumPy",
+    "section": "1. Tablica ndarray",
+    "text": "1. Tablica ndarray\n\nCzym jest ndarray\nGłówny typ definiowany przez bibliotekę NumPy.\n\nReprezentuje jedno lub wielowymiarową tablicę wartości. Jest to podstawowa klasa definiowana przez bibliotekę.\nWszystkie wartości w tablicy muszą być tego samego typu, czyli np.ndarray jest tablicą jednorodną (homogeniczną).\nKażda wartość zajmuje tę samą określoną przez typ porcję pamięci.\n\n\n\nnp.array()\nTworzy tablice z “tablicopodobnych” obiektów, np. z list:\n\na = np.array([[1, 2, 3], [7, 8, 9]])\na\n\narray([[1, 2, 3],\n       [7, 8, 9]])\n\n\n\n\ndtype\nWspólny typ dla wszystkich wartości w tablicy:\n\na = np.array([1, 2, 3])\na.dtype\n\ndtype('int64')\n\n\n\na = np.array([1.5, 2, 3.14])\na.dtype\n\ndtype('float64')\n\n\n\n\nNumPy: typy wbudowane\n\n\n\n\n\n\n\nData type\nDescription\n\n\n\n\nbool_\nBoolean (True or False) stored as a byte\n\n\nint_\nDefault integer type (same as C long; normally either int64 or int32)\n\n\nintc\nIdentical to C int (normally int32 or int64)\n\n\nintp\nInteger used for indexing (same as C ssize_t; normally either int32 or int64)\n\n\nint8\nByte (-128 to 127)\n\n\nint16\nInteger (-32768 to 32767)\n\n\nint32\nInteger (-2147483648 to 2147483647)\n\n\nint64\nInteger (-9223372036854775808 to 9223372036854775807)\n\n\nuint8\nUnsigned integer (0 to 255)\n\n\nuint16\nUnsigned integer (0 to 65535)\n\n\nuint32\nUnsigned integer (0 to 4294967295)\n\n\nuint64\nUnsigned integer (0 to 18446744073709551615)\n\n\nfloat_\nShorthand for float64.\n\n\nfloat16\nHalf precision float: sign bit, 5 bits exponent, 10 bits mantissa\n\n\nfloat32\nSingle precision float: sign bit, 8 bits exponent, 23 bits mantissa\n\n\nfloat64\nDouble precision float: sign bit, 11 bits exponent, 52 bits mantissa\n\n\ncomplex_\nShorthand for complex128.\n\n\ncomplex64\nComplex number, represented by two 32-bit floats\n\n\ncomplex128\nComplex number, represented by two 64-bit floats\n\n\n\n\n\nAtrybuty tablic\n\n.ndim – liczba wymiarów, liczba całkowita.\n.shape – rozmiar każdego z wymiarów, krotka liczb całkowitych.\n.size – całkowita liczba wartości, iloczyn wartości z krotki .shape.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#tworzenie-tablic",
+    "href": "wyklady/wyklad_1.html#tworzenie-tablic",
+    "title": "Wykład 1: NumPy",
+    "section": "2. Tworzenie tablic",
+    "text": "2. Tworzenie tablic\n\nTablice stałe\nTablice stałe to tablice, które mają wszystkie elementy ustawione na tę samą wartość. NumPy dostarcza kilka funkcji do tworzenia takich tablic:\n\nnp.zeros() — tworzy tablicę wypełnioną zerami.\nnp.ones() — tworzy tablicę wypełnioną jedynkami.\nnp.full() — tworzy tablicę o określonym kształcie, wypełnioną podaną wartością.\nnp.eye() — generuje macierz, w której elementy na głównej przekątnej są jedynkami, a pozostałe zerami.\nnp.identity() — zwraca kwadratową macierz jednostkową (tożsamościową).\nnp.*_like() — funkcje (np. np.zeros_like(), np.ones_like(), np.full_like()) tworzą tablice o tym samym kształcie i typie danych, co podana tablica, ale wypełnione zerami, jedynkami lub inną wartością.\n\n\nArgument shape\nPodane wyżej funkcje, jak i wiele innych generujących tablice, przyjmują argument shape (czasem size, np. np.random.normal()), który określa kształt tablicy wynikowej.\nPouczającym ćwiczeniem jest próba własnej implementacji funkcji generującej tablicę w postaci listy list o zadanym kształcie. Oto przykład implementacji funkcji np.full():\n\ndef f(shape, fill=0):\n    '''Zwraca tablicę o kształcie shape wypełnioną wartością fill.'''\n    if len(shape) == 0:\n        return fill\n    else:\n        a, *q = shape\n        return a * [f(q, fill)]\n\nOczywiście, w praktyce nie ma potrzeby implementowania takich funkcji, ponieważ NumPy dostarcza gotowe, zoptymalizowane implementacje. Tym niemniej tego typu zadania stanowią dobry trening zdolności programistycznych.\n\n\n\nTablice z danych\n\nnp.array() — Konwertuje dane wejściowe (np. listy, krotki) na tablicę ndarray.\nnp.asarray() — Podobnie jak np.array(), ale nie kopiuje danych, gdy już są tablicą NumPy.\nnp.copy() — Tworzy głęboką kopię tablicy, co zapewnia niezależność oryginału i kopii.\nnp.fromfile() — Wczytuje dane binarne z pliku, tworząc z nich tablicę.\nnp.fromfunction() — Generuje tablicę na podstawie funkcji, która jest wywoływana dla każdego indeksu.\nnp.fromiter() — Tworzy tablicę z dowolnego iterowalnego obiektu, np. generatora.\nnp.fromstring() — Konwertuje dane zawarte w łańcuchu znaków na tablicę, dzieląc tekst według separatorów.\nnp.loadtxt() — Ładuje dane tekstowe z pliku do tablicy, przydatne przy pracy z danymi zapisanymi w formacie tekstowym.\n\n\n\nTablice zakresów liczbowych\n\nnp.arange() — Generuje tablicę z wartościami o stałym kroku, podobnie jak funkcja range(), ale zwraca obiekt ndarray.\nnp.linspace() — Zwraca tablicę z określoną liczbą równomiernie rozmieszczonych wartości w zadanym przedziale.\nnp.logspace() — Tworzy tablicę wartości rozmieszczonych równomiernie na skali logarytmicznej.\nnp.geomspace() — Generuje tablicę wartości rozmieszczonych równomiernie w skali geometrycznej (iloczynowo).\nnp.meshgrid() — Tworzy siatkę współrzędnych na podstawie podanych wektorów; umożliwia przygotowanie danych do wizualizacji lub obliczeń na wielowymiarowych funkcjach.\n\n\nUżycie np.linspace() do generowania punktów na wykresie\nFunkcje rysujące wykresy, np. matplotlib.pyplot.plot() czy seaborn.lineplot(), pobierają współrzędne punktów z tablic dla poszczególnych osi. Zatem jeśli chcemy narysować wykres funkcji na płaszczyźnie, to musimy dostarczyć dwie tablice: jedną ze współrzędnymi x, drugą ze współrzędnymi y. Funkcja np.linspace() pozwala na wygodne generowanie tablicy 1D z równomiernie rozmieszczonymi punktami na zadanym przedziale. W ten sposób możemy wygenerować tablicę z punktami na osi x, a następnie obliczyć wartości funkcji dla tych punktów i zapisać je w tablicy z punktami na osi y.\n\nfrom matplotlib import pyplot as plt\n%matplotlib inline\n\n# Rysujemy wykres funkcji f(x) = x * sin(x)\nn = 100 # liczba argumentów funkcji\nx = np.linspace(0, 10, n) # generujemy n równo rozmieszczonych punktów na odcinku [0, 10]\ny = x * np.sin(x) # obliczamy wartości funkcji f w tych punktach\nplt.plot(x, y); # rysujemy wykres\n\n\n\n\n\n\n\n\n\n\n\nUżycie np.meshgrid() do generowania siatki punktów\nAby narysować wykres funkcji \\(z=f(x,y)\\) na płaszczyźnie postępujemy podobnie jak w przypadku rysowania wykresu funkcji jednej zmiennej. Tym razem jednak potrzebujemy tablic z punktami na osi x i y oraz tablicę z wartościami funkcji dla tych punktów. Do wygenerowania tablic argumentów x i y możemy użyć funkcji np.linspace() i np.meshgrid(). Funkcja np.meshgrid() przyjmuje jako argumenty dwie tablice z punktami na osi x i y, a zwraca dwie tablice 2D, w których elementy to współrzędne punktów.\nDokładniej działa to tak: jeśli x to tablica z punktami na osi x, a y to tablica z punktami na osi y, to X, Y = np.meshgrid(x, y) zwraca dwie tablice X i Y takie, że * X[i, j] to x[j], * Y[i, j] to y[i].\nGdy mamy X i Y, to możemy obliczyć wartości Z wstawiając X i Y do f(): Z = f(X, Y).\nDemonstracja działania np.meshgrid() na przykładzie funkcji \\(f(x,y)=xy\\) w prostokącie \\([1,4]\\times[1,3]\\):\n\nx = [1, 2, 3, 4]\ny = [1, 2, 3]\nX, Y = np.meshgrid(x, y)\nZ = X*Y\nprint(X)\nprint(Y)\nprint(Z)\n\n\n[[1 2 3 4]\n [1 2 3 4]\n [1 2 3 4]]\n[[1 1 1 1]\n [2 2 2 2]\n [3 3 3 3]]\n[[ 1  2  3  4]\n [ 2  4  6  8]\n [ 3  6  9 12]]\n\n\nWykres konturowy funkcji \\(f(x,y)=y^2-x^2(1+x)\\) w prostokącie \\([-1,1]\\times[-1,1]\\):\n\nfrom matplotlib import pyplot as plt\n%matplotlib inline\n\nN = 100 # N**2 punktów na wykresie\nx = np.linspace(-1, 1, N)\ny = np.linspace(-1, 1, N)\nX, Y = np.meshgrid(x, y)\nZ = Y**2 - X**2*(1 + X)\n\nfig, ax = plt.subplots(figsize=(10, 6))\ncs = ax.contourf(X, Y, Z, levels=20, cmap='viridis')\nfig.colorbar(cs)\nax.plot(x, x*np.sqrt(1 + x), 'black', label='$y^2 = x^2(1 + x)$')\nax.plot(x, -x*np.sqrt(1 + x), 'black')\nax.set(\n    xlim=(-1, 1),\n    ylim=(-1, 1),\n    title='Wykres $f(x, y) = y^2 - x^2(1 + x)$ z zaznaczonymi miejscami zerowymi'\n)\nax.legend();\n\n\n\n\n\n\n\n\n\n\n\n\nWartości losowe\nUwaga: Od NumPy 1.17 zalecanym sposobem generowania liczb losowych jest nowe API oparte na generatorach. Zamiast np.random.function() używamy obiektu Generator:\n\nrng = np.random.default_rng(seed=42)  # powtarzalność wyników\nrng.integers(0, 10, size=5)           # zamiast np.random.randint()\nrng.random(size=5)                    # zamiast np.random.random()\nrng.standard_normal(size=5)           # zamiast np.random.randn()\nrng.choice([1, 2, 3], size=2)        # zamiast np.random.choice()\n\n\narray([3, 2])\n\n\nStare API (np.random.randint(), np.random.randn(), …) nadal działa, ale nowe jest zalecane ze względu na lepszą kontrolę stanu generatora i lepsze właściwości statystyczne (domyślny generator PCG64 zamiast Mersenne Twister).\n\nProste tablice wartości losowych\nWybrane metody generatora:\n\nrng.integers(low, high, size) — Losowe liczby całkowite z przedziału \\([\\text{low}, \\text{high})\\).\nrng.random(size) — Wartości z rozkładu jednostajnego na \\([0,1)\\).\nrng.standard_normal(size) — Wartości z rozkładu normalnego \\(\\mathcal{N}(0,1)\\).\nrng.choice(a, size, replace, p) — Losowy wybór elementów z tablicy a.\n\n\n\nLosowa zmiana porządku\n\nrng.shuffle() — Miesza elementy tablicy „w miejscu” (in-place).\nrng.permutation() — Zwraca nową tablicę będącą losową permutacją elementów podanej tablicy. Jeśli podamy liczbę, funkcja wygeneruje permutację liczb od 0 do \\(n-1\\), nie modyfikując oryginalnych danych.\nrng.permuted() — Działa podobnie jak permutation(), zwracając nową, permutowaną kopię tablicy, pozostawiając oryginał nietkniętym.\n\n\n\nRozkłady\n\nrng.normal(loc, scale, size) — Rozkład normalny (Gaussa) o zadanej średniej i odchyleniu standardowym.\nrng.uniform(low, high, size) — Rozkład jednostajny na zadanym przedziale.\nrng.exponential(scale, size) — Rozkład wykładniczy o zadanym parametrze.\nrng.poisson(lam, size) — Rozkład Poissona o zadanym parametrze \\(\\lambda\\).\nrng.binomial(n, p, size) — Rozkład dwumianowy o zadanym prawdopodobieństwie sukcesu i liczbie prób.\nitp.\n\n\nimport seaborn as sns\n\nrng = np.random.default_rng(seed=0)\nN = 1000 ## Liczba losów\n\narr = rng.exponential(2, N)\nsns.histplot(arr, kde=True);",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#indeksowanie",
+    "href": "wyklady/wyklad_1.html#indeksowanie",
+    "title": "Wykład 1: NumPy",
+    "section": "3. Indeksowanie",
+    "text": "3. Indeksowanie\nKorzysta ze zwykłej składni Pythona:\nA[obj]\nOd rodzaju obj zależy, czy indeksowanie będzie proste, czy złożone (basic/advanced).\n\nIndeksowanie proste\nZachodzi, gdy obj jest wycinkiem, liczbą całkowitą lub krotką wycinków i liczb całkowitych plus ewentualne Ellipsis i np.newaxis.\nKluczowe cechy:\n\nZwraca widok oryginalnej tablicy, nie tworząc kopii danych.\nUmożliwia indeksowanie za pomocą liczb całkowitych lub wycinków dla każdego wymiaru.\nOperacje modyfikacji wykonane na zwróconym widoku wpływają na oryginalną tablicę.\n\n\n\nIndeksowanie złożone\nA[obj] uruchamia indeksowanie złożone, gdy: * obj jest sekwencją inną niż krotka, * obj jest tablicą NumPy o typie całkowitym lub logicznym, * obj jest krotką z przynajmniej jedną sekwencją lub tablicą NumPy o typie całkowitym lub logicznym.\nWartość zwracana podczas indeksowania złożonego jest kopią.\n\n\nIndeksowanie i instrukcja przypisania\nOba rodzaje indeksowania można łączyć z instrukcją przypisania. Prowadzi to do modyfikacji oryginalnej tablicy.\nA[obj] = v\nAle musi być możliwy broadcast v do kształtu A[obj].\n\n\nPrzykład: widok vs kopia\n\na = np.array([10, 20, 30, 40, 50])\n\n# Indeksowanie proste (wycinki) → widok\nview = a[1:4]\nview[0] = 999\na  # oryginał zmieniony!\n\narray([ 10, 999,  30,  40,  50])\n\n\n\na = np.array([10, 20, 30, 40, 50])\n\n# Indeksowanie złożone (lista indeksów) → kopia\ncopy = a[[1, 2, 3]]\ncopy[0] = 999\na  # oryginał niezmieniony\n\narray([10, 20, 30, 40, 50])",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#wektoryzacja-i-broadcasting",
+    "href": "wyklady/wyklad_1.html#wektoryzacja-i-broadcasting",
+    "title": "Wykład 1: NumPy",
+    "section": "4. Wektoryzacja i broadcasting",
+    "text": "4. Wektoryzacja i broadcasting\n\nWektoryzacja\nWektoryzacja polega na zastąpieniu jawnych pętli Pythona operacjami NumPy wykonywanymi na całych tablicach. Dzięki temu kod jest szybszy (operacje realizowane w skompilowanym C) i bardziej czytelny.\n\n# Porównanie: suma kwadratów elementów tablicy\n\na = np.arange(1_000_000, dtype=np.float64)\n\n\n%%timeit\n# Pętla Pythona\ntotal = 0.0\nfor x in a:\n    total += x * x\n\n84.7 ms ± 1.55 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)\n\n\n\n%%timeit\n# Wektoryzacja NumPy\nnp.sum(a ** 2)\n\n1.34 ms ± 117 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)\n\n\nW tym przykładzie wersja wektoryzowana jest wyraźnie szybsza niż pętla Pythona.\n\n\nBroadcasting\nOperowanie na tablicach o różnych kształtach.\n\nReguły broadcastingu\n\nJeśli dwie tablice różnią się wymiarem, to kształt tej o mniejszym wymiarze jest uzupełniany od lewej jedynkami.\nJeśli rozmiary na danej osi nie są w obu tablicach równe, to ten który jest równy jeden, jest rozszerzany do większego rozmiaru.\nJeśli rozmiary na danej osi nie są w obu tablicach równe i żaden z nich nie jest równy jeden, to broadcasting nie może zostać wykonany. Wtedy rzucany jest wyjątek.\n\n\n\nZadanie\nNa których kształtach da się wykonać broadcasting?\n\n(1, 2) i (3, 4, 2)\n(1, 2) i (3, 2, 4)\n(5, 3, 8) i (5, 4, 8)\n(5, 3, 8) i (5, 8)\n(5, 3, 8) i (3, 8)\n(5, 3, 8) i (5, 3)\n\n\n\nPrzykład\nWykres funkcji \\(z=\\sin(\\exp(2x^2)) + \\sin(\\exp(2y^2))\\) w kwadracie \\([-1, 1]\\times[-1, 1]\\):\n\nx = np.linspace(-1, 1, 500)\ny = np.linspace(-1, 1, 500)[:, np.newaxis]\n\nz = np.sin(np.exp(2*x**2)) + np.cos(np.exp(2*y**2))\n\n\nfrom matplotlib import pyplot as plt\nfig = plt.figure()\nax = fig.add_subplot(111, projection='3d')\nax.plot_surface(x, y, z, cmap='viridis');\n\n\n\n\n\n\n\n\n\n\n\nnp.tile()\nFunkcja np.tile() służy do tworzenia nowej tablicy przez powtarzanie istniejącej tablicy określoną liczbę razy wzdłuż każdego wymiaru. Pozwala na “kafelkowanie” (tiling) danych w uporządkowany sposób.\nSkładnia podstawowa:\n\nA = np.array([[1, 2], [3, 4]])\nreps = (2, 3) # powtórz 2 razy wzdłuż pierwszego wymiaru i 3 razy wzdłuż drugiego\nnp.tile(A, reps)\n\narray([[1, 2, 1, 2, 1, 2],\n       [3, 4, 3, 4, 3, 4],\n       [1, 2, 1, 2, 1, 2],\n       [3, 4, 3, 4, 3, 4]])\n\n\nGdzie: - A to tablica wejściowa (lub skalar) - reps to liczba powtórzeń (pojedyncza liczba lub krotka określająca liczbę powtórzeń w każdym wymiarze)\n\n# Powtórz 1D tablicę 3 razy\na = np.array([1, 2, 3])\nnp.tile(a, 3)\n\narray([1, 2, 3, 1, 2, 3, 1, 2, 3])\n\n\n\n# Powtórz tablicę 2 razy wzdłuż pierwszego wymiaru i 3 razy wzdłuż drugiego\nnp.tile(a, (2, 3))\n\narray([[1, 2, 3, 1, 2, 3, 1, 2, 3],\n       [1, 2, 3, 1, 2, 3, 1, 2, 3]])\n\n\nPorównanie z broadcastingiem: np.tile() tworzy jawne kopie danych w pamięci, podczas gdy broadcasting operuje na widokach — w wielu przypadkach broadcasting jest więc bardziej efektywny pamięciowo niż np.tile().",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#funkcje-agregujące-łączenie-i-dzielenie-tablic",
+    "href": "wyklady/wyklad_1.html#funkcje-agregujące-łączenie-i-dzielenie-tablic",
+    "title": "Wykład 1: NumPy",
+    "section": "5. Funkcje agregujące, łączenie i dzielenie tablic",
+    "text": "5. Funkcje agregujące, łączenie i dzielenie tablic\n\nFunkcje agregujące\n\nnp.sum() — Sumuje wartości w tablicy.\nnp.min(), np.max() — Znajduje wartość minimalną lub maksymalną.\nnp.mean() — Oblicza średnią arytmetyczną.\nnp.median() — Znajduje medianę.\nnp.std() — Oblicza odchylenie standardowe.\nnp.var() — Oblicza wariancję.\ni wiele innych …\n\n\n\nŁączenie i dzielenie tablic\n\nnp.concatenate() — Łączy tablice wzdłuż zadanego wymiaru.\nnp.vstack() — Łączy tablice wzdłuż pierwszego wymiaru.\nnp.hstack() — Łączy tablice wzdłuż drugiego wymiaru.\nnp.split() — Dzieli tablicę na podtablice.\nnp.vsplit() — Dzieli tablicę wzdłuż pierwszego wymiaru.\nnp.hsplit() — Dzieli tablicę wzdłuż drugiego wymiaru.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#algebra-liniowa-np.linalg",
+    "href": "wyklady/wyklad_1.html#algebra-liniowa-np.linalg",
+    "title": "Wykład 1: NumPy",
+    "section": "6. Algebra liniowa (np.linalg)",
+    "text": "6. Algebra liniowa (np.linalg)\n\nOperacje macierzowe\n\nnp.dot() — Oblicza iloczyn skalarny lub mnożenie macierzy w zależności od wymiarów wejściowych.\nnp.linalg.multi_dot() — Wydajnie oblicza iloczyn kilku macierzy, optymalizując kolejność mnożeń.\nnp.vdot() — Liczy iloczyn wektorowy, traktując argumenty jako spłaszczone tablice (dla liczb zespolonych sprzęga pierwszy argument).\nnp.inner() — Zwraca sumę iloczynów odpowiadających sobie elementów dwóch tablic.\nnp.outer() — Oblicza iloczyn zewnętrzny dwóch wektorów, tworząc macierz.\nnp.matmul() oraz operacja @ — Wykonują mnożenie macierzy, obsługując zarówno operacje na macierzach 2D, jak i na tablicach o wyższych wymiarach.\nnp.linalg.matrix_power() — Podnosi kwadratową macierz do zadanej potęgi przez kolejne mnożenia.\n\n\n\nRównania liniowe\n\nnp.linalg.solve() — Rozwiązuje układ równań liniowych \\(Ax = b\\) dla macierzy kwadratowej \\(A\\), zwracając wektor \\(x\\).\nnp.linalg.tensorsolve() — Rozwiązuje równanie liniowe, w którym macierz \\(A\\) jest zastąpiona przez tensor, przy odpowiednim określeniu osi.\nnp.linalg.lstsq() — Znajduje rozwiązanie układu równań metodą najmniejszych kwadratów, przydatne przy układach nadokreślonych lub niedookreślonych.\nnp.linalg.inv() — Oblicza macierz odwrotną dla danej macierzy kwadratowej, jeśli taka istnieje.\nnp.linalg.pinv() — Wyznacza macierz pseudoodwrotną (Moore-Penrose).\nnp.linalg.tensorinv() — Oblicza odwrotność tensora poprzez reinterpretację wielowymiarowej tablicy jako macierzy, z uwzględnieniem odpowiedniego rozbicia indeksów.\n\n\nPrzykład: rozwiązywanie układu równań\nRozwiązujemy układ \\(Ax = b\\):\n\\[\\begin{cases} 2x + y = 5 \\\\ x + 3y = 7 \\end{cases}\\]\n\nA = np.array([[2, 1],\n              [1, 3]])\nb = np.array([5, 7])\n\nx = np.linalg.solve(A, b)\nx\n\narray([1.6, 1.8])\n\n\n\n# Weryfikacja: A @ x powinno dać b\nA @ x\n\narray([5., 7.])\n\n\n\n\nPrzykład: pseudoodwrotność (układ nadokreślony)\nGdy mamy więcej równań niż niewiadomych, np.linalg.lstsq() znajduje rozwiązanie w sensie najmniejszych kwadratów:\n\n# 3 równania, 2 niewiadome (układ nadokreślony)\nA = np.array([[1, 1],\n              [1, 2],\n              [1, 3]])\nb = np.array([1, 2, 2])\n\nx, residuals, rank, sv = np.linalg.lstsq(A, b, rcond=None)\nx\n\narray([0.66666667, 0.5       ])",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#podsumowanie",
+    "href": "wyklady/wyklad_1.html#podsumowanie",
+    "title": "Wykład 1: NumPy",
+    "section": "Podsumowanie",
+    "text": "Podsumowanie\nW tym wykładzie omówiliśmy bibliotekę NumPy, która stanowi fundament ekosystemu naukowego Pythona. Najważniejsze zagadnienia to:\n\nTyp ndarray — homogeniczna tablica wielowymiarowa o ustalonym dtype.\nTworzenie tablic — z danych, ze stałych, z zakresów liczbowych, z meshgrid.\nIndeksowanie — proste (widoki) vs złożone (kopie); kluczowe rozróżnienie przy modyfikacji danych.\nWektoryzacja — operacje na tablicach zamiast pętli (rzędy wielkości szybsze).\nBroadcasting — reguły dopasowywania kształtów tablic w operacjach arytmetycznych.\nAlgebra liniowa (np.linalg) — mnożenie macierzy, rozwiązywanie układów równań, pseudoodwrotność.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#ćwiczenia",
+    "href": "wyklady/wyklad_1.html#ćwiczenia",
+    "title": "Wykład 1: NumPy",
+    "section": "Ćwiczenia",
+    "text": "Ćwiczenia\n\nUtwórz tablicę 5×5 wypełnioną kolejnymi liczbami od 1 do 25. Wyodrębnij z niej podmacierz 3×3 środkowych elementów za pomocą wycinków. Sprawdź, czy wynik jest widokiem.\nBez użycia pętli, znormalizuj każdą kolumnę macierzy A (rozmiar \\(m \\times n\\)) tak, aby miała średnią 0 i odchylenie standardowe 1. Wskazówka: użyj broadcastingu i axis=0.\nDana jest macierz \\(A\\) rozmiaru \\(3\\times 2\\) i wektor \\(b\\) długości 3. Znajdź wektor \\(x\\) rozwiązujący układ \\(Ax \\approx b\\) w sensie najmniejszych kwadratów. Zweryfikuj wynik, porównując A @ x z b.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: NumPy"
+    ]
+  }
+]

@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 1: NumPy – Biblioteki Python w analizie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-998bc67fc564509d0c0a19893f2ca1aa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykład 1: NumPy</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#numpy" id="toc-numpy" class="nav-link active" data-scroll-target="#numpy">NumPy</a>
+  <ul class="collapse">
+  <li><a href="#tablica-ndarray" id="toc-tablica-ndarray" class="nav-link" data-scroll-target="#tablica-ndarray">1. Tablica <code>ndarray</code></a>
+  <ul class="collapse">
+  <li><a href="#czym-jest-ndarray" id="toc-czym-jest-ndarray" class="nav-link" data-scroll-target="#czym-jest-ndarray">Czym jest <code>ndarray</code></a></li>
+  <li><a href="#np.array" id="toc-np.array" class="nav-link" data-scroll-target="#np.array"><code>np.array()</code></a></li>
+  <li><a href="#dtype" id="toc-dtype" class="nav-link" data-scroll-target="#dtype"><code>dtype</code></a></li>
+  <li><a href="#numpy-typy-wbudowane" id="toc-numpy-typy-wbudowane" class="nav-link" data-scroll-target="#numpy-typy-wbudowane">NumPy: typy wbudowane</a></li>
+  <li><a href="#atrybuty-tablic" id="toc-atrybuty-tablic" class="nav-link" data-scroll-target="#atrybuty-tablic">Atrybuty tablic</a></li>
+  </ul></li>
+  <li><a href="#tworzenie-tablic" id="toc-tworzenie-tablic" class="nav-link" data-scroll-target="#tworzenie-tablic">2. Tworzenie tablic</a>
+  <ul class="collapse">
+  <li><a href="#tablice-stałe" id="toc-tablice-stałe" class="nav-link" data-scroll-target="#tablice-stałe">Tablice stałe</a></li>
+  <li><a href="#tablice-z-danych" id="toc-tablice-z-danych" class="nav-link" data-scroll-target="#tablice-z-danych">Tablice z danych</a></li>
+  <li><a href="#tablice-zakresów-liczbowych" id="toc-tablice-zakresów-liczbowych" class="nav-link" data-scroll-target="#tablice-zakresów-liczbowych">Tablice zakresów liczbowych</a></li>
+  <li><a href="#wartości-losowe" id="toc-wartości-losowe" class="nav-link" data-scroll-target="#wartości-losowe">Wartości losowe</a></li>
+  </ul></li>
+  <li><a href="#indeksowanie" id="toc-indeksowanie" class="nav-link" data-scroll-target="#indeksowanie">3. Indeksowanie</a>
+  <ul class="collapse">
+  <li><a href="#indeksowanie-proste" id="toc-indeksowanie-proste" class="nav-link" data-scroll-target="#indeksowanie-proste">Indeksowanie proste</a></li>
+  <li><a href="#indeksowanie-złożone" id="toc-indeksowanie-złożone" class="nav-link" data-scroll-target="#indeksowanie-złożone">Indeksowanie złożone</a></li>
+  <li><a href="#indeksowanie-i-instrukcja-przypisania" id="toc-indeksowanie-i-instrukcja-przypisania" class="nav-link" data-scroll-target="#indeksowanie-i-instrukcja-przypisania">Indeksowanie i instrukcja przypisania</a></li>
+  <li><a href="#przykład-widok-vs-kopia" id="toc-przykład-widok-vs-kopia" class="nav-link" data-scroll-target="#przykład-widok-vs-kopia">Przykład: widok vs kopia</a></li>
+  </ul></li>
+  <li><a href="#wektoryzacja-i-broadcasting" id="toc-wektoryzacja-i-broadcasting" class="nav-link" data-scroll-target="#wektoryzacja-i-broadcasting">4. Wektoryzacja i broadcasting</a>
+  <ul class="collapse">
+  <li><a href="#wektoryzacja" id="toc-wektoryzacja" class="nav-link" data-scroll-target="#wektoryzacja">Wektoryzacja</a></li>
+  <li><a href="#broadcasting" id="toc-broadcasting" class="nav-link" data-scroll-target="#broadcasting">Broadcasting</a></li>
+  <li><a href="#np.tile" id="toc-np.tile" class="nav-link" data-scroll-target="#np.tile"><code>np.tile()</code></a></li>
+  </ul></li>
+  <li><a href="#funkcje-agregujące-łączenie-i-dzielenie-tablic" id="toc-funkcje-agregujące-łączenie-i-dzielenie-tablic" class="nav-link" data-scroll-target="#funkcje-agregujące-łączenie-i-dzielenie-tablic">5. Funkcje agregujące, łączenie i dzielenie tablic</a>
+  <ul class="collapse">
+  <li><a href="#funkcje-agregujące" id="toc-funkcje-agregujące" class="nav-link" data-scroll-target="#funkcje-agregujące">Funkcje agregujące</a></li>
+  <li><a href="#łączenie-i-dzielenie-tablic" id="toc-łączenie-i-dzielenie-tablic" class="nav-link" data-scroll-target="#łączenie-i-dzielenie-tablic">Łączenie i dzielenie tablic</a></li>
+  </ul></li>
+  <li><a href="#algebra-liniowa-np.linalg" id="toc-algebra-liniowa-np.linalg" class="nav-link" data-scroll-target="#algebra-liniowa-np.linalg">6. Algebra liniowa (<code>np.linalg</code>)</a>
+  <ul class="collapse">
+  <li><a href="#operacje-macierzowe" id="toc-operacje-macierzowe" class="nav-link" data-scroll-target="#operacje-macierzowe">Operacje macierzowe</a></li>
+  <li><a href="#równania-liniowe" id="toc-równania-liniowe" class="nav-link" data-scroll-target="#równania-liniowe">Równania liniowe</a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie">Podsumowanie</a></li>
+  <li><a href="#ćwiczenia" id="toc-ćwiczenia" class="nav-link" data-scroll-target="#ćwiczenia">Ćwiczenia</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykład 1: NumPy</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 1: NumPy</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_1.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<section id="numpy" class="level1">
+<h1>NumPy</h1>
+<p>Dokumentacja: <a href="https://numpy.org/doc/stable/">https://numpy.org/doc/stable/</a></p>
+<p>Biblioteka do przetwarzania numerycznego dużych wielowymiarowych tablic liczbowych. Dostarcza typ <code>ndarray</code> (homogeniczna tablica wielowymiarowa), mechanizmy indeksowania, wektoryzacji i broadcastingu oraz zestaw funkcji do algebry liniowej.</p>
+<p>Typowy import:</p>
+<div id="cell-3" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="tablica-ndarray" class="level2">
+<h2 class="anchored" data-anchor-id="tablica-ndarray">1. Tablica <code>ndarray</code></h2>
+<section id="czym-jest-ndarray" class="level3">
+<h3 class="anchored" data-anchor-id="czym-jest-ndarray">Czym jest <code>ndarray</code></h3>
+<p>Główny typ definiowany przez bibliotekę NumPy.</p>
+<ul>
+<li>Reprezentuje jedno lub wielowymiarową tablicę wartości. Jest to podstawowa klasa definiowana przez bibliotekę.</li>
+<li>Wszystkie wartości w tablicy muszą być tego samego typu, czyli <code>np.ndarray</code> jest tablicą jednorodną (homogeniczną).</li>
+<li>Każda wartość zajmuje tę samą określoną przez typ porcję pamięci.</li>
+</ul>
+</section>
+<section id="np.array" class="level3">
+<h3 class="anchored" data-anchor-id="np.array"><code>np.array()</code></h3>
+<p>Tworzy tablice z <a href="https://numpy.org/doc/stable/user/basics.creation.html?highlight=array_like">“tablicopodobnych”</a> obiektów, np. z list:</p>
+<div id="cell-7" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]])</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>array([[1, 2, 3],
+       [7, 8, 9]])</code></pre>
+</div>
+</div>
+</section>
+<section id="dtype" class="level3">
+<h3 class="anchored" data-anchor-id="dtype"><code>dtype</code></h3>
+<p>Wspólny typ dla wszystkich wartości w tablicy:</p>
+<div id="cell-9" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>a.dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>dtype('int64')</code></pre>
+</div>
+</div>
+<div id="cell-10" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">3.14</span>])</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>a.dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>dtype('float64')</code></pre>
+</div>
+</div>
+</section>
+<section id="numpy-typy-wbudowane" class="level3">
+<h3 class="anchored" data-anchor-id="numpy-typy-wbudowane">NumPy: typy wbudowane</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Data type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>bool_</td>
+<td>Boolean (True or False) stored as a byte</td>
+</tr>
+<tr class="even">
+<td>int_</td>
+<td>Default integer type (same as C long; normally either int64 or int32)</td>
+</tr>
+<tr class="odd">
+<td>intc</td>
+<td>Identical to C int (normally int32 or int64)</td>
+</tr>
+<tr class="even">
+<td>intp</td>
+<td>Integer used for indexing (same as C ssize_t; normally either int32 or int64)</td>
+</tr>
+<tr class="odd">
+<td>int8</td>
+<td>Byte (-128 to 127)</td>
+</tr>
+<tr class="even">
+<td>int16</td>
+<td>Integer (-32768 to 32767)</td>
+</tr>
+<tr class="odd">
+<td>int32</td>
+<td>Integer (-2147483648 to 2147483647)</td>
+</tr>
+<tr class="even">
+<td>int64</td>
+<td>Integer (-9223372036854775808 to 9223372036854775807)</td>
+</tr>
+<tr class="odd">
+<td>uint8</td>
+<td>Unsigned integer (0 to 255)</td>
+</tr>
+<tr class="even">
+<td>uint16</td>
+<td>Unsigned integer (0 to 65535)</td>
+</tr>
+<tr class="odd">
+<td>uint32</td>
+<td>Unsigned integer (0 to 4294967295)</td>
+</tr>
+<tr class="even">
+<td>uint64</td>
+<td>Unsigned integer (0 to 18446744073709551615)</td>
+</tr>
+<tr class="odd">
+<td>float_</td>
+<td>Shorthand for float64.</td>
+</tr>
+<tr class="even">
+<td>float16</td>
+<td>Half precision float: sign bit, 5 bits exponent, 10 bits mantissa</td>
+</tr>
+<tr class="odd">
+<td>float32</td>
+<td>Single precision float: sign bit, 8 bits exponent, 23 bits mantissa</td>
+</tr>
+<tr class="even">
+<td>float64</td>
+<td>Double precision float: sign bit, 11 bits exponent, 52 bits mantissa</td>
+</tr>
+<tr class="odd">
+<td>complex_</td>
+<td>Shorthand for complex128.</td>
+</tr>
+<tr class="even">
+<td>complex64</td>
+<td>Complex number, represented by two 32-bit floats</td>
+</tr>
+<tr class="odd">
+<td>complex128</td>
+<td>Complex number, represented by two 64-bit floats</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="atrybuty-tablic" class="level3">
+<h3 class="anchored" data-anchor-id="atrybuty-tablic">Atrybuty tablic</h3>
+<ul>
+<li><strong><code>.ndim</code></strong> – liczba wymiarów, liczba całkowita.</li>
+<li><strong><code>.shape</code></strong> – rozmiar każdego z wymiarów, krotka liczb całkowitych.</li>
+<li><strong><code>.size</code></strong> – całkowita liczba wartości, iloczyn wartości z krotki <code>.shape</code>.</li>
+</ul>
+<center>
+<img src="tablica2D.png">
+</center>
+</section>
+</section>
+<section id="tworzenie-tablic" class="level2">
+<h2 class="anchored" data-anchor-id="tworzenie-tablic">2. Tworzenie tablic</h2>
+<section id="tablice-stałe" class="level3">
+<h3 class="anchored" data-anchor-id="tablice-stałe"><a href="https://numpy.org/doc/stable/reference/routines.array-creation.html#ones-and-zeros">Tablice stałe</a></h3>
+<p>Tablice stałe to tablice, które mają wszystkie elementy ustawione na tę samą wartość. NumPy dostarcza kilka funkcji do tworzenia takich tablic:</p>
+<ul>
+<li><strong><code>np.zeros()</code></strong> — tworzy tablicę wypełnioną zerami.</li>
+<li><strong><code>np.ones()</code></strong> — tworzy tablicę wypełnioną jedynkami.</li>
+<li><strong><code>np.full()</code></strong> — tworzy tablicę o określonym kształcie, wypełnioną podaną wartością.</li>
+<li><strong><code>np.eye()</code></strong> — generuje macierz, w której elementy na głównej przekątnej są jedynkami, a pozostałe zerami.</li>
+<li><strong><code>np.identity()</code></strong> — zwraca kwadratową macierz jednostkową (tożsamościową).</li>
+<li><strong><code>np.*_like()</code></strong> — funkcje (np. <code>np.zeros_like()</code>, <code>np.ones_like()</code>, <code>np.full_like()</code>) tworzą tablice o tym samym kształcie i typie danych, co podana tablica, ale wypełnione zerami, jedynkami lub inną wartością.</li>
+</ul>
+<section id="argument-shape" class="level4">
+<h4 class="anchored" data-anchor-id="argument-shape">Argument <code>shape</code></h4>
+<p>Podane wyżej funkcje, jak i wiele innych generujących tablice, przyjmują argument <code>shape</code> (czasem <code>size</code>, np. <code>np.random.normal()</code>), który określa kształt tablicy wynikowej.</p>
+<p>Pouczającym ćwiczeniem jest próba własnej implementacji funkcji generującej tablicę w postaci listy list o zadanym kształcie. Oto przykład implementacji funkcji <code>np.full()</code>:</p>
+<div id="cell-16" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f(shape, fill<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''Zwraca tablicę o kształcie shape wypełnioną wartością fill.'''</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(shape) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> fill</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        a, <span class="op">*</span>q <span class="op">=</span> shape</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> a <span class="op">*</span> [f(q, fill)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Oczywiście, w praktyce nie ma potrzeby implementowania takich funkcji, ponieważ NumPy dostarcza gotowe, zoptymalizowane implementacje. Tym niemniej tego typu zadania stanowią dobry trening zdolności programistycznych.</p>
+</section>
+</section>
+<section id="tablice-z-danych" class="level3">
+<h3 class="anchored" data-anchor-id="tablice-z-danych"><a href="https://numpy.org/doc/stable/reference/routines.array-creation.html#from-existing-data">Tablice z danych</a></h3>
+<ul>
+<li><strong><code>np.array()</code></strong> — Konwertuje dane wejściowe (np. listy, krotki) na tablicę ndarray.</li>
+<li><strong><code>np.asarray()</code></strong> — Podobnie jak <code>np.array()</code>, ale nie kopiuje danych, gdy już są tablicą NumPy.</li>
+<li><strong><code>np.copy()</code></strong> — Tworzy głęboką kopię tablicy, co zapewnia niezależność oryginału i kopii.</li>
+<li><strong><code>np.fromfile()</code></strong> — Wczytuje dane binarne z pliku, tworząc z nich tablicę.</li>
+<li><strong><code>np.fromfunction()</code></strong> — Generuje tablicę na podstawie funkcji, która jest wywoływana dla każdego indeksu.</li>
+<li><strong><code>np.fromiter()</code></strong> — Tworzy tablicę z dowolnego iterowalnego obiektu, np. generatora.</li>
+<li><strong><code>np.fromstring()</code></strong> — Konwertuje dane zawarte w łańcuchu znaków na tablicę, dzieląc tekst według separatorów.</li>
+<li><strong><code>np.loadtxt()</code></strong> — Ładuje dane tekstowe z pliku do tablicy, przydatne przy pracy z danymi zapisanymi w formacie tekstowym.</li>
+</ul>
+</section>
+<section id="tablice-zakresów-liczbowych" class="level3">
+<h3 class="anchored" data-anchor-id="tablice-zakresów-liczbowych"><a href="https://numpy.org/doc/stable/reference/routines.array-creation.html#numerical-ranges">Tablice zakresów liczbowych</a></h3>
+<ul>
+<li><strong><code>np.arange()</code></strong> — Generuje tablicę z wartościami o stałym kroku, podobnie jak funkcja <code>range()</code>, ale zwraca obiekt <code>ndarray</code>.</li>
+<li><strong><code>np.linspace()</code></strong> — Zwraca tablicę z określoną liczbą równomiernie rozmieszczonych wartości w zadanym przedziale.</li>
+<li><strong><code>np.logspace()</code></strong> — Tworzy tablicę wartości rozmieszczonych równomiernie na skali logarytmicznej.</li>
+<li><strong><code>np.geomspace()</code></strong> — Generuje tablicę wartości rozmieszczonych równomiernie w skali geometrycznej (iloczynowo).</li>
+<li><strong><code>np.meshgrid()</code></strong> — Tworzy siatkę współrzędnych na podstawie podanych wektorów; umożliwia przygotowanie danych do wizualizacji lub obliczeń na wielowymiarowych funkcjach.</li>
+</ul>
+<section id="użycie-np.linspace-do-generowania-punktów-na-wykresie" class="level4">
+<h4 class="anchored" data-anchor-id="użycie-np.linspace-do-generowania-punktów-na-wykresie">Użycie <code>np.linspace()</code> do generowania punktów na wykresie</h4>
+<p>Funkcje rysujące wykresy, np. <code>matplotlib.pyplot.plot()</code> czy <code>seaborn.lineplot()</code>, pobierają współrzędne punktów z tablic dla poszczególnych osi. Zatem jeśli chcemy narysować wykres funkcji na płaszczyźnie, to musimy dostarczyć dwie tablice: jedną ze współrzędnymi x, drugą ze współrzędnymi y. Funkcja <code>np.linspace()</code> pozwala na wygodne generowanie tablicy 1D z równomiernie rozmieszczonymi punktami na zadanym przedziale. W ten sposób możemy wygenerować tablicę z punktami na osi x, a następnie obliczyć wartości funkcji dla tych punktów i zapisać je w tablicy z punktami na osi y.</p>
+<div id="cell-21" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Rysujemy wykres funkcji f(x) = x * sin(x)</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">100</span> <span class="co"># liczba argumentów funkcji</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, n) <span class="co"># generujemy n równo rozmieszczonych punktów na odcinku [0, 10]</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x <span class="op">*</span> np.sin(x) <span class="co"># obliczamy wartości funkcji f w tych punktach</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.plot(x, y)<span class="op">;</span> <span class="co"># rysujemy wykres</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_1_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="użycie-np.meshgrid-do-generowania-siatki-punktów" class="level4">
+<h4 class="anchored" data-anchor-id="użycie-np.meshgrid-do-generowania-siatki-punktów">Użycie <code>np.meshgrid()</code> do generowania siatki punktów</h4>
+<p>Aby narysować wykres funkcji <span class="math inline">\(z=f(x,y)\)</span> na płaszczyźnie postępujemy podobnie jak w przypadku rysowania wykresu funkcji jednej zmiennej. Tym razem jednak potrzebujemy tablic z punktami na osi x i y oraz tablicę z wartościami funkcji dla tych punktów. Do wygenerowania tablic argumentów x i y możemy użyć funkcji <code>np.linspace()</code> i <code>np.meshgrid()</code>. Funkcja <code>np.meshgrid()</code> przyjmuje jako argumenty dwie tablice z punktami na osi x i y, a zwraca dwie tablice 2D, w których elementy to współrzędne punktów.</p>
+<p>Dokładniej działa to tak: jeśli <code>x</code> to tablica z punktami na osi x, a <code>y</code> to tablica z punktami na osi y, to <code>X, Y = np.meshgrid(x, y)</code> zwraca dwie tablice <code>X</code> i <code>Y</code> takie, że * <code>X[i, j]</code> to <code>x[j]</code>, * <code>Y[i, j]</code> to <code>y[i]</code>.</p>
+<p>Gdy mamy <code>X</code> i <code>Y</code>, to możemy obliczyć wartości <code>Z</code> wstawiając <code>X</code> i <code>Y</code> do <code>f()</code>: <code>Z = f(X, Y)</code>.</p>
+<p>Demonstracja działania <code>np.meshgrid()</code> na przykładzie funkcji <span class="math inline">\(f(x,y)=xy\)</span> w prostokącie <span class="math inline">\([1,4]\times[1,3]\)</span>:</p>
+<div id="cell-23" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> X<span class="op">*</span>Y</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Y)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Z)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1 2 3 4]
+ [1 2 3 4]
+ [1 2 3 4]]
+[[1 1 1 1]
+ [2 2 2 2]
+ [3 3 3 3]]
+[[ 1  2  3  4]
+ [ 2  4  6  8]
+ [ 3  6  9 12]]</code></pre>
+</div>
+</div>
+<p>Wykres konturowy funkcji <span class="math inline">\(f(x,y)=y^2-x^2(1+x)\)</span> w prostokącie <span class="math inline">\([-1,1]\times[-1,1]\)</span>:</p>
+<div id="cell-25" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">100</span> <span class="co"># N**2 punktów na wykresie</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, N)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, N)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> Y<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> X<span class="op">**</span><span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span> <span class="op">+</span> X)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>cs <span class="op">=</span> ax.contourf(X, Y, Z, levels<span class="op">=</span><span class="dv">20</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>fig.colorbar(cs)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>ax.plot(x, x<span class="op">*</span>np.sqrt(<span class="dv">1</span> <span class="op">+</span> x), <span class="st">'black'</span>, label<span class="op">=</span><span class="st">'$y^2 = x^2(1 + x)$'</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>ax.plot(x, <span class="op">-</span>x<span class="op">*</span>np.sqrt(<span class="dv">1</span> <span class="op">+</span> x), <span class="st">'black'</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    xlim<span class="op">=</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    ylim<span class="op">=</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">'Wykres $f(x, y) = y^2 - x^2(1 + x)$ z zaznaczonymi miejscami zerowymi'</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_1_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="wartości-losowe" class="level3">
+<h3 class="anchored" data-anchor-id="wartości-losowe"><a href="https://numpy.org/doc/stable/reference/random/generator.html">Wartości losowe</a></h3>
+<p><strong>Uwaga:</strong> Od NumPy 1.17 zalecanym sposobem generowania liczb losowych jest nowe API oparte na generatorach. Zamiast <code>np.random.function()</code> używamy obiektu <code>Generator</code>:</p>
+<div id="cell-27" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(seed<span class="op">=</span><span class="dv">42</span>)  <span class="co"># powtarzalność wyników</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>rng.integers(<span class="dv">0</span>, <span class="dv">10</span>, size<span class="op">=</span><span class="dv">5</span>)           <span class="co"># zamiast np.random.randint()</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>rng.random(size<span class="op">=</span><span class="dv">5</span>)                    <span class="co"># zamiast np.random.random()</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>rng.standard_normal(size<span class="op">=</span><span class="dv">5</span>)           <span class="co"># zamiast np.random.randn()</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>rng.choice([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], size<span class="op">=</span><span class="dv">2</span>)        <span class="co"># zamiast np.random.choice()</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>array([3, 2])</code></pre>
+</div>
+</div>
+<p>Stare API (<code>np.random.randint()</code>, <code>np.random.randn()</code>, …) nadal działa, ale nowe jest zalecane ze względu na lepszą kontrolę stanu generatora i lepsze właściwości statystyczne (domyślny generator PCG64 zamiast Mersenne Twister).</p>
+<section id="proste-tablice-wartości-losowych" class="level4">
+<h4 class="anchored" data-anchor-id="proste-tablice-wartości-losowych">Proste tablice wartości losowych</h4>
+<p>Wybrane metody generatora:</p>
+<ul>
+<li><strong><code>rng.integers(low, high, size)</code></strong> — Losowe liczby całkowite z przedziału <span class="math inline">\([\text{low}, \text{high})\)</span>.</li>
+<li><strong><code>rng.random(size)</code></strong> — Wartości z rozkładu jednostajnego na <span class="math inline">\([0,1)\)</span>.</li>
+<li><strong><code>rng.standard_normal(size)</code></strong> — Wartości z rozkładu normalnego <span class="math inline">\(\mathcal{N}(0,1)\)</span>.</li>
+<li><strong><code>rng.choice(a, size, replace, p)</code></strong> — Losowy wybór elementów z tablicy <code>a</code>.</li>
+</ul>
+</section>
+<section id="losowa-zmiana-porządku" class="level4">
+<h4 class="anchored" data-anchor-id="losowa-zmiana-porządku"><a href="https://numpy.org/doc/stable/reference/random/generator.html#permutations">Losowa zmiana porządku</a></h4>
+<ul>
+<li><strong><code>rng.shuffle()</code></strong> — Miesza elementy tablicy „w miejscu” (in-place).</li>
+<li><strong><code>rng.permutation()</code></strong> — Zwraca nową tablicę będącą losową permutacją elementów podanej tablicy. Jeśli podamy liczbę, funkcja wygeneruje permutację liczb od 0 do <span class="math inline">\(n-1\)</span>, nie modyfikując oryginalnych danych.</li>
+<li><strong><code>rng.permuted()</code></strong> — Działa podobnie jak <code>permutation()</code>, zwracając nową, permutowaną kopię tablicy, pozostawiając oryginał nietkniętym.</li>
+</ul>
+</section>
+<section id="rozkłady" class="level4">
+<h4 class="anchored" data-anchor-id="rozkłady"><a href="https://numpy.org/doc/stable/reference/random/generator.html#distributions">Rozkłady</a></h4>
+<ul>
+<li><strong><code>rng.normal(loc, scale, size)</code></strong> — Rozkład normalny (Gaussa) o zadanej średniej i odchyleniu standardowym.</li>
+<li><strong><code>rng.uniform(low, high, size)</code></strong> — Rozkład jednostajny na zadanym przedziale.</li>
+<li><strong><code>rng.exponential(scale, size)</code></strong> — Rozkład wykładniczy o zadanym parametrze.</li>
+<li><strong><code>rng.poisson(lam, size)</code></strong> — Rozkład Poissona o zadanym parametrze <span class="math inline">\(\lambda\)</span>.</li>
+<li><strong><code>rng.binomial(n, p, size)</code></strong> — Rozkład dwumianowy o zadanym prawdopodobieństwie sukcesu i liczbie prób.</li>
+<li>itp.</li>
+</ul>
+<div id="cell-32" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(seed<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">1000</span> <span class="co">## Liczba losów</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> rng.exponential(<span class="dv">2</span>, N)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>sns.histplot(arr, kde<span class="op">=</span><span class="va">True</span>)<span class="op">;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_1_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="indeksowanie" class="level2">
+<h2 class="anchored" data-anchor-id="indeksowanie">3. Indeksowanie</h2>
+<p>Korzysta ze zwykłej składni Pythona:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>A[obj]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Od rodzaju <code>obj</code> zależy, czy indeksowanie będzie proste, czy złożone (<em>basic</em>/<em>advanced</em>).</p>
+<section id="indeksowanie-proste" class="level3">
+<h3 class="anchored" data-anchor-id="indeksowanie-proste"><a href="https://numpy.org/doc/stable/reference/arrays.indexing.html#basic-slicing-and-indexing">Indeksowanie proste</a></h3>
+<p>Zachodzi, gdy <code>obj</code> jest wycinkiem, liczbą całkowitą lub krotką wycinków i liczb całkowitych plus ewentualne <code>Ellipsis</code> i <code>np.newaxis</code>.</p>
+<p>Kluczowe cechy:</p>
+<ul>
+<li>Zwraca widok oryginalnej tablicy, nie tworząc kopii danych.</li>
+<li>Umożliwia indeksowanie za pomocą liczb całkowitych lub wycinków dla każdego wymiaru.</li>
+<li>Operacje modyfikacji wykonane na zwróconym widoku wpływają na oryginalną tablicę.</li>
+</ul>
+</section>
+<section id="indeksowanie-złożone" class="level3">
+<h3 class="anchored" data-anchor-id="indeksowanie-złożone">Indeksowanie złożone</h3>
+<p><code>A[obj]</code> uruchamia indeksowanie złożone, gdy: * <code>obj</code> jest sekwencją inną niż krotka, * <code>obj</code> jest tablicą NumPy o typie całkowitym lub logicznym, * <code>obj</code> jest krotką z przynajmniej jedną sekwencją lub tablicą NumPy o typie całkowitym lub logicznym.</p>
+<p>Wartość zwracana podczas indeksowania złożonego <strong>jest kopią</strong>.</p>
+</section>
+<section id="indeksowanie-i-instrukcja-przypisania" class="level3">
+<h3 class="anchored" data-anchor-id="indeksowanie-i-instrukcja-przypisania">Indeksowanie i instrukcja przypisania</h3>
+<p>Oba rodzaje indeksowania można łączyć z instrukcją przypisania. Prowadzi to do modyfikacji oryginalnej tablicy.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>A[obj] <span class="op">=</span> v</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Ale musi być możliwy <em>broadcast</em> <code>v</code> do kształtu <code>A[obj]</code>.</p>
+</section>
+<section id="przykład-widok-vs-kopia" class="level3">
+<h3 class="anchored" data-anchor-id="przykład-widok-vs-kopia">Przykład: widok vs kopia</h3>
+<div id="cell-40" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>])</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Indeksowanie proste (wycinki) → widok</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>view <span class="op">=</span> a[<span class="dv">1</span>:<span class="dv">4</span>]</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>view[<span class="dv">0</span>] <span class="op">=</span> <span class="dv">999</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>a  <span class="co"># oryginał zmieniony!</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>array([ 10, 999,  30,  40,  50])</code></pre>
+</div>
+</div>
+<div id="cell-41" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>])</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Indeksowanie złożone (lista indeksów) → kopia</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>copy <span class="op">=</span> a[[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>copy[<span class="dv">0</span>] <span class="op">=</span> <span class="dv">999</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>a  <span class="co"># oryginał niezmieniony</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>array([10, 20, 30, 40, 50])</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="wektoryzacja-i-broadcasting" class="level2">
+<h2 class="anchored" data-anchor-id="wektoryzacja-i-broadcasting">4. Wektoryzacja i broadcasting</h2>
+<section id="wektoryzacja" class="level3">
+<h3 class="anchored" data-anchor-id="wektoryzacja">Wektoryzacja</h3>
+<p>Wektoryzacja polega na zastąpieniu jawnych pętli Pythona operacjami NumPy wykonywanymi na całych tablicach. Dzięki temu kod jest szybszy (operacje realizowane w skompilowanym C) i bardziej czytelny.</p>
+<div id="cell-44" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Porównanie: suma kwadratów elementów tablicy</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.arange(<span class="dv">1_000_000</span>, dtype<span class="op">=</span>np.float64)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-45" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>timeit</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Pętla Pythona</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> a:</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> x <span class="op">*</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>84.7 ms ± 1.55 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</code></pre>
+</div>
+</div>
+<div id="cell-46" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>timeit</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Wektoryzacja NumPy</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">sum</span>(a <span class="op">**</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1.34 ms ± 117 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)</code></pre>
+</div>
+</div>
+<p>W tym przykładzie wersja wektoryzowana jest wyraźnie szybsza niż pętla Pythona.</p>
+</section>
+<section id="broadcasting" class="level3">
+<h3 class="anchored" data-anchor-id="broadcasting"><a href="https://numpy.org/doc/stable/user/theory.broadcasting.html?highlight=broadcasting">Broadcasting</a></h3>
+<p>Operowanie na tablicach o różnych kształtach.</p>
+<section id="reguły-broadcastingu" class="level4">
+<h4 class="anchored" data-anchor-id="reguły-broadcastingu">Reguły broadcastingu</h4>
+<ol type="1">
+<li>Jeśli dwie tablice różnią się wymiarem, to kształt tej o mniejszym wymiarze jest uzupełniany od lewej jedynkami.</li>
+<li>Jeśli rozmiary na danej osi nie są w obu tablicach równe, to ten który jest równy jeden, jest rozszerzany do większego rozmiaru.</li>
+<li>Jeśli rozmiary na danej osi nie są w obu tablicach równe i żaden z nich nie jest równy jeden, to broadcasting nie może zostać wykonany. Wtedy rzucany jest wyjątek.</li>
+</ol>
+</section>
+<section id="zadanie" class="level4">
+<h4 class="anchored" data-anchor-id="zadanie">Zadanie</h4>
+<p>Na których kształtach da się wykonać broadcasting?</p>
+<ol type="1">
+<li><code>(1, 2)</code> i <code>(3, 4, 2)</code></li>
+<li><code>(1, 2)</code> i <code>(3, 2, 4)</code></li>
+<li><code>(5, 3, 8)</code> i <code>(5, 4, 8)</code></li>
+<li><code>(5, 3, 8)</code> i <code>(5, 8)</code></li>
+<li><code>(5, 3, 8)</code> i <code>(3, 8)</code></li>
+<li><code>(5, 3, 8)</code> i <code>(5, 3)</code></li>
+</ol>
+</section>
+<section id="przykład" class="level4">
+<h4 class="anchored" data-anchor-id="przykład">Przykład</h4>
+<p>Wykres funkcji <span class="math inline">\(z=\sin(\exp(2x^2)) + \sin(\exp(2y^2))\)</span> w kwadracie <span class="math inline">\([-1, 1]\times[-1, 1]\)</span>:</p>
+<div id="cell-52" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">500</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">500</span>)[:, np.newaxis]</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> np.sin(np.exp(<span class="dv">2</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span>)) <span class="op">+</span> np.cos(np.exp(<span class="dv">2</span><span class="op">*</span>y<span class="op">**</span><span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-53" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">'3d'</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(x, y, z, cmap<span class="op">=</span><span class="st">'viridis'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_1_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="np.tile" class="level3">
+<h3 class="anchored" data-anchor-id="np.tile"><code>np.tile()</code></h3>
+<p>Funkcja <code>np.tile()</code> służy do tworzenia nowej tablicy przez powtarzanie istniejącej tablicy określoną liczbę razy wzdłuż każdego wymiaru. Pozwala na “kafelkowanie” (tiling) danych w uporządkowany sposób.</p>
+<p>Składnia podstawowa:</p>
+<div id="cell-55" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">3</span>, <span class="dv">4</span>]])</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>reps <span class="op">=</span> (<span class="dv">2</span>, <span class="dv">3</span>) <span class="co"># powtórz 2 razy wzdłuż pierwszego wymiaru i 3 razy wzdłuż drugiego</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>np.tile(A, reps)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>array([[1, 2, 1, 2, 1, 2],
+       [3, 4, 3, 4, 3, 4],
+       [1, 2, 1, 2, 1, 2],
+       [3, 4, 3, 4, 3, 4]])</code></pre>
+</div>
+</div>
+<p>Gdzie: - <code>A</code> to tablica wejściowa (lub skalar) - <code>reps</code> to liczba powtórzeń (pojedyncza liczba lub krotka określająca liczbę powtórzeń w każdym wymiarze)</p>
+<div id="cell-57" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Powtórz 1D tablicę 3 razy</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>np.tile(a, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>array([1, 2, 3, 1, 2, 3, 1, 2, 3])</code></pre>
+</div>
+</div>
+<div id="cell-58" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Powtórz tablicę 2 razy wzdłuż pierwszego wymiaru i 3 razy wzdłuż drugiego</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>np.tile(a, (<span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>array([[1, 2, 3, 1, 2, 3, 1, 2, 3],
+       [1, 2, 3, 1, 2, 3, 1, 2, 3]])</code></pre>
+</div>
+</div>
+<p>Porównanie z broadcastingiem: <code>np.tile()</code> tworzy jawne kopie danych w pamięci, podczas gdy broadcasting operuje na widokach — w wielu przypadkach broadcasting jest więc bardziej efektywny pamięciowo niż <code>np.tile()</code>.</p>
+</section>
+</section>
+<section id="funkcje-agregujące-łączenie-i-dzielenie-tablic" class="level2">
+<h2 class="anchored" data-anchor-id="funkcje-agregujące-łączenie-i-dzielenie-tablic">5. Funkcje agregujące, łączenie i dzielenie tablic</h2>
+<section id="funkcje-agregujące" class="level3">
+<h3 class="anchored" data-anchor-id="funkcje-agregujące">Funkcje agregujące</h3>
+<ul>
+<li><strong><code>np.sum()</code></strong> — Sumuje wartości w tablicy.</li>
+<li><strong><code>np.min()</code>, <code>np.max()</code></strong> — Znajduje wartość minimalną lub maksymalną.</li>
+<li><strong><code>np.mean()</code></strong> — Oblicza średnią arytmetyczną.</li>
+<li><strong><code>np.median()</code></strong> — Znajduje medianę.</li>
+<li><strong><code>np.std()</code></strong> — Oblicza odchylenie standardowe.</li>
+<li><strong><code>np.var()</code></strong> — Oblicza wariancję.</li>
+<li><strong>i wiele innych …</strong></li>
+</ul>
+</section>
+<section id="łączenie-i-dzielenie-tablic" class="level3">
+<h3 class="anchored" data-anchor-id="łączenie-i-dzielenie-tablic">Łączenie i dzielenie tablic</h3>
+<ul>
+<li><strong><code>np.concatenate()</code></strong> — Łączy tablice wzdłuż zadanego wymiaru.</li>
+<li><strong><code>np.vstack()</code></strong> — Łączy tablice wzdłuż pierwszego wymiaru.</li>
+<li><strong><code>np.hstack()</code></strong> — Łączy tablice wzdłuż drugiego wymiaru.</li>
+<li><strong><code>np.split()</code></strong> — Dzieli tablicę na podtablice.</li>
+<li><strong><code>np.vsplit()</code></strong> — Dzieli tablicę wzdłuż pierwszego wymiaru.</li>
+<li><strong><code>np.hsplit()</code></strong> — Dzieli tablicę wzdłuż drugiego wymiaru.</li>
+</ul>
+</section>
+</section>
+<section id="algebra-liniowa-np.linalg" class="level2">
+<h2 class="anchored" data-anchor-id="algebra-liniowa-np.linalg">6. Algebra liniowa (<code>np.linalg</code>)</h2>
+<section id="operacje-macierzowe" class="level3">
+<h3 class="anchored" data-anchor-id="operacje-macierzowe"><a href="https://numpy.org/doc/stable/reference/routines.linalg.html">Operacje macierzowe</a></h3>
+<ul>
+<li><strong><code>np.dot()</code></strong> — Oblicza iloczyn skalarny lub mnożenie macierzy w zależności od wymiarów wejściowych.</li>
+<li><strong><code>np.linalg.multi_dot()</code></strong> — Wydajnie oblicza iloczyn kilku macierzy, optymalizując kolejność mnożeń.</li>
+<li><strong><code>np.vdot()</code></strong> — Liczy iloczyn wektorowy, traktując argumenty jako spłaszczone tablice (dla liczb zespolonych sprzęga pierwszy argument).</li>
+<li><strong><code>np.inner()</code></strong> — Zwraca sumę iloczynów odpowiadających sobie elementów dwóch tablic.</li>
+<li><strong><code>np.outer()</code></strong> — Oblicza iloczyn zewnętrzny dwóch wektorów, tworząc macierz.</li>
+<li><strong><code>np.matmul()</code> oraz operacja <code>@</code></strong> — Wykonują mnożenie macierzy, obsługując zarówno operacje na macierzach 2D, jak i na tablicach o wyższych wymiarach.</li>
+<li><strong><code>np.linalg.matrix_power()</code></strong> — Podnosi kwadratową macierz do zadanej potęgi przez kolejne mnożenia.</li>
+</ul>
+</section>
+<section id="równania-liniowe" class="level3">
+<h3 class="anchored" data-anchor-id="równania-liniowe"><a href="https://numpy.org/doc/stable/reference/routines.linalg.html#solving-equations-and-inverting-matrices">Równania liniowe</a></h3>
+<ul>
+<li><strong><code>np.linalg.solve()</code></strong> — Rozwiązuje układ równań liniowych <span class="math inline">\(Ax = b\)</span> dla macierzy kwadratowej <span class="math inline">\(A\)</span>, zwracając wektor <span class="math inline">\(x\)</span>.</li>
+<li><strong><code>np.linalg.tensorsolve()</code></strong> — Rozwiązuje równanie liniowe, w którym macierz <span class="math inline">\(A\)</span> jest zastąpiona przez tensor, przy odpowiednim określeniu osi.</li>
+<li><strong><code>np.linalg.lstsq()</code></strong> — Znajduje rozwiązanie układu równań metodą najmniejszych kwadratów, przydatne przy układach nadokreślonych lub niedookreślonych.</li>
+<li><strong><code>np.linalg.inv()</code></strong> — Oblicza macierz odwrotną dla danej macierzy kwadratowej, jeśli taka istnieje.</li>
+<li><strong><code>np.linalg.pinv()</code></strong> — Wyznacza macierz pseudoodwrotną (Moore-Penrose).</li>
+<li><strong><code>np.linalg.tensorinv()</code></strong> — Oblicza odwrotność tensora poprzez reinterpretację wielowymiarowej tablicy jako macierzy, z uwzględnieniem odpowiedniego rozbicia indeksów.</li>
+</ul>
+<section id="przykład-rozwiązywanie-układu-równań" class="level4">
+<h4 class="anchored" data-anchor-id="przykład-rozwiązywanie-układu-równań">Przykład: rozwiązywanie układu równań</h4>
+<p>Rozwiązujemy układ <span class="math inline">\(Ax = b\)</span>:</p>
+<p><span class="math display">\[\begin{cases} 2x + y = 5 \\ x + 3y = 7 \end{cases}\]</span></p>
+<div id="cell-67" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">2</span>, <span class="dv">1</span>],</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">1</span>, <span class="dv">3</span>]])</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="dv">5</span>, <span class="dv">7</span>])</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linalg.solve(A, b)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>array([1.6, 1.8])</code></pre>
+</div>
+</div>
+<div id="cell-68" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Weryfikacja: A @ x powinno dać b</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">@</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>array([5., 7.])</code></pre>
+</div>
+</div>
+</section>
+<section id="przykład-pseudoodwrotność-układ-nadokreślony" class="level4">
+<h4 class="anchored" data-anchor-id="przykład-pseudoodwrotność-układ-nadokreślony">Przykład: pseudoodwrotność (układ nadokreślony)</h4>
+<p>Gdy mamy więcej równań niż niewiadomych, <code>np.linalg.lstsq()</code> znajduje rozwiązanie w sensie najmniejszych kwadratów:</p>
+<div id="cell-70" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3 równania, 2 niewiadome (układ nadokreślony)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">1</span>, <span class="dv">3</span>]])</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>])</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>x, residuals, rank, sv <span class="op">=</span> np.linalg.lstsq(A, b, rcond<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>array([0.66666667, 0.5       ])</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="podsumowanie" class="level2">
+<h2 class="anchored" data-anchor-id="podsumowanie">Podsumowanie</h2>
+<p>W tym wykładzie omówiliśmy bibliotekę NumPy, która stanowi fundament ekosystemu naukowego Pythona. Najważniejsze zagadnienia to:</p>
+<ul>
+<li>Typ <code>ndarray</code> — homogeniczna tablica wielowymiarowa o ustalonym <code>dtype</code>.</li>
+<li>Tworzenie tablic — z danych, ze stałych, z zakresów liczbowych, z <code>meshgrid</code>.</li>
+<li>Indeksowanie — proste (widoki) vs złożone (kopie); kluczowe rozróżnienie przy modyfikacji danych.</li>
+<li>Wektoryzacja — operacje na tablicach zamiast pętli (rzędy wielkości szybsze).</li>
+<li>Broadcasting — reguły dopasowywania kształtów tablic w operacjach arytmetycznych.</li>
+<li>Algebra liniowa (<code>np.linalg</code>) — mnożenie macierzy, rozwiązywanie układów równań, pseudoodwrotność.</li>
+</ul>
+</section>
+<section id="ćwiczenia" class="level2">
+<h2 class="anchored" data-anchor-id="ćwiczenia">Ćwiczenia</h2>
+<ol type="1">
+<li><p>Utwórz tablicę 5×5 wypełnioną kolejnymi liczbami od 1 do 25. Wyodrębnij z niej podmacierz 3×3 środkowych elementów za pomocą wycinków. Sprawdź, czy wynik jest widokiem.</p></li>
+<li><p>Bez użycia pętli, znormalizuj każdą kolumnę macierzy <code>A</code> (rozmiar <span class="math inline">\(m \times n\)</span>) tak, aby miała średnią 0 i odchylenie standardowe 1. Wskazówka: użyj broadcastingu i <code>axis=0</code>.</p></li>
+<li><p>Dana jest macierz <span class="math inline">\(A\)</span> rozmiaru <span class="math inline">\(3\times 2\)</span> i wektor <span class="math inline">\(b\)</span> długości 3. Znajdź wektor <span class="math inline">\(x\)</span> rozwiązujący układ <span class="math inline">\(Ax \approx b\)</span> w sensie najmniejszych kwadratów. Zweryfikuj wynik, porównując <code>A @ x</code> z <code>b</code>.</p></li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
