@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.md
+    - "wyklady/wyklad_1.ipynb"
+    - "laby/lab_1.ipynb"
+
+website:
+  title: "Biblioteki Python w analizie danych"
+  sidebar:
+    contents:
+      - index.md
+      - section: "Wykłady"
+        contents:
+          - "wyklady/wyklad_1.ipynb"
+      - section: "Laboratoria"
+        contents:
+          - "laby/lab_1.ipynb"
+
+format:
+  html:
+    theme: sandstone
+    toc: true
+    toc-title: "Spis treści"
