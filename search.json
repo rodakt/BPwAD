@@ -15,7 +15,7 @@
     "href": "laby/lab_1.html#numpy",
     "title": "Lab 1: NumPy - regresja liniowa",
     "section": "NumPy",
-    "text": "NumPy\nPodstawowy NumPy: Numpy: the absolute basics for beginners.\nW zadaniach poniżej wykorzystaj: - rng = np.random.default_rng() do generowania zmiennych losowych, - wektoryzację operacji arytmetycznych, np. jeśli A i B to tablice numeryczne NumPy o takich samych wymiarach, to A + B zwraca tablicę, której elementy to sumy odpowiadających elementów tablic A i B, - operator @ do mnożenia macierzy, - np.linalg.inv() do obliczenia odwrotności macierzy, - np.linalg.svd() do rozkładu SVD macierzy, - np.transpose() lub .T do transpozycji macierzy, - @ do mnożenia macierzy.",
+    "text": "NumPy\nPodstawowy NumPy: Numpy: the absolute basics for beginners.\nW zadaniach poniżej wykorzystaj:\n\nrng = np.random.default_rng() do generowania zmiennych losowych,\nwektoryzację operacji arytmetycznych, np. jeśli A i B to tablice numeryczne NumPy o takich samych wymiarach, to A + B zwraca tablicę, której elementy to sumy odpowiadających elementów tablic A i B,\noperator @ do mnożenia macierzy,\nnp.linalg.inv() do obliczenia odwrotności macierzy,\nnp.linalg.svd() do rozkładu SVD macierzy,\nnp.transpose() lub .T do transpozycji macierzy,\n@ do mnożenia macierzy.",
     "crumbs": [
       "Laboratoria",
       "Lab 1: NumPy - regresja liniowa"
