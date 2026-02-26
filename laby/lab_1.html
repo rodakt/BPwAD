@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-81161df70946103be4ff68a34233701c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b938e67c0c3a38245966223dfb5d7d7b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -227,10 +227,11 @@ window.Quarto = {
   <li><a href="#generowanie-danych" id="toc-generowanie-danych" class="nav-link" data-scroll-target="#generowanie-danych">1.1 Generowanie danych</a></li>
   <li><a href="#obliczenie-całkowitej-sumy-kwadratów-tss" id="toc-obliczenie-całkowitej-sumy-kwadratów-tss" class="nav-link" data-scroll-target="#obliczenie-całkowitej-sumy-kwadratów-tss">1.2 Obliczenie całkowitej sumy kwadratów (TSS)</a></li>
   <li><a href="#implementacja-regresji-liniowej" id="toc-implementacja-regresji-liniowej" class="nav-link" data-scroll-target="#implementacja-regresji-liniowej">1.3 Implementacja regresji liniowej</a></li>
-  <li><a href="#ocena-jakości-modelu" id="toc-ocena-jakości-modelu" class="nav-link" data-scroll-target="#ocena-jakości-modelu">1.4 Ocena jakości modelu</a></li>
+  <li><a href="#macierz-grama-i-uwarunkowanie-przypadek-zdrowy" id="toc-macierz-grama-i-uwarunkowanie-przypadek-zdrowy" class="nav-link" data-scroll-target="#macierz-grama-i-uwarunkowanie-przypadek-zdrowy">1.4 Macierz Grama i uwarunkowanie (przypadek „zdrowy”)</a></li>
+  <li><a href="#ocena-jakości-modelu" id="toc-ocena-jakości-modelu" class="nav-link" data-scroll-target="#ocena-jakości-modelu">1.5 Ocena jakości modelu</a></li>
   <li><a href="#pytania-dodatkowe" id="toc-pytania-dodatkowe" class="nav-link" data-scroll-target="#pytania-dodatkowe">Pytania dodatkowe</a></li>
   </ul></li>
-  <li><a href="#przypadek-występowania-zależności-między-zmiennymi" id="toc-przypadek-występowania-zależności-między-zmiennymi" class="nav-link" data-scroll-target="#przypadek-występowania-zależności-między-zmiennymi">2. Przypadek występowania zależności między zmiennymi</a></li>
+  <li><a href="#przypadek-współliniowości-zmiennych" id="toc-przypadek-współliniowości-zmiennych" class="nav-link" data-scroll-target="#przypadek-współliniowości-zmiennych">2. Przypadek współliniowości zmiennych</a></li>
   <li><a href="#schemat-aktywności-słońca" id="toc-schemat-aktywności-słońca" class="nav-link" data-scroll-target="#schemat-aktywności-słońca">3. Schemat aktywności Słońca</a>
   <ul class="collapse">
   <li><a href="#wczytanie-danych" id="toc-wczytanie-danych" class="nav-link" data-scroll-target="#wczytanie-danych">3.1. Wczytanie danych</a></li>
@@ -287,6 +288,9 @@ window.Quarto = {
 <li><code>np.linalg.svd()</code> do rozkładu SVD macierzy,</li>
 <li><code>np.transpose()</code> lub <code>.T</code> do transpozycji macierzy,</li>
 <li><code>@</code> do mnożenia macierzy.</li>
+<li><code>np.column_stack()</code> lub <code>np.hstack()</code> do łączenia tablic wzdłuż kolumn,</li>
+<li><code>np.linalg.eigvalsh()</code> do obliczania wartości własnych symetrycznej macierzy rzeczywistej (wersja zoptymalizowana dla macierzy <span class="math inline">\(\mathbf{X}^T\mathbf{X}\)</span>),</li>
+<li><code>np.linalg.lstsq()</code> do rozwiązywania układów równań metodą najmniejszych kwadratów.</li>
 </ul>
 </section>
 <section id="regresja-liniowa-z-wykorzystaniem-numpy" class="level2">
@@ -308,10 +312,9 @@ Y = w_0 + w_1 X_1 + w_2 X_2 + \ldots + w_p X_p + \varepsilon.
 \end{equation}\]</span></p>
 <p>Wygeneruj w Numpy zbiór danych zgodnie z powyższym modelem:</p>
 <ol type="1">
-<li>Zaimportuj bibliotekę NumPy.</li>
-<li>Wygeneruj losowy wektor współczynników <code>w</code> o długości <span class="math inline">\(p+1\)</span> (uwzględniając wyraz wolny). Przyjmij <span class="math inline">\(p=5\)</span>.</li>
-<li>Utwórz zbiór obserwacji zmiennych niezależnych <code>X</code> składający się z <span class="math inline">\(N=1000\)</span> obserwacji i <span class="math inline">\(p=5\)</span> zmiennych niezależnych.</li>
-<li>Stwórz zmienną zależną <code>y</code> zgodnie z podanym wyżej modelem. Przyjmij <span class="math inline">\(\sigma=2.0\)</span>.</li>
+<li>Wygeneruj losowy wektor współczynników <span class="math display">\[\mathbf{w} = [w_0, w_1, \ldots, w_p]^T\]</span> o długości <span class="math inline">\(p+1\)</span> (uwzględniając wyraz wolny). Przyjmij <span class="math inline">\(p=5\)</span>.</li>
+<li>Utwórz zbiór obserwacji zmiennych niezależnych <span class="math display">\[\mathbf{X} = [\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_p]\]</span> składający się z <span class="math inline">\(N=1000\)</span> obserwacji. Symbolem <span class="math display">\[\mathbf{x}_j=[x_{1j}, x_{2j}, \ldots, x_{Nj}]^T\]</span> oznaczamy wektor obserwacji zmiennej <span class="math inline">\(X_j\)</span>.</li>
+<li>Niech <span class="math inline">\(\tilde{\mathbf{X}} = [\mathbf{1} \quad \mathbf{X}]\)</span> będzie macierzą obserwacji <span class="math inline">\(\mathbf{X}\)</span> rozszerzoną o kolumnę jedynek (tzw. <em>bias term</em>). Wygeneruj wektor szumu <span class="math display">\[\boldsymbol{\varepsilon} = [\varepsilon_1, \varepsilon_2, \ldots, \varepsilon_N]^T\]</span> o rozkładzie <span class="math inline">\(\mathcal{N}(0,\sigma^2)\)</span>. Zgodnie z podanym wyżej modelem, stwórz zmienną zależną <span class="math display">\[\mathbf{y} = \tilde{\mathbf{X}}\mathbf{w} + \boldsymbol{\varepsilon}.\]</span> Przyjmij <span class="math inline">\(\sigma=2.0\)</span>.</li>
 </ol>
 </section>
 <section id="obliczenie-całkowitej-sumy-kwadratów-tss" class="level3">
@@ -328,14 +331,41 @@ Y = w_0 + w_1 X_1 + w_2 X_2 + \ldots + w_p X_p + \varepsilon.
 </section>
 <section id="implementacja-regresji-liniowej" class="level3">
 <h3 class="anchored" data-anchor-id="implementacja-regresji-liniowej">1.3 Implementacja regresji liniowej</h3>
+<p>Estymator współczynników regresji <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> wyznaczany jest za pomocą metody najmniejszych kwadratów (<em>Ordinary Least Squares</em>):</p>
+<p><span class="math display">\[\mathbf{w}_{\text{ML}} = (\mathbf{\tilde X}^T\mathbf{\tilde X})^{-1}\mathbf{\tilde X}^T\mathbf{y}\]</span></p>
+<p>gdzie <span class="math inline">\(\mathbf{\tilde X} = [\mathbf{1} \quad \mathbf{X}]\)</span> to macierz obserwacji <span class="math inline">\(\mathbf{X}\)</span> rozszerzona o kolumnę jedynek (tzw. <em>bias term</em>). Szczegółowe wyprowadzenie oraz właściwości statystyczne estymatora znajdziesz w artykule <a href="https://pl.wikipedia.org/wiki/Regresja_liniowa">Regresja liniowa w serwisie Wikipedia</a>.</p>
 <ol type="1">
-<li>Dodaj kolumnę jedynek do macierzy <code>X</code> jako pierwszą kolumnę (odpowiadającą wyrazowi wolnemu).</li>
-<li>Oblicz estymator współczynników regresji <span class="math inline">\(\mathbf{w}_{\text{ML}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}\)</span>, gdzie <span class="math inline">\(\mathbf{X}\)</span> to macierz obserwacji zmiennych <span class="math inline">\(X_i\)</span> rozszerzona o kolumnę jedynek, a <span class="math inline">\(\mathbf{y}\)</span> to wektor wartości zmiennej <span class="math inline">\(Y\)</span>. Zobacz jak duże, co do wartości bezwzględnej, są wpisy w macierzy <span class="math inline">\((\mathbf{X}^T\mathbf{X})^{-1}\)</span>. Jak wygląda struktura wartości własnych tej macierzy?</li>
-<li>Porównaj wartości estymowanych parametrów z wartościami rzeczywistymi. Oblicz błędy względne.</li>
+<li><strong>Oblicz współczynniki</strong> <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> zgodnie z powyższym wzorem macierzowym.</li>
+<li><strong>Oblicz przewidywane wartości</strong> zmiennej zależnej korzystając z zależności: <span class="math inline">\(\hat{\mathbf{y}} = \mathbf{\tilde X} \mathbf{w}_{\text{ML}}\)</span>.</li>
+<li><strong>Dokonaj ewaluacji modelu</strong>: porównaj wartości estymowanych parametrów z wartościami rzeczywistymi i oblicz błędy względne dla poszczególnych obserwacji.</li>
 </ol>
 </section>
+<section id="macierz-grama-i-uwarunkowanie-przypadek-zdrowy" class="level3">
+<h3 class="anchored" data-anchor-id="macierz-grama-i-uwarunkowanie-przypadek-zdrowy">1.4 Macierz Grama i uwarunkowanie (przypadek „zdrowy”)</h3>
+<p>Niech <span class="math inline">\(G = \mathbf{\tilde X}^T \mathbf{\tilde X}\)</span>. Zauważ, że <span class="math inline">\(G\)</span> jest <strong>macierzą Grama</strong> kolumn macierzy <span class="math inline">\(\mathbf{\tilde X}\)</span>: jeśli <span class="math inline">\(\mathbf{x}_0, \mathbf{x}_1,\dots,\mathbf{x}_p\)</span> oznaczają kolumny <span class="math inline">\(\mathbf{\tilde X}\)</span>, to</p>
+<p><span class="math display">\[
+G_{ij} = \mathbf{x}_i^T \mathbf{x}_j = \langle \mathbf{x}_i, \mathbf{x}_j\rangle,
+\]</span></p>
+<p>czyli <span class="math inline">\(G\)</span> zawiera wszystkie odpowiednie <strong>iloczyny skalarne</strong> między cechami (kolumnami).</p>
+<ol type="1">
+<li>Oblicz macierz <span class="math inline">\(G\)</span> i obejrzyj jej wpisy. Porównaj typową skalę elementów diagonalnych <span class="math inline">\(G_{jj}\)</span> z pozadiagonalnymi <span class="math inline">\(G_{ij}\)</span> dla <span class="math inline">\(i\neq j\)</span>.</li>
+<li>Oblicz wartości własne <span class="math inline">\(G\)</span> oraz liczbę uwarunkowania <span class="math display">\[
+\kappa(G)=\frac{\lambda_{\max}(G)}{\lambda_{\min}(G)}.
+\]</span> W tym punkcie (losowe, niezależne cechy) <span class="math inline">\(\kappa(G)\)</span> powinna być umiarkowana, a <span class="math inline">\(\lambda_{\min}(G)\)</span> nie powinna być bliska zeru.</li>
+<li>Oblicz macierz odwrotną <span class="math inline">\(G^{-1}\)</span> i sprawdź, że jej wartości własne są równe <span class="math inline">\(1/\lambda_i(G)\)</span>. Co to oznacza dla stabilności obliczeń przy odwracaniu macierzy?</li>
+</ol>
+<div class="alert alert-block alert-info">
+<p><b>Intuicja: co „widzi” macierz Grama <span class="math inline">\(G=X^T X\)</span></b></p>
+<p>Macierz <span class="math inline">\(G\)</span> jest macierzą iloczynów skalarnych kolumn <span class="math inline">\(X\)</span>: <span class="math inline">\(G_{ij}=\langle x_i,x_j\rangle\)</span>. Elementy diagonalne <span class="math inline">\(G_{jj}=\|x_j\|^2\)</span> opisują skalę (energię) pojedynczej cechy, a wpisy pozadiagonalne <span class="math inline">\(G_{ij}\)</span> mówią, na ile dwie cechy niosą tę samą informację (korelacja / redundancja). Gdy pozadiagonalne wpisy są duże, cechy są współliniowe i trudniej „rozliczyć” ich wpływ osobno.</p>
+</div>
+<div class="alert alert-block alert-warning">
+<p><b>Dlaczego to ma znaczenie dla MNK (i czemu wrócimy do tego w sekcji 2)</b><br> W MNK odwracamy (jawnie lub niejawnie) macierz Grama: pojawia się <span class="math inline">\(G^{-1}\)</span>. Jeśli współliniowość sprawia, że najmniejsza wartość własna <span class="math inline">\(\lambda_{\min}(G)\)</span> staje się mała, to liczba uwarunkowania <span class="math display">\[
+\kappa(G)=\frac{\lambda_{\max}(G)}{\lambda_{\min}(G)}
+\]</span> gwałtownie rośnie, a w <span class="math inline">\(G^{-1}\)</span> pojawiają się duże wartości własne (<span class="math inline">\(1/\lambda_i(G)\)</span>) i często duże wpisy. To prowadzi do niestabilnych współczynników MNK i dużej wrażliwości na szum. W sekcji 2 skonstruujemy taki przypadek celowo.</p>
+</div>
+</section>
 <section id="ocena-jakości-modelu" class="level3">
-<h3 class="anchored" data-anchor-id="ocena-jakości-modelu">1.4 Ocena jakości modelu</h3>
+<h3 class="anchored" data-anchor-id="ocena-jakości-modelu">1.5 Ocena jakości modelu</h3>
 <p>RSS (<em>Residual Sum of Squares</em>) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami <span class="math inline">\(y_i\)</span> a przewidywanymi <span class="math inline">\(\hat{y}_i\)</span> (jak wygląda wzór na <span class="math inline">\(\hat{y}_i\)</span>?):</p>
 <p><span class="math display">\[\begin{equation*}
 \text{RSS} = \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
@@ -361,14 +391,21 @@ R^2 = \frac{\text{TSS} - \text{RSS}}{\text{TSS}}= 1 - \frac{\text{RSS}}{\text{TS
 </ol>
 </section>
 </section>
-<section id="przypadek-występowania-zależności-między-zmiennymi" class="level2">
-<h2 class="anchored" data-anchor-id="przypadek-występowania-zależności-między-zmiennymi">2. Przypadek występowania zależności między zmiennymi</h2>
-<p>W poprzednim zadaniu zakładaliśmy, że zmienne losowe <span class="math inline">\(X_1,\ldots,X_p\)</span> są niezależne, co powodowało, że macierz <span class="math inline">\(\mathbf{X}^T\mathbf{X}\)</span> była odwracalna a estymator <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> dobrze aproksymował parametry modelu. Teraz załóżmy, że jedna ze zmiennych, powiedzmy <span class="math inline">\(X_p\)</span>, wyraża, z pewnym błędem, jako liniowa kombinacja innych zmiennych, np:</p>
-<p><span class="math display">\[\begin{equation}
-X_p = 2X_1 - X_2 + \varepsilon_p,
-\end{equation}\]</span></p>
-<p>gdzie <span class="math inline">\(\varepsilon_p\sim\mathcal{N}(0,\sigma_p^2)\)</span>.</p>
-<p>Przeprowadź analogiczne analizy jak w poprzednim zadaniu. Czy zmiana struktury zmiennych niezależnych wpływa na jakość modelu? Jak teraz wygląda macierz <span class="math inline">\((\mathbf{X}^T\mathbf{X})^{-1}\)</span>? Jak wyglądają wartości własne macierzy <span class="math inline">\(\mathbf{X}^T\mathbf{X}\)</span>?</p>
+<section id="przypadek-współliniowości-zmiennych" class="level2">
+<h2 class="anchored" data-anchor-id="przypadek-współliniowości-zmiennych">2. Przypadek współliniowości zmiennych</h2>
+<p>W zadaniu 1. zmienne <span class="math inline">\(X_1,\ldots,X_p\)</span> były wzajemnie niezależne, dzięki czemu macierz Grama <span class="math inline">\(G = \tilde{\mathbf{X}}^T\tilde{\mathbf{X}}\)</span> była dobrze uwarunkowana, a estymator <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> trafnie aproksymował prawdziwe parametry modelu. Sekcja 1.4 sygnalizowała, że sytuacja zmienia się zasadniczo, gdy cechy przestają być niezależne — duże wpisy pozadiagonalne <span class="math inline">\(G\)</span> oznaczają redundancję informacji i prowadzą do niestabilności estymatora.</p>
+<p>Teraz skonstruujemy taki przypadek celowo. Przyjmijmy, że ostatnia zmienna <span class="math inline">\(X_p\)</span> jest przybliżoną kombinacją liniową pozostałych:</p>
+<p><span class="math display">\[X_p = 2X_1 - X_2 + \varepsilon_p,\]</span></p>
+<p>gdzie <span class="math inline">\(\varepsilon_p \sim \mathcal{N}(0, \sigma_p^2)\)</span>.</p>
+<p>Parametr <span class="math inline">\(\sigma_p\)</span> kontroluje stopień współliniowości: dla <span class="math inline">\(\sigma_p \to 0\)</span> kolumny macierzy <span class="math inline">\(\tilde{\mathbf{X}}\)</span> stają się liniowo zależne i <span class="math inline">\(G\)</span> przestaje być odwracalna.</p>
+<p>Przeprowadź poniższe analizy i porównaj wyniki z zadaniem 1.:</p>
+<ol type="1">
+<li><strong>Wygeneruj dane</strong> zgodnie z powyższym modelem. Przyjmij <span class="math inline">\(p=5\)</span>, <span class="math inline">\(N=1000\)</span>, <span class="math inline">\(\sigma=2.0\)</span>. Przetestuj kilka wartości <span class="math inline">\(\sigma_p\)</span>, np. <span class="math inline">\(\sigma_p \in \{0.01,\, 0.1,\, 1.0\}\)</span>.</li>
+<li><strong>Zbadaj macierz Grama</strong>: oblicz <span class="math inline">\(G\)</span> i jej liczbę uwarunkowania <span class="math inline">\(\kappa(G)\)</span>. Jak zmienia się <span class="math inline">\(\kappa(G)\)</span> w zależności od <span class="math inline">\(\sigma_p\)</span>? Porównaj z wynikiem z sekcji 1.4.</li>
+<li><strong>Oblicz estymator <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span></strong> metodą normalną przy użyciu <code>np.linalg.inv()</code>: <span class="math display">\[\mathbf{w}_{\text{ML}} = (\tilde{\mathbf{X}}^T\tilde{\mathbf{X}})^{-1}\tilde{\mathbf{X}}^T\mathbf{y}.\]</span> Porównaj uzyskane współczynniki z wartościami rzeczywistymi — czy estymator jest nadal trafny?</li>
+<li><strong>Oceń jakość modelu</strong>: oblicz RSS i <span class="math inline">\(R^2\)</span>. Czy wysoki <span class="math inline">\(R^2\)</span> wyklucza niestabilność współczynników?</li>
+<li><strong>Rozkład SVD jako alternatywa</strong>: wyznacz <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> za pomocą pseudoodwrotności Moore’a–Penrose’a, wykorzystując rozkład SVD zwracany przez funkcję <code>np.linalg.svd()</code>. Dla rozkładu postaci <span class="math inline">\(\tilde{\mathbf{X}} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^T\)</span> pseudoodwrotność dana jest wzorem: <span class="math display">\[\tilde{\mathbf{X}}^+ = \mathbf{V}\boldsymbol{\Sigma}^+\mathbf{U}^T,\]</span> gdzie macierz <span class="math inline">\(\boldsymbol{\Sigma}^+\)</span> powstaje poprzez zastąpienie niezerowych wartości osobliwych <span class="math inline">\(\sigma_i\)</span> ich odwrotnościami <span class="math inline">\(1/\sigma_i\)</span>. Estymator przyjmuje wówczas postać: <span class="math display">\[\mathbf{w}_{\text{ML}} = \tilde{\mathbf{X}}^+\mathbf{y} = \mathbf{V}\boldsymbol{\Sigma}^+\mathbf{U}^T\mathbf{y}.\]</span> W celu stabilizacji numerycznej zastosuj ucięcie (<em>truncation</em>), polegające na zignorowaniu pomijalnie małych wartości osobliwych <span class="math inline">\(\sigma_i\)</span> i zastąpieniu ich zerami w macierzy <span class="math inline">\(\boldsymbol{\Sigma}^+\)</span>. Porównaj stabilność wyników z metodą równań normalnych, szczególnie w przypadku złego uwarunkowania macierzy (małe <span class="math inline">\(\sigma_p\)</span>).</li>
+</ol>
 </section>
 <section id="schemat-aktywności-słońca" class="level2">
 <h2 class="anchored" data-anchor-id="schemat-aktywności-słońca">3. Schemat aktywności Słońca</h2>
