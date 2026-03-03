@@ -5,6 +5,7 @@ project:
     - index.md
     - "wyklady/wyklad_1.ipynb"
     - "laby/lab_1.ipynb"
+    - "laby/lab_2.ipynb"
 
 website:
   title: "Biblioteki Python w analizie danych"
@@ -17,6 +18,7 @@ website:
       - section: "Laboratoria"
         contents:
           - "laby/lab_1.ipynb"
+          - "laby/lab_2.ipynb"
 
 format:
   html:

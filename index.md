@@ -26,6 +26,7 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 | Temat | Podgląd | Colab | Pobierz |
 |-------|---------|-------|---------|
 | Lab 1: NumPy - regresja liniowa | [🔗 HTML](laby/lab_1.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_1.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_1.ipynb) |
+| Lab 2: NumPy - obrazy rastrowe | [🔗 HTML](laby/lab_2.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_2.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_2.ipynb) |
 
 
 ## Zaliczenie
