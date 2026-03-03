@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://rodakt.github.io/BPwAD/laby/lab_1.html</loc>
-    <lastmod>2026-02-28T06:05:31.570Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rodakt.github.io/BPwAD/index.html</loc>
-    <lastmod>2026-02-28T06:05:31.570Z</lastmod>
+    <loc>https://rodakt.github.io/BPwAD/laby/lab_2.html</loc>
+    <lastmod>2026-03-03T23:56:25.423Z</lastmod>
   </url>
   <url>
     <loc>https://rodakt.github.io/BPwAD/wyklady/wyklad_1.html</loc>
-    <lastmod>2026-02-28T06:05:31.573Z</lastmod>
+    <lastmod>2026-03-03T23:56:25.426Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/index.html</loc>
+    <lastmod>2026-03-03T23:56:25.422Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/laby/lab_1.html</loc>
+    <lastmod>2026-03-03T23:56:25.422Z</lastmod>
   </url>
 </urlset>

@@ -1,117 +1,90 @@
 [
   {
-    "objectID": "laby/lab_1.html",
-    "href": "laby/lab_1.html",
-    "title": "Lab 1: NumPy - regresja liniowa",
+    "objectID": "laby/lab_2.html",
+    "href": "laby/lab_2.html",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
     "section": "",
-    "text": "Open In Colab",
+    "text": "Open In Colab\nW tym arkuszu będziemy przetwarzać w NumPy obrazy rastrowe. Obrazy rastrowe to tablice pikseli, z których każdy ma przypisaną wartość koloru. W przypadku obrazów RGB każdy piksel ma trzy wartości: intensywność koloru czerwonego, zielonego i niebieskiego. Wartości te są zazwyczaj z zakresu 0–255, gdzie 0 oznacza brak danego koloru, a 255 — jego maksymalną intensywność. Zakres 0–255 to dokładnie jeden bajt, w NumPy reprezentowany jako uint8.\nPomostem między obrazem reprezentowanym jako tablica NumPy a obrazem wyświetlanym na ekranie będzie dla nas biblioteka Pillow (PIL — Python Imaging Library).\nimport numpy as np\nfrom PIL import Image\nimport matplotlib.pyplot as plt\nKonwencja wyświetlania: Do wyświetlania obrazów używamy Image.fromarray() — obiekt PIL wyświetla się automatycznie w Jupyterze jako ostatnie wyrażenie w komórce. Matplotlib (plt.imshow(), plt.subplots()) stosujemy tam, gdzie potrzebujemy porównań obok siebie, colormap (np. cmap='gray' dla tablic 2D) lub wykresów (histogramy).",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: NumPy - regresja liniowa"
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#numpy",
-    "href": "laby/lab_1.html#numpy",
-    "title": "Lab 1: NumPy - regresja liniowa",
-    "section": "NumPy",
-    "text": "NumPy\nPodstawowy NumPy: Numpy: the absolute basics for beginners.\nW zadaniach poniżej wykorzystaj:\n\nrng = np.random.default_rng() do generowania zmiennych losowych,\nwektoryzację operacji arytmetycznych, np. jeśli A i B to tablice numeryczne NumPy o takich samych wymiarach, to A + B zwraca tablicę, której elementy to sumy odpowiadających elementów tablic A i B,\noperator @ do mnożenia macierzy,\nnp.linalg.inv() do obliczenia odwrotności macierzy,\nnp.linalg.svd() do rozkładu SVD macierzy,\nnp.transpose() lub .T do transpozycji macierzy,\n@ do mnożenia macierzy.\nnp.column_stack() lub np.hstack() do łączenia tablic wzdłuż kolumn,\nnp.linalg.eigvalsh() do obliczania wartości własnych symetrycznej macierzy rzeczywistej (wersja zoptymalizowana dla macierzy \\(\\mathbf{X}^T\\mathbf{X}\\)),\nnp.linalg.lstsq() do rozwiązywania układów równań metodą najmniejszych kwadratów.",
+    "objectID": "laby/lab_2.html#obraz-jako-tablica-numpy",
+    "href": "laby/lab_2.html#obraz-jako-tablica-numpy",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "1. Obraz jako tablica NumPy",
+    "text": "1. Obraz jako tablica NumPy\n\n1.1 Wczytanie obrazu\nPobierz dowolny kolorowy obraz RGB z internetu (np. ten) i wczytaj go za pomocą Image.open(). Możesz pobrać obraz ręcznie lub skorzystać z biblioteki requests:\n\nimport requests\n\nurl = 'https://upload.wikimedia.org/wikipedia/commons/d/d3/HepaticaNobilisSLO_flower.JPG'\nr = requests.get(\n    url,\n    headers={\"User-Agent\": \"Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0\"}\n    )\nr.raise_for_status()\nwith open('kwiatek.jpg', 'wb') as f:\n    f.write(r.content)\n\nWczytaj obraz i wyświetl go w notatniku.\n\nJakie są wymiary obrazu (img.size)?\nJaki jest tryb kolorów (img.mode)?\nJaki jest format pliku (img.format)?\n\n\n\n\n\n\n1.2 Konwersja do tablicy NumPy\nPrzekształć obiekt Image do tablicy NumPy za pomocą np.array().\n\nJaki jest kształt (shape) powstałej tablicy? Zinterpretuj każdy wymiar.\nJaki jest typ danych (dtype)?\nIle wymiarów (ndim) ma tablica?\nIle łącznie wartości (size) zawiera tablica?\n\n\n\n\n\n\n1.3 Dostęp do kanałów\nKażdy piksel obrazu RGB jest opisany trzema wartościami — kanałami R, G, B — zapisanymi w ostatnim wymiarze tablicy. Wyodrębnij poszczególne kanały i wyświetl je jako osobne obrazy w skali szarości obok siebie.\nWskazówka: Kanał czerwony to img_array[:, :, 0], zielony — img_array[:, :, 1], niebieski — img_array[:, :, 2]. Ponieważ pojedynczy kanał jest tablicą 2D, PIL nie wyświetli go poprawnie jako obraz RGB — tutaj wygodniej jest użyć plt.subplots() z plt.imshow(..., cmap='gray'), aby matplotlib potraktował tablicę 2D jako obraz szaroodcieniowy.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: NumPy - regresja liniowa"
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#regresja-liniowa-z-wykorzystaniem-numpy",
-    "href": "laby/lab_1.html#regresja-liniowa-z-wykorzystaniem-numpy",
-    "title": "Lab 1: NumPy - regresja liniowa",
-    "section": "1. Regresja liniowa z wykorzystaniem NumPy",
-    "text": "1. Regresja liniowa z wykorzystaniem NumPy\nCelem ćwiczenia jest implementacja regresji liniowej z wykorzystaniem biblioteki NumPy. Zamiast gotowych narzędzi jak sklearn, wykorzystamy operacje algebraiczne do obliczenia współczynników modelu oraz oceny jego jakości.\nZaczniemy od wygenerowania sztucznych danych, które posłużą nam do przetestowania implementacji.\n\n1.1 Generowanie danych\nNiech \\(w_0,w_1,\\ldots,w_p\\), \\(X_1,X_2,\\ldots,X_p\\) oraz \\(\\varepsilon\\) będą niezależnymi zmiennymi losowymi o rozkładach:\n\\[\\begin{align*}\nw_i&\\sim\\mathcal{N}(0,1),\\ i=0,1,\\ldots,p,\\\\\nX_j&\\sim\\mathcal{N}(0,1),\\ j=1,2,\\ldots,p,\\\\\n\\varepsilon&\\sim\\mathcal{N}(0,\\sigma^2),\n\\end{align*}\\]\ngdzie \\(\\mathcal{N}(\\mu,\\sigma^2)\\) oznacza rozkład normalny o średniej \\(\\mu\\) i wariancji \\(\\sigma^2\\).\nGdy parametry \\(w_0,w_1,\\ldots,w_p\\) są znane, to zmienną zależną \\(Y\\) definiujemy wzorem:\n\\[\\begin{equation}\nY = w_0 + w_1 X_1 + w_2 X_2 + \\ldots + w_p X_p + \\varepsilon.\n\\end{equation}\\]\nWygeneruj w Numpy zbiór danych zgodnie z powyższym modelem:\n\nWygeneruj losowy wektor współczynników \\[\\mathbf{w} = [w_0, w_1, \\ldots, w_p]^T\\] o długości \\(p+1\\) (uwzględniając wyraz wolny). Przyjmij \\(p=5\\).\nUtwórz zbiór obserwacji zmiennych niezależnych \\[\\mathbf{X} = [\\mathbf{x}_1, \\mathbf{x}_2, \\ldots, \\mathbf{x}_p]\\] składający się z \\(N=1000\\) obserwacji. Symbolem \\[\\mathbf{x}_j=[x_{1j}, x_{2j}, \\ldots, x_{Nj}]^T\\] oznaczamy wektor obserwacji zmiennej \\(X_j\\).\nNiech \\(\\tilde{\\mathbf{X}} = [\\mathbf{1} \\quad \\mathbf{X}]\\) będzie macierzą obserwacji \\(\\mathbf{X}\\) rozszerzoną o kolumnę jedynek (tzw. bias term). Wygeneruj wektor szumu \\[\\boldsymbol{\\varepsilon} = [\\varepsilon_1, \\varepsilon_2, \\ldots, \\varepsilon_N]^T\\] o rozkładzie \\(\\mathcal{N}(0,\\sigma^2)\\). Zgodnie z podanym wyżej modelem, stwórz zmienną zależną \\[\\mathbf{y} = \\tilde{\\mathbf{X}}\\mathbf{w} + \\boldsymbol{\\varepsilon}.\\] Przyjmij \\(\\sigma=2.0\\).\n\n\n\n1.2 Obliczenie całkowitej sumy kwadratów (TSS)\nTSS (Total Sum of Squares) to suma kwadratów różnic między wartościami zmiennej zależnej y a ich średnią:\n\\[\\begin{equation*}\n\\text{TSS} = \\sum_{i=1}^{N} (y_i - \\bar{y})^2\n\\end{equation*}\\]\ngdzie \\(\\bar{y}\\) to średnia wartość zmiennej y. Wielkość tę można interpretować jako całkowitą wariancję zmiennej zależnej. Można też powiedzieć, że jest to ocena bazowego modelu wyznaczonego przez średnią wartość zmiennej zależnej.\n\nOblicz średnią wartość zmiennej y.\nKorzystając z definicji oblicz TSS.\n\n\n\n1.3 Implementacja regresji liniowej\nEstymator współczynników regresji \\(\\mathbf{w}_{\\text{ML}}\\) wyznaczany jest za pomocą metody najmniejszych kwadratów (Ordinary Least Squares):\n\\[\\mathbf{w}_{\\text{ML}} = (\\mathbf{\\tilde X}^T\\mathbf{\\tilde X})^{-1}\\mathbf{\\tilde X}^T\\mathbf{y}\\]\ngdzie \\(\\mathbf{\\tilde X} = [\\mathbf{1} \\quad \\mathbf{X}]\\) to macierz obserwacji \\(\\mathbf{X}\\) rozszerzona o kolumnę jedynek (tzw. bias term). Szczegółowe wyprowadzenie oraz właściwości statystyczne estymatora znajdziesz w artykule Regresja liniowa w serwisie Wikipedia.\n\nOblicz współczynniki \\(\\mathbf{w}_{\\text{ML}}\\) zgodnie z powyższym wzorem macierzowym.\nOblicz przewidywane wartości zmiennej zależnej korzystając z zależności: \\(\\hat{\\mathbf{y}} = \\mathbf{\\tilde X} \\mathbf{w}_{\\text{ML}}\\).\nDokonaj ewaluacji modelu: porównaj wartości estymowanych parametrów z wartościami rzeczywistymi i oblicz błędy względne dla poszczególnych obserwacji.\n\n\n\n1.4 Macierz Grama i uwarunkowanie (przypadek „zdrowy”)\nNiech \\(G = \\mathbf{\\tilde X}^T \\mathbf{\\tilde X}\\). Zauważ, że \\(G\\) jest macierzą Grama kolumn macierzy \\(\\mathbf{\\tilde X}\\): jeśli \\(\\mathbf{x}_0, \\mathbf{x}_1,\\dots,\\mathbf{x}_p\\) oznaczają kolumny \\(\\mathbf{\\tilde X}\\), to\n\\[\nG_{ij} = \\mathbf{x}_i^T \\mathbf{x}_j = \\langle \\mathbf{x}_i, \\mathbf{x}_j\\rangle,\n\\]\nczyli \\(G\\) zawiera wszystkie odpowiednie iloczyny skalarne między cechami (kolumnami).\n\nOblicz macierz \\(G\\) i obejrzyj jej wpisy. Porównaj typową skalę elementów diagonalnych \\(G_{jj}\\) z pozadiagonalnymi \\(G_{ij}\\) dla \\(i\\neq j\\).\nOblicz wartości własne \\(G\\) oraz liczbę uwarunkowania \\[\n\\kappa(G)=\\frac{\\lambda_{\\max}(G)}{\\lambda_{\\min}(G)}.\n\\] W tym punkcie (losowe, niezależne cechy) \\(\\kappa(G)\\) powinna być umiarkowana, a \\(\\lambda_{\\min}(G)\\) nie powinna być bliska zeru.\nOblicz macierz odwrotną \\(G^{-1}\\) i sprawdź, że jej wartości własne są równe \\(1/\\lambda_i(G)\\). Co to oznacza dla stabilności obliczeń przy odwracaniu macierzy?\n\n\nIntuicja: co „widzi” macierz Grama \\(G=X^T X\\)\nMacierz \\(G\\) jest macierzą iloczynów skalarnych kolumn \\(X\\): \\(G_{ij}=\\langle x_i,x_j\\rangle\\). Elementy diagonalne \\(G_{jj}=\\|x_j\\|^2\\) opisują skalę (energię) pojedynczej cechy, a wpisy pozadiagonalne \\(G_{ij}\\) mówią, na ile dwie cechy niosą tę samą informację (korelacja / redundancja). Gdy pozadiagonalne wpisy są duże, cechy są współliniowe i trudniej „rozliczyć” ich wpływ osobno.\n\n\nDlaczego to ma znaczenie dla MNK (i czemu wrócimy do tego w sekcji 2) W MNK odwracamy (jawnie lub niejawnie) macierz Grama: pojawia się \\(G^{-1}\\). Jeśli współliniowość sprawia, że najmniejsza wartość własna \\(\\lambda_{\\min}(G)\\) staje się mała, to liczba uwarunkowania \\[\n\\kappa(G)=\\frac{\\lambda_{\\max}(G)}{\\lambda_{\\min}(G)}\n\\] gwałtownie rośnie, a w \\(G^{-1}\\) pojawiają się duże wartości własne (\\(1/\\lambda_i(G)\\)) i często duże wpisy. To prowadzi do niestabilnych współczynników MNK i dużej wrażliwości na szum. W sekcji 2 skonstruujemy taki przypadek celowo.\n\n\n\n1.5 Ocena jakości modelu\nRSS (Residual Sum of Squares) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami \\(y_i\\) a przewidywanymi \\(\\hat{y}_i\\) (jak wygląda wzór na \\(\\hat{y}_i\\)?):\n\\[\\begin{equation*}\n\\text{RSS} = \\sum_{i=1}^{N} (y_i - \\hat{y}_i)^2\n\\end{equation*}\\]\nWielkość ta jest miarą dopasowania modelu do danych. Wyliczone w poprzednich krokach parametry modelu minimalizują RSS.\nWspółczynnik determinacji \\(R^2\\) to stosunek wariancji wyjaśnionej przez model do całkowitej wariancji zmiennej zależnej:\n\\[\\begin{equation*}\nR^2 = \\frac{\\text{TSS} - \\text{RSS}}{\\text{TSS}}= 1 - \\frac{\\text{RSS}}{\\text{TSS}}\n\\end{equation*}\\]\n\nOblicz przewidywane wartości \\(\\hat{y_i}\\), \\(i=1,\\ldots,N\\).\nOblicz RSS.\nOblicz współczynnik determinacji \\(R^2\\).\n\n\n\nPytania dodatkowe\nZobacz jak zmienia się wartość TSS, RSS i \\(R^2\\) w zależności od:\n\nwariancji szumu,\nliczby obserwacji \\(N\\),\nliczby zmiennych niezależnych \\(p\\).",
+    "objectID": "laby/lab_2.html#konwersja-do-skali-szarości",
+    "href": "laby/lab_2.html#konwersja-do-skali-szarości",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "2. Konwersja do skali szarości",
+    "text": "2. Konwersja do skali szarości\nKonwersja obrazu RGB do skali szarości polega na zastąpieniu trzech wartości (R, G, B) każdego piksela jedną wartością jasności. Standardowy wzór, uwzględniający percepcję ludzkiego oka, to:\n\\[L = 0{,}2126 \\cdot R + 0{,}7152 \\cdot G + 0{,}0722 \\cdot B\\]\n\n2.1 Implementacja wektoryzowana\nZaimplementuj konwersję RGB → skala szarości za pomocą jednej operacji NumPy, bez pętli. Wynik powinien być tablicą 2D typu uint8.\nWskazówka: Zdefiniuj wektor wag w = np.array([0.2126, 0.7152, 0.0722]). Broadcasting pozwoli pomnożyć tablicę o kształcie (H, W, 3) przez wektor o kształcie (3,) — jaka operacja da sumę ważoną po ostatniej osi?\nWyświetl wynik za pomocą Image.fromarray() (PIL automatycznie rozpoznaje tablicę 2D uint8 jako obraz w skali szarości).\n\n\n\n\n\n2.2 Porównanie z pętlą\nNapisz drugą implementację konwersji — za pomocą podwójnej pętli for iterującej po pikselach. Zmierz czas wykonania obu wersji za pomocą %%timeit (lub time.time() jeśli obraz jest duży). Jaka jest różnica?",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: NumPy - regresja liniowa"
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#przypadek-współliniowości-zmiennych",
-    "href": "laby/lab_1.html#przypadek-współliniowości-zmiennych",
-    "title": "Lab 1: NumPy - regresja liniowa",
-    "section": "2. Przypadek współliniowości zmiennych",
-    "text": "2. Przypadek współliniowości zmiennych\nW zadaniu 1. zmienne \\(X_1,\\ldots,X_p\\) były wzajemnie niezależne, dzięki czemu macierz Grama \\(G = \\tilde{\\mathbf{X}}^T\\tilde{\\mathbf{X}}\\) była dobrze uwarunkowana, a estymator \\(\\mathbf{w}_{\\text{ML}}\\) trafnie aproksymował prawdziwe parametry modelu. Sekcja 1.4 sygnalizowała, że sytuacja zmienia się zasadniczo, gdy cechy przestają być niezależne — duże wpisy pozadiagonalne \\(G\\) oznaczają redundancję informacji i prowadzą do niestabilności estymatora.\nTeraz skonstruujemy taki przypadek celowo. Przyjmijmy, że ostatnia zmienna \\(X_p\\) jest przybliżoną kombinacją liniową pozostałych:\n\\[X_p = 2X_1 - X_2 + \\varepsilon_p,\\]\ngdzie \\(\\varepsilon_p \\sim \\mathcal{N}(0, \\sigma_p^2)\\).\nParametr \\(\\sigma_p\\) kontroluje stopień współliniowości: dla \\(\\sigma_p \\to 0\\) kolumny macierzy \\(\\tilde{\\mathbf{X}}\\) stają się liniowo zależne i \\(G\\) przestaje być odwracalna.\nPrzeprowadź poniższe analizy i porównaj wyniki z zadaniem 1.:\n\nWygeneruj dane zgodnie z powyższym modelem. Przyjmij \\(p=5\\), \\(N=1000\\), \\(\\sigma=2.0\\). Przetestuj kilka wartości \\(\\sigma_p\\), np. \\(\\sigma_p \\in \\{0.01,\\, 0.1,\\, 1.0\\}\\).\nZbadaj macierz Grama: oblicz \\(G\\) i jej liczbę uwarunkowania \\(\\kappa(G)\\). Jak zmienia się \\(\\kappa(G)\\) w zależności od \\(\\sigma_p\\)? Porównaj z wynikiem z sekcji 1.4.\nOblicz estymator \\(\\mathbf{w}_{\\text{ML}}\\) metodą normalną przy użyciu np.linalg.inv(): \\[\\mathbf{w}_{\\text{ML}} = (\\tilde{\\mathbf{X}}^T\\tilde{\\mathbf{X}})^{-1}\\tilde{\\mathbf{X}}^T\\mathbf{y}.\\] Porównaj uzyskane współczynniki z wartościami rzeczywistymi — czy estymator jest nadal trafny?\nOceń jakość modelu: oblicz RSS i \\(R^2\\). Czy wysoki \\(R^2\\) wyklucza niestabilność współczynników?\nRozkład SVD jako alternatywa: wyznacz \\(\\mathbf{w}_{\\text{ML}}\\) za pomocą pseudoodwrotności Moore’a–Penrose’a, wykorzystując rozkład SVD zwracany przez funkcję np.linalg.svd(). Dla rozkładu postaci \\(\\tilde{\\mathbf{X}} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^T\\) pseudoodwrotność dana jest wzorem: \\[\\tilde{\\mathbf{X}}^+ = \\mathbf{V}\\boldsymbol{\\Sigma}^+\\mathbf{U}^T,\\] gdzie macierz \\(\\boldsymbol{\\Sigma}^+\\) powstaje poprzez zastąpienie niezerowych wartości osobliwych \\(\\sigma_i\\) ich odwrotnościami \\(1/\\sigma_i\\). Estymator przyjmuje wówczas postać: \\[\\mathbf{w}_{\\text{ML}} = \\tilde{\\mathbf{X}}^+\\mathbf{y} = \\mathbf{V}\\boldsymbol{\\Sigma}^+\\mathbf{U}^T\\mathbf{y}.\\] W celu stabilizacji numerycznej zastosuj ucięcie (truncation), polegające na zignorowaniu pomijalnie małych wartości osobliwych \\(\\sigma_i\\) i zastąpieniu ich zerami w macierzy \\(\\boldsymbol{\\Sigma}^+\\). Porównaj stabilność wyników z metodą równań normalnych, szczególnie w przypadku złego uwarunkowania macierzy (małe \\(\\sigma_p\\)).",
+    "objectID": "laby/lab_2.html#operacje-punktowe-na-obrazach",
+    "href": "laby/lab_2.html#operacje-punktowe-na-obrazach",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "3. Operacje punktowe na obrazach",
+    "text": "3. Operacje punktowe na obrazach\nOperacje punktowe to przekształcenia, w których nowa wartość piksela zależy wyłącznie od jego starej wartości (a nie od sąsiadów).\n\n3.1 Negatyw\nNegatyw obrazu w skali szarości powstaje przez odwrócenie jasności: \\(L' = 255 - L\\). Utwórz negatyw obrazu szaroodcieniowego z zadania 2. Wyświetl oryginał i negatyw obok siebie (tu wygodnie jest użyć plt.subplots() z cmap='gray', albo złożyć oba obrazy obok siebie za pomocą np.hstack() i wyświetlić przez Image.fromarray()).\n\n\n3.2 Progowanie (thresholding)\nProgowanie zamienia obraz szaroodcieniowy na obraz binarny (czarno-biały):\n\\[L'(x,y) = \\begin{cases} 255 & \\text{jeśli } L(x,y) &gt; t \\\\ 0 & \\text{w przeciwnym razie} \\end{cases}\\]\ngdzie \\(t\\) to próg.\n\nZaimplementuj progowanie za pomocą porównania tablicowego (wynikiem porównania gray &gt; t jest tablica boolowska — jak zamienić ją na uint8?).\nWyświetl wyniki dla kilku wartości progu: \\(t \\in \\{64, 128, 192\\}\\).\n\n\n\n3.3 Automatyczny próg Otsu\nRęczny dobór progu wymaga eksperymentowania. Metoda Otsu wyznacza próg automatycznie na podstawie rozkładu jasności pikseli.\nIntuicja. Próg \\(t\\) dzieli piksele na dwie klasy: ciemne (\\(\\leq t\\)) i jasne (\\(&gt; t\\)). Dobry próg to taki, przy którym piksele w każdej klasie są do siebie podobne — mają małą wariancję jasności. Metoda Otsu szuka progu \\(t^*\\) minimalizującego sumę ważonych wariancji obu klas:\n\\[\\sigma_w^2(t) = \\frac{n_0(t)}{N}\\,\\sigma_0^2(t) + \\frac{n_1(t)}{N}\\,\\sigma_1^2(t)\\]\ngdzie \\(n_0(t)\\) to liczba pikseli o jasności \\(\\leq t\\), \\(n_1(t) = N - n_0(t)\\), a \\(\\sigma_0^2(t)\\), \\(\\sigma_1^2(t)\\) to wariancje jasności w każdej z klas.\nAlgorytm. Naiwne podejście wymagałoby dla każdego \\(t \\in \\{0, \\ldots, 255\\}\\) przejrzenia wszystkich \\(N\\) pikseli — koszt \\(O(255 \\times N)\\). Kluczowy trik polega na kompresji danych do histogramu: tablica 256 liczb zastępuje miliony pikseli, a wszystkie statystyki obliczamy z histogramu.\n\nHistogram. Oblicz histogram jasności:\nh = np.bincount(gray.ravel(), minlength=256)\nTeraz h[i] to liczba pikseli o jasności \\(i\\), a cała informacja o obrazie mieści się w 256 liczbach.\nWektor jasności. Zdefiniuj bins = np.arange(256).\nSumy kumulacyjne. Oblicz:\ncum_n = np.cumsum(h)            # cum_n[t] = n_0(t) = sum h[0..t]\ncum_sum = np.cumsum(bins * h)   # cum_sum[t] = sum i*h[i] dla i=0..t\nDzięki temu \\(n_0(t)\\) i \\(\\sum_{i=0}^{t} i \\cdot h[i]\\) są dostępne dla wszystkich progów jednocześnie — bez pętli po \\(t\\).\nStatystyki klas. Dla każdego progu \\(t\\): \\[n_0(t) = \\texttt{cum\\_n}[t], \\qquad \\mu_0(t) = \\frac{\\texttt{cum\\_sum}[t]}{n_0(t)}\\] Statystyki klasy 1 wynikają z różnicy z wartościami globalnymi (tzn. wartościami dla \\(t = 255\\)).\nWariancje klas. To najtrudniejszy krok. Potrzebujesz sumy kumulacyjnej \\(\\sum_{i=0}^{t} h[i] \\cdot i^2\\), z której wariancja wynika ze wzoru \\(\\sigma^2 = \\overline{x^2} - \\bar{x}^2\\). Uważaj na progi, przy których \\(n_0(t) = 0\\) lub \\(n_1(t) = 0\\) — dzielenie przez zero można zabezpieczyć np. przez np.where lub dodanie małej wartości eps.\nOptymalny próg. Wybierz \\(t^* = \\arg\\min_t \\sigma_w^2(t)\\) za pomocą np.argmin.\n\nWeryfikacja:\n\nWyświetl wykres \\(\\sigma_w^2(t)\\) w funkcji \\(t\\) — powinien mieć wyraźne minimum.\nZastosuj znaleziony próg \\(t^*\\) do progowania obrazu i porównaj wynik z ręcznymi progami z zadania 3.2.\n\n\n\n\n\n\n\n\n\n3.4 Rozciąganie histogramu\nRozciąganie histogramu (contrast stretching) poprawia kontrast obrazu, mapując zakres jasności \\([\\min L, \\max L]\\) na pełen zakres \\([0, 255]\\):\n\\[L' = \\frac{L - \\min L}{\\max L - \\min L} \\cdot 255\\]\nZaimplementuj tę operację na tablicy szaroodcieniowej. Wyświetl obraz przed i po rozciągnięciu za pomocą Image.fromarray(). Wyświetl histogramy jasności przed i po rozciągnięciu za pomocą plt.hist() (tu matplotlib jest naturalnym wyborem, bo rysujemy wykres, nie obraz).",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: NumPy - regresja liniowa"
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#schemat-aktywności-słońca",
-    "href": "laby/lab_1.html#schemat-aktywności-słońca",
-    "title": "Lab 1: NumPy - regresja liniowa",
-    "section": "3. Schemat aktywności Słońca",
-    "text": "3. Schemat aktywności Słońca\nNa Solar Influences Data Analysis Center (SIDC) znajduje się baza danych dotycząca aktywności Słońca. Celem zadania jest wyznaczenie przeciętnej liczby plam słonecznych w zależności od czasu.\n\n3.1. Wczytanie danych\nPobierz dane (Sunspot Number) w formacie CSV. Dane te są dostępne od roku 1818. Dane możesz pobrać ręcznie, ale wygodniej będzie zrobić to wykorzystując bibliotekę requests:\nimport requests\n\nurl = 'https://sidc.be/SILSO/INFO/sndtotcsv.php'\nr = requests.get(url)\nwith open('sunspots.csv', 'wb') as f:\n    f.write(r.content)\n\n\n3.2. Przygotowanie i wizualizacja\n\nDane wczytaj do obiektu DataFrame biblioteki Pandas.\nSprawdź typy danych i usuń ewentualne braki (zobacz dokumentację zbioru na stronie SIDC).\nWyświetl wykres rozproszenia liczby plam słonecznych w zależności od czasu.\n\n\n\n3.3 Regresja liniowa\n\nStwórz tablicę X zawierającą rok jako zmienną niezależną oraz tablicę y zawierającą liczbę plam słonecznych jako zmienną zależną.\nZastosuj regresję liniową do wyznaczenia przeciętnej liczby plam słonecznych w zależności od roku. Wykorzystaj bazę funkcji składających się z wyrazu wolnego oraz funkcji bazowych Gaussa:\n\n\\[\\begin{equation*}\n\\phi_i(x) = \\exp\\left(-\\frac{(x - c_i)^2}{\\sigma^2}\\right),\n\\end{equation*}\\]\ngdzie \\(c_i\\) to równo odległe punkty na odcinku \\([X_{\\text{min}},X_{\\text{max}}]\\) oraz \\(\\sigma&gt;0\\) to parametr kontrolujący szerokość funkcji Gaussa. 3. Wyświetl wykres przeciętnej liczby plam słonecznych w zależności od roku wraz z wykresem rozproszenia danych. 4. Przetestuj inne typy funkcji bazowych, np. funkcję sigmoidalną\n\\[\\begin{equation*}\n\\phi_i(x) = \\frac{1}{1 + \\exp\\left(-\\frac{x - c_i}{\\sigma}\\right)}\n\\end{equation*}\\]\nlub ReLU\n\\[\\begin{equation*}\n\\phi_i(x) = \\max(0, x - c_i).\n\\end{equation*}\\]",
+    "objectID": "laby/lab_2.html#wymiana-palety-kolorów-broadcasting-3d",
+    "href": "laby/lab_2.html#wymiana-palety-kolorów-broadcasting-3d",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "4. Wymiana palety kolorów (broadcasting 3D)",
+    "text": "4. Wymiana palety kolorów (broadcasting 3D)\nCelem tego zadania jest zamiana kolorów obrazu RGB na najbliższe kolory z zadanej palety. To kluczowe ćwiczenie z broadcastingu na tablicach trójwymiarowych.\n\n4.1 Definicja palety\nStwórz tablicę paleta o kształcie (k, 3), gdzie k to liczba kolorów w palecie. Każdy wiersz zawiera wartości RGB jednego koloru. Możesz wybrać kolory dowolnie lub skorzystać z tablicy kolorów, np. stąd.\nPrzykładowa paleta 8-kolorowa:\n\npaleta = np.array([\n    [0,   0,   0],    # czarny\n    [255, 255, 255],  # biały\n    [255, 0,   0],    # czerwony\n    [0,   255, 0],    # zielony\n    [0,   0,   255],  # niebieski\n    [255, 255, 0],    # żółty\n    [255, 0,   255],  # magenta\n    [0,   255, 255],  # cyan\n], dtype=np.uint8)\n\n\n\n\n\n\n4.2 Reshaping\nZamień tablicę obrazu o kształcie (H, W, 3) na tablicę 2D o kształcie (N, 3), gdzie N = H * W. Każdy wiersz to wartości RGB jednego piksela.\n\n\n\n\n\n4.3 Obliczenie odległości (broadcasting)\nDla każdego piksela oblicz odległość euklidesową do każdego koloru z palety. Powinno to dać tablicę o kształcie (N, k).\nWskazówka: Wykorzystaj broadcasting. Przeanalizuj transformację kształtów:\npiksele:  (N, 3)    →  (N, 1, 3)\npaleta:   (k, 3)    →  (1, k, 3)\nróżnica:               (N, k, 3)\nkwadrat + suma po osi 2:  (N, k)\nUżyj np.newaxis (lub None) do dodania wymiaru i np.sum() z parametrem axis do redukcji.\n\n\n\n\n\n4.4 Mapowanie pikseli na paletę\nDla każdego piksela znajdź indeks najbliższego koloru w palecie (np.argmin() z odpowiednim axis). Następnie za pomocą indeksowania złożonego (fancy indexing) utwórz nową tablicę pikseli, w której każdy piksel ma wartości RGB najbliższego koloru z palety.\nPrzywróć kształt (H, W, 3) i wyświetl wynikowy obraz za pomocą Image.fromarray().\n\n\n\n\n\n4.5 Eksperymenty\n\nPrzetestuj palety o różnej liczbie kolorów: 2, 4, 8, 16, 32. Jak zmienia się jakość obrazu?\nZamiast ręcznej palety, wylosuj k kolorów z rozkładu jednostajnego na \\([0, 255]^3\\). Porównaj wynik z paletą dobraną ręcznie.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: NumPy - regresja liniowa"
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "",
-    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "objectID": "laby/lab_2.html#generowanie-wzorów",
+    "href": "laby/lab_2.html#generowanie-wzorów",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "5. Generowanie wzorów",
+    "text": "5. Generowanie wzorów\n\n5.1 Szachownica\nNapisz program, który utworzy obrazek szachownicy 8×8 pól na tle o wymiarach 500×500 pikseli.\nWymiary: * pola — 50×50 pikseli, czarne i białe, * tło — szarość o wartości 100, * szachownica wycentrowana, czarne pole w lewym dolnym rogu.\nWskazówka: Utwórz tablicę wypełnioną wartością tła. Następnie za pomocą indeksowania z przypisaniem (A[slice] = value) wypełnij odpowiednie fragmenty tablicy. Alternatywnie: skorzystaj z np.tile() na wzorcu 2×2. Wyświetl wynik za pomocą Image.fromarray().\n\n\n\n\n\n5.2 Gradient\nWygeneruj obraz o wymiarach 256×256 pikseli przedstawiający gradient kolorów: * w kierunku poziomym — od czarnego (0) do czerwonego (255, 0, 0), * w kierunku pionowym — od czarnego (0) do niebieskiego (0, 0, 255).\nW efekcie prawy dolny róg powinien być magentą (255, 0, 255).\nWskazówka: Utwórz tablicę (256, 256, 3) wypełnioną zerami. Kanał czerwony to funkcja kolumny, kanał niebieski — funkcja wiersza. Broadcasting z np.arange() lub np.linspace() pozwoli uniknąć pętli. Wyświetl wynik za pomocą Image.fromarray().",
     "crumbs": [
-      "Biblioteki Python w analizie danych"
+      "Laboratoria",
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "index.html#opis-przedmiotu",
-    "href": "index.html#opis-przedmiotu",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "",
-    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "objectID": "laby/lab_2.html#widoki-i-kopie",
+    "href": "laby/lab_2.html#widoki-i-kopie",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "6. Widoki i kopie",
+    "text": "6. Widoki i kopie\n\n6.1 Modyfikacja in-place przez widok\n\nUtwórz kopię tablicy obrazu (img_copy = img_array.copy()).\nZa pomocą wycinków wyodrębnij prostokątny fragment obrazu (np. lewy górny kwadrant).\nSprawdź, czy wyodrębniony fragment jest widokiem (np.shares_memory()).\nUstaw wszystkie piksele fragmentu na kolor czerwony [255, 0, 0]. Czy oryginalna tablica img_copy też się zmieniła?\n\n\n\n\n\n\n6.2 Indeksowanie złożone — kopia\n\nUtwórz tablicę boolowską (maskę) wskazującą piksele, których kanał czerwony jest większy niż 200.\nWyodrębnij te piksele za pomocą maski. Czy wynik jest widokiem czy kopią? Sprawdź za pomocą np.shares_memory().\nUstaw kolor wyodrębnionych pikseli na zielony. Czy oryginalna tablica się zmieniła?\nJak osiągnąć modyfikację oryginału za pomocą maski? (Wskazówka: img_array[maska] = [0, 255, 0].)",
     "crumbs": [
-      "Biblioteki Python w analizie danych"
+      "Laboratoria",
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
-    "objectID": "index.html#wykłady",
-    "href": "index.html#wykłady",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Wykłady",
-    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nWykład 1: NumPy\n🔗 HTML\n\n📥 .ipynb",
+    "objectID": "laby/lab_2.html#zadania-dodatkowe",
+    "href": "laby/lab_2.html#zadania-dodatkowe",
+    "title": "Lab 2: NumPy - obrazy rastrowe",
+    "section": "7. Zadania dodatkowe",
+    "text": "7. Zadania dodatkowe\n\n7.1 Wymiana kanałów\nUtwórz wersję obrazu, w której kanały R i B są zamienione miejscami. Wyświetl wynik. Czy potrzebujesz kopii, czy wystarczy widok? Co się stanie, jeśli użyjesz img_array[:, :, [2, 1, 0]] a co jeśli napiszesz img_array[:, :, ::-1]? Sprawdź, które z tych podejść zwraca widok, a które kopię.\n\n\n\n\n\n7.2 Mozaika z np.tile()\nUtwórz mozaikę 3×3 z pomniejszonego obrazu. Aby pomniejszyć obraz, weź co n-ty piksel w obu kierunkach (np. img_array[::4, ::4]). Następnie użyj np.tile() do powielenia tablicy.",
     "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#laboratoria",
-    "href": "index.html#laboratoria",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Laboratoria",
-    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nLab 1: NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#zaliczenie",
-    "href": "index.html#zaliczenie",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Zaliczenie",
-    "text": "Zaliczenie\n\nĆwiczenia: zaliczenie na podstawie pracy domowej oraz jej indywidualnej obrony.\nWykład: test sprawdzający wiedzę, przeprowadzany w formie tradycyjnej (arkusz papierowy), bez dostępu do urządzeń elektronicznych i materiałów pomocniczych.",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#literatura",
-    "href": "index.html#literatura",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Literatura",
-    "text": "Literatura\n\nBaza teoretyczna\n\nPRML Christopher M. Bishop, “Pattern Recognition and Machine Learning”, 2006.\nDL Ian Goodfellow, Yoshua Bengio, Aaron Courville, “Deep Learning”, 2016.\nBishop DL Christopher M. Bishop, “Deep Learning”, 2022.\nPML-1 Kevin P. Murphy, “Probabilistic Machine Learning: An Introduction”, 2022.\nFrom Python to NumPy Nicolas P. Rougier, 2017.\nPython Data Science Handbook Jake VanderPlas\n\n\n\nDokumentacja i tutoriale\n\nDokumentacja NumPy\nScikit-learn: User Guide\nMatplotlib: Tutorials",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
+      "Laboratoria",
+      "Lab 2: NumPy - obrazy rastrowe"
     ]
   },
   {
@@ -233,6 +206,121 @@
     "crumbs": [
       "Wykłady",
       "Wykład 1: NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "",
+    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#opis-przedmiotu",
+    "href": "index.html#opis-przedmiotu",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "",
+    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#wykłady",
+    "href": "index.html#wykłady",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Wykłady",
+    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nWykład 1: NumPy\n🔗 HTML\n\n📥 .ipynb",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#laboratoria",
+    "href": "index.html#laboratoria",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Laboratoria",
+    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nLab 1: NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb\n\n\nLab 2: NumPy - obrazy rastrowe\n🔗 HTML\n\n📥 .ipynb",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#zaliczenie",
+    "href": "index.html#zaliczenie",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Zaliczenie",
+    "text": "Zaliczenie\n\nĆwiczenia: zaliczenie na podstawie pracy domowej oraz jej indywidualnej obrony.\nWykład: test sprawdzający wiedzę, przeprowadzany w formie tradycyjnej (arkusz papierowy), bez dostępu do urządzeń elektronicznych i materiałów pomocniczych.",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#literatura",
+    "href": "index.html#literatura",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Literatura",
+    "text": "Literatura\n\nBaza teoretyczna\n\nPRML Christopher M. Bishop, “Pattern Recognition and Machine Learning”, 2006.\nDL Ian Goodfellow, Yoshua Bengio, Aaron Courville, “Deep Learning”, 2016.\nBishop DL Christopher M. Bishop, “Deep Learning”, 2022.\nPML-1 Kevin P. Murphy, “Probabilistic Machine Learning: An Introduction”, 2022.\nFrom Python to NumPy Nicolas P. Rougier, 2017.\nPython Data Science Handbook Jake VanderPlas\n\n\n\nDokumentacja i tutoriale\n\nDokumentacja NumPy\nScikit-learn: User Guide\nMatplotlib: Tutorials",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html",
+    "href": "laby/lab_1.html",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "",
+    "text": "Open In Colab",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#numpy",
+    "href": "laby/lab_1.html#numpy",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "NumPy",
+    "text": "NumPy\nPodstawowy NumPy: Numpy: the absolute basics for beginners.\nW zadaniach poniżej wykorzystaj:\n\nrng = np.random.default_rng() do generowania zmiennych losowych,\nwektoryzację operacji arytmetycznych, np. jeśli A i B to tablice numeryczne NumPy o takich samych wymiarach, to A + B zwraca tablicę, której elementy to sumy odpowiadających elementów tablic A i B,\noperator @ do mnożenia macierzy,\nnp.linalg.inv() do obliczenia odwrotności macierzy,\nnp.linalg.svd() do rozkładu SVD macierzy,\nnp.transpose() lub .T do transpozycji macierzy,\n@ do mnożenia macierzy.\nnp.column_stack() lub np.hstack() do łączenia tablic wzdłuż kolumn,\nnp.linalg.eigvalsh() do obliczania wartości własnych symetrycznej macierzy rzeczywistej (wersja zoptymalizowana dla macierzy \\(\\mathbf{X}^T\\mathbf{X}\\)),\nnp.linalg.lstsq() do rozwiązywania układów równań metodą najmniejszych kwadratów.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#regresja-liniowa-z-wykorzystaniem-numpy",
+    "href": "laby/lab_1.html#regresja-liniowa-z-wykorzystaniem-numpy",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "1. Regresja liniowa z wykorzystaniem NumPy",
+    "text": "1. Regresja liniowa z wykorzystaniem NumPy\nCelem ćwiczenia jest implementacja regresji liniowej z wykorzystaniem biblioteki NumPy. Zamiast gotowych narzędzi jak sklearn, wykorzystamy operacje algebraiczne do obliczenia współczynników modelu oraz oceny jego jakości.\nZaczniemy od wygenerowania sztucznych danych, które posłużą nam do przetestowania implementacji.\n\n1.1 Generowanie danych\nNiech \\(w_0,w_1,\\ldots,w_p\\), \\(X_1,X_2,\\ldots,X_p\\) oraz \\(\\varepsilon\\) będą niezależnymi zmiennymi losowymi o rozkładach:\n\\[\\begin{align*}\nw_i&\\sim\\mathcal{N}(0,1),\\ i=0,1,\\ldots,p,\\\\\nX_j&\\sim\\mathcal{N}(0,1),\\ j=1,2,\\ldots,p,\\\\\n\\varepsilon&\\sim\\mathcal{N}(0,\\sigma^2),\n\\end{align*}\\]\ngdzie \\(\\mathcal{N}(\\mu,\\sigma^2)\\) oznacza rozkład normalny o średniej \\(\\mu\\) i wariancji \\(\\sigma^2\\).\nGdy parametry \\(w_0,w_1,\\ldots,w_p\\) są znane, to zmienną zależną \\(Y\\) definiujemy wzorem:\n\\[\\begin{equation}\nY = w_0 + w_1 X_1 + w_2 X_2 + \\ldots + w_p X_p + \\varepsilon.\n\\end{equation}\\]\nWygeneruj w Numpy zbiór danych zgodnie z powyższym modelem:\n\nWygeneruj losowy wektor współczynników \\[\\mathbf{w} = [w_0, w_1, \\ldots, w_p]^T\\] o długości \\(p+1\\) (uwzględniając wyraz wolny). Przyjmij \\(p=5\\).\nUtwórz zbiór obserwacji zmiennych niezależnych \\[\\mathbf{X} = [\\mathbf{x}_1, \\mathbf{x}_2, \\ldots, \\mathbf{x}_p]\\] składający się z \\(N=1000\\) obserwacji. Symbolem \\[\\mathbf{x}_j=[x_{1j}, x_{2j}, \\ldots, x_{Nj}]^T\\] oznaczamy wektor obserwacji zmiennej \\(X_j\\).\nNiech \\(\\tilde{\\mathbf{X}} = [\\mathbf{1} \\quad \\mathbf{X}]\\) będzie macierzą obserwacji \\(\\mathbf{X}\\) rozszerzoną o kolumnę jedynek (tzw. bias term). Wygeneruj wektor szumu \\[\\boldsymbol{\\varepsilon} = [\\varepsilon_1, \\varepsilon_2, \\ldots, \\varepsilon_N]^T\\] o rozkładzie \\(\\mathcal{N}(0,\\sigma^2)\\). Zgodnie z podanym wyżej modelem, stwórz zmienną zależną \\[\\mathbf{y} = \\tilde{\\mathbf{X}}\\mathbf{w} + \\boldsymbol{\\varepsilon}.\\] Przyjmij \\(\\sigma=2.0\\).\n\n\n\n1.2 Obliczenie całkowitej sumy kwadratów (TSS)\nTSS (Total Sum of Squares) to suma kwadratów różnic między wartościami zmiennej zależnej y a ich średnią:\n\\[\\begin{equation*}\n\\text{TSS} = \\sum_{i=1}^{N} (y_i - \\bar{y})^2\n\\end{equation*}\\]\ngdzie \\(\\bar{y}\\) to średnia wartość zmiennej y. Wielkość tę można interpretować jako całkowitą wariancję zmiennej zależnej. Można też powiedzieć, że jest to ocena bazowego modelu wyznaczonego przez średnią wartość zmiennej zależnej.\n\nOblicz średnią wartość zmiennej y.\nKorzystając z definicji oblicz TSS.\n\n\n\n1.3 Implementacja regresji liniowej\nEstymator współczynników regresji \\(\\mathbf{w}_{\\text{ML}}\\) wyznaczany jest za pomocą metody najmniejszych kwadratów (Ordinary Least Squares):\n\\[\\mathbf{w}_{\\text{ML}} = (\\mathbf{\\tilde X}^T\\mathbf{\\tilde X})^{-1}\\mathbf{\\tilde X}^T\\mathbf{y}\\]\ngdzie \\(\\mathbf{\\tilde X} = [\\mathbf{1} \\quad \\mathbf{X}]\\) to macierz obserwacji \\(\\mathbf{X}\\) rozszerzona o kolumnę jedynek (tzw. bias term). Szczegółowe wyprowadzenie oraz właściwości statystyczne estymatora znajdziesz w artykule Regresja liniowa w serwisie Wikipedia.\n\nOblicz współczynniki \\(\\mathbf{w}_{\\text{ML}}\\) zgodnie z powyższym wzorem macierzowym.\nOblicz przewidywane wartości zmiennej zależnej korzystając z zależności: \\(\\hat{\\mathbf{y}} = \\mathbf{\\tilde X} \\mathbf{w}_{\\text{ML}}\\).\nDokonaj ewaluacji modelu: porównaj wartości estymowanych parametrów z wartościami rzeczywistymi i oblicz błędy względne dla poszczególnych obserwacji.\n\n\n\n1.4 Macierz Grama i uwarunkowanie (przypadek „zdrowy”)\nNiech \\(G = \\mathbf{\\tilde X}^T \\mathbf{\\tilde X}\\). Zauważ, że \\(G\\) jest macierzą Grama kolumn macierzy \\(\\mathbf{\\tilde X}\\): jeśli \\(\\mathbf{x}_0, \\mathbf{x}_1,\\dots,\\mathbf{x}_p\\) oznaczają kolumny \\(\\mathbf{\\tilde X}\\), to\n\\[\nG_{ij} = \\mathbf{x}_i^T \\mathbf{x}_j = \\langle \\mathbf{x}_i, \\mathbf{x}_j\\rangle,\n\\]\nczyli \\(G\\) zawiera wszystkie odpowiednie iloczyny skalarne między cechami (kolumnami).\n\nOblicz macierz \\(G\\) i obejrzyj jej wpisy. Porównaj typową skalę elementów diagonalnych \\(G_{jj}\\) z pozadiagonalnymi \\(G_{ij}\\) dla \\(i\\neq j\\).\nOblicz wartości własne \\(G\\) oraz liczbę uwarunkowania \\[\n\\kappa(G)=\\frac{\\lambda_{\\max}(G)}{\\lambda_{\\min}(G)}.\n\\] W tym punkcie (losowe, niezależne cechy) \\(\\kappa(G)\\) powinna być umiarkowana, a \\(\\lambda_{\\min}(G)\\) nie powinna być bliska zeru.\nOblicz macierz odwrotną \\(G^{-1}\\) i sprawdź, że jej wartości własne są równe \\(1/\\lambda_i(G)\\). Co to oznacza dla stabilności obliczeń przy odwracaniu macierzy?\n\n\nIntuicja: co „widzi” macierz Grama \\(G=X^T X\\)\nMacierz \\(G\\) jest macierzą iloczynów skalarnych kolumn \\(X\\): \\(G_{ij}=\\langle x_i,x_j\\rangle\\). Elementy diagonalne \\(G_{jj}=\\|x_j\\|^2\\) opisują skalę (energię) pojedynczej cechy, a wpisy pozadiagonalne \\(G_{ij}\\) mówią, na ile dwie cechy niosą tę samą informację (korelacja / redundancja). Gdy pozadiagonalne wpisy są duże, cechy są współliniowe i trudniej „rozliczyć” ich wpływ osobno.\n\n\nDlaczego to ma znaczenie dla MNK (i czemu wrócimy do tego w sekcji 2) W MNK odwracamy (jawnie lub niejawnie) macierz Grama: pojawia się \\(G^{-1}\\). Jeśli współliniowość sprawia, że najmniejsza wartość własna \\(\\lambda_{\\min}(G)\\) staje się mała, to liczba uwarunkowania \\[\n\\kappa(G)=\\frac{\\lambda_{\\max}(G)}{\\lambda_{\\min}(G)}\n\\] gwałtownie rośnie, a w \\(G^{-1}\\) pojawiają się duże wartości własne (\\(1/\\lambda_i(G)\\)) i często duże wpisy. To prowadzi do niestabilnych współczynników MNK i dużej wrażliwości na szum. W sekcji 2 skonstruujemy taki przypadek celowo.\n\n\n\n1.5 Ocena jakości modelu\nRSS (Residual Sum of Squares) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami \\(y_i\\) a przewidywanymi \\(\\hat{y}_i\\) (jak wygląda wzór na \\(\\hat{y}_i\\)?):\n\\[\\begin{equation*}\n\\text{RSS} = \\sum_{i=1}^{N} (y_i - \\hat{y}_i)^2\n\\end{equation*}\\]\nWielkość ta jest miarą dopasowania modelu do danych. Wyliczone w poprzednich krokach parametry modelu minimalizują RSS.\nWspółczynnik determinacji \\(R^2\\) to stosunek wariancji wyjaśnionej przez model do całkowitej wariancji zmiennej zależnej:\n\\[\\begin{equation*}\nR^2 = \\frac{\\text{TSS} - \\text{RSS}}{\\text{TSS}}= 1 - \\frac{\\text{RSS}}{\\text{TSS}}\n\\end{equation*}\\]\n\nOblicz przewidywane wartości \\(\\hat{y_i}\\), \\(i=1,\\ldots,N\\).\nOblicz RSS.\nOblicz współczynnik determinacji \\(R^2\\).\n\n\n\nPytania dodatkowe\nZobacz jak zmienia się wartość TSS, RSS i \\(R^2\\) w zależności od:\n\nwariancji szumu,\nliczby obserwacji \\(N\\),\nliczby zmiennych niezależnych \\(p\\).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#przypadek-współliniowości-zmiennych",
+    "href": "laby/lab_1.html#przypadek-współliniowości-zmiennych",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "2. Przypadek współliniowości zmiennych",
+    "text": "2. Przypadek współliniowości zmiennych\nW zadaniu 1. zmienne \\(X_1,\\ldots,X_p\\) były wzajemnie niezależne, dzięki czemu macierz Grama \\(G = \\tilde{\\mathbf{X}}^T\\tilde{\\mathbf{X}}\\) była dobrze uwarunkowana, a estymator \\(\\mathbf{w}_{\\text{ML}}\\) trafnie aproksymował prawdziwe parametry modelu. Sekcja 1.4 sygnalizowała, że sytuacja zmienia się zasadniczo, gdy cechy przestają być niezależne — duże wpisy pozadiagonalne \\(G\\) oznaczają redundancję informacji i prowadzą do niestabilności estymatora.\nTeraz skonstruujemy taki przypadek celowo. Przyjmijmy, że ostatnia zmienna \\(X_p\\) jest przybliżoną kombinacją liniową pozostałych:\n\\[X_p = 2X_1 - X_2 + \\varepsilon_p,\\]\ngdzie \\(\\varepsilon_p \\sim \\mathcal{N}(0, \\sigma_p^2)\\).\nParametr \\(\\sigma_p\\) kontroluje stopień współliniowości: dla \\(\\sigma_p \\to 0\\) kolumny macierzy \\(\\tilde{\\mathbf{X}}\\) stają się liniowo zależne i \\(G\\) przestaje być odwracalna.\nPrzeprowadź poniższe analizy i porównaj wyniki z zadaniem 1.:\n\nWygeneruj dane zgodnie z powyższym modelem. Przyjmij \\(p=5\\), \\(N=1000\\), \\(\\sigma=2.0\\). Przetestuj kilka wartości \\(\\sigma_p\\), np. \\(\\sigma_p \\in \\{0.01,\\, 0.1,\\, 1.0\\}\\).\nZbadaj macierz Grama: oblicz \\(G\\) i jej liczbę uwarunkowania \\(\\kappa(G)\\). Jak zmienia się \\(\\kappa(G)\\) w zależności od \\(\\sigma_p\\)? Porównaj z wynikiem z sekcji 1.4.\nOblicz estymator \\(\\mathbf{w}_{\\text{ML}}\\) metodą normalną przy użyciu np.linalg.inv(): \\[\\mathbf{w}_{\\text{ML}} = (\\tilde{\\mathbf{X}}^T\\tilde{\\mathbf{X}})^{-1}\\tilde{\\mathbf{X}}^T\\mathbf{y}.\\] Porównaj uzyskane współczynniki z wartościami rzeczywistymi — czy estymator jest nadal trafny?\nOceń jakość modelu: oblicz RSS i \\(R^2\\). Czy wysoki \\(R^2\\) wyklucza niestabilność współczynników?\nRozkład SVD jako alternatywa: wyznacz \\(\\mathbf{w}_{\\text{ML}}\\) za pomocą pseudoodwrotności Moore’a–Penrose’a, wykorzystując rozkład SVD zwracany przez funkcję np.linalg.svd(). Dla rozkładu postaci \\(\\tilde{\\mathbf{X}} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^T\\) pseudoodwrotność dana jest wzorem: \\[\\tilde{\\mathbf{X}}^+ = \\mathbf{V}\\boldsymbol{\\Sigma}^+\\mathbf{U}^T,\\] gdzie macierz \\(\\boldsymbol{\\Sigma}^+\\) powstaje poprzez zastąpienie niezerowych wartości osobliwych \\(\\sigma_i\\) ich odwrotnościami \\(1/\\sigma_i\\). Estymator przyjmuje wówczas postać: \\[\\mathbf{w}_{\\text{ML}} = \\tilde{\\mathbf{X}}^+\\mathbf{y} = \\mathbf{V}\\boldsymbol{\\Sigma}^+\\mathbf{U}^T\\mathbf{y}.\\] W celu stabilizacji numerycznej zastosuj ucięcie (truncation), polegające na zignorowaniu pomijalnie małych wartości osobliwych \\(\\sigma_i\\) i zastąpieniu ich zerami w macierzy \\(\\boldsymbol{\\Sigma}^+\\). Porównaj stabilność wyników z metodą równań normalnych, szczególnie w przypadku złego uwarunkowania macierzy (małe \\(\\sigma_p\\)).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#schemat-aktywności-słońca",
+    "href": "laby/lab_1.html#schemat-aktywności-słońca",
+    "title": "Lab 1: NumPy - regresja liniowa",
+    "section": "3. Schemat aktywności Słońca",
+    "text": "3. Schemat aktywności Słońca\nNa Solar Influences Data Analysis Center (SIDC) znajduje się baza danych dotycząca aktywności Słońca. Celem zadania jest wyznaczenie przeciętnej liczby plam słonecznych w zależności od czasu.\n\n3.1. Wczytanie danych\nPobierz dane (Sunspot Number) w formacie CSV. Dane te są dostępne od roku 1818. Dane możesz pobrać ręcznie, ale wygodniej będzie zrobić to wykorzystując bibliotekę requests:\nimport requests\n\nurl = 'https://sidc.be/SILSO/INFO/sndtotcsv.php'\nr = requests.get(url)\nwith open('sunspots.csv', 'wb') as f:\n    f.write(r.content)\n\n\n3.2. Przygotowanie i wizualizacja\n\nDane wczytaj do obiektu DataFrame biblioteki Pandas.\nSprawdź typy danych i usuń ewentualne braki (zobacz dokumentację zbioru na stronie SIDC).\nWyświetl wykres rozproszenia liczby plam słonecznych w zależności od czasu.\n\n\n\n3.3 Regresja liniowa\n\nStwórz tablicę X zawierającą rok jako zmienną niezależną oraz tablicę y zawierającą liczbę plam słonecznych jako zmienną zależną.\nZastosuj regresję liniową do wyznaczenia przeciętnej liczby plam słonecznych w zależności od roku. Wykorzystaj bazę funkcji składających się z wyrazu wolnego oraz funkcji bazowych Gaussa:\n\n\\[\\begin{equation*}\n\\phi_i(x) = \\exp\\left(-\\frac{(x - c_i)^2}{\\sigma^2}\\right),\n\\end{equation*}\\]\ngdzie \\(c_i\\) to równo odległe punkty na odcinku \\([X_{\\text{min}},X_{\\text{max}}]\\) oraz \\(\\sigma&gt;0\\) to parametr kontrolujący szerokość funkcji Gaussa. 3. Wyświetl wykres przeciętnej liczby plam słonecznych w zależności od roku wraz z wykresem rozproszenia danych. 4. Przetestuj inne typy funkcji bazowych, np. funkcję sigmoidalną\n\\[\\begin{equation*}\n\\phi_i(x) = \\frac{1}{1 + \\exp\\left(-\\frac{x - c_i}{\\sigma}\\right)}\n\\end{equation*}\\]\nlub ReLU\n\\[\\begin{equation*}\n\\phi_i(x) = \\max(0, x - c_i).\n\\end{equation*}\\]",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: NumPy - regresja liniowa"
     ]
   }
 ]

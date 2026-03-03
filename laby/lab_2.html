@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 2: NumPy - obrazy rastrowe – Biblioteki Python w analizie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b938e67c0c3a38245966223dfb5d7d7b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_2.html">Lab 2: NumPy - obrazy rastrowe</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#obraz-jako-tablica-numpy" id="toc-obraz-jako-tablica-numpy" class="nav-link active" data-scroll-target="#obraz-jako-tablica-numpy">1. Obraz jako tablica NumPy</a>
+  <ul class="collapse">
+  <li><a href="#wczytanie-obrazu" id="toc-wczytanie-obrazu" class="nav-link" data-scroll-target="#wczytanie-obrazu">1.1 Wczytanie obrazu</a></li>
+  <li><a href="#konwersja-do-tablicy-numpy" id="toc-konwersja-do-tablicy-numpy" class="nav-link" data-scroll-target="#konwersja-do-tablicy-numpy">1.2 Konwersja do tablicy NumPy</a></li>
+  <li><a href="#dostęp-do-kanałów" id="toc-dostęp-do-kanałów" class="nav-link" data-scroll-target="#dostęp-do-kanałów">1.3 Dostęp do kanałów</a></li>
+  </ul></li>
+  <li><a href="#konwersja-do-skali-szarości" id="toc-konwersja-do-skali-szarości" class="nav-link" data-scroll-target="#konwersja-do-skali-szarości">2. Konwersja do skali szarości</a>
+  <ul class="collapse">
+  <li><a href="#implementacja-wektoryzowana" id="toc-implementacja-wektoryzowana" class="nav-link" data-scroll-target="#implementacja-wektoryzowana">2.1 Implementacja wektoryzowana</a></li>
+  <li><a href="#porównanie-z-pętlą" id="toc-porównanie-z-pętlą" class="nav-link" data-scroll-target="#porównanie-z-pętlą">2.2 Porównanie z pętlą</a></li>
+  </ul></li>
+  <li><a href="#operacje-punktowe-na-obrazach" id="toc-operacje-punktowe-na-obrazach" class="nav-link" data-scroll-target="#operacje-punktowe-na-obrazach">3. Operacje punktowe na obrazach</a>
+  <ul class="collapse">
+  <li><a href="#negatyw" id="toc-negatyw" class="nav-link" data-scroll-target="#negatyw">3.1 Negatyw</a></li>
+  <li><a href="#progowanie-thresholding" id="toc-progowanie-thresholding" class="nav-link" data-scroll-target="#progowanie-thresholding">3.2 Progowanie (thresholding)</a></li>
+  <li><a href="#automatyczny-próg-otsu" id="toc-automatyczny-próg-otsu" class="nav-link" data-scroll-target="#automatyczny-próg-otsu">3.3 Automatyczny próg Otsu</a></li>
+  <li><a href="#rozciąganie-histogramu" id="toc-rozciąganie-histogramu" class="nav-link" data-scroll-target="#rozciąganie-histogramu">3.4 Rozciąganie histogramu</a></li>
+  </ul></li>
+  <li><a href="#wymiana-palety-kolorów-broadcasting-3d" id="toc-wymiana-palety-kolorów-broadcasting-3d" class="nav-link" data-scroll-target="#wymiana-palety-kolorów-broadcasting-3d">4. Wymiana palety kolorów (broadcasting 3D)</a>
+  <ul class="collapse">
+  <li><a href="#definicja-palety" id="toc-definicja-palety" class="nav-link" data-scroll-target="#definicja-palety">4.1 Definicja palety</a></li>
+  <li><a href="#reshaping" id="toc-reshaping" class="nav-link" data-scroll-target="#reshaping">4.2 Reshaping</a></li>
+  <li><a href="#obliczenie-odległości-broadcasting" id="toc-obliczenie-odległości-broadcasting" class="nav-link" data-scroll-target="#obliczenie-odległości-broadcasting">4.3 Obliczenie odległości (broadcasting)</a></li>
+  <li><a href="#mapowanie-pikseli-na-paletę" id="toc-mapowanie-pikseli-na-paletę" class="nav-link" data-scroll-target="#mapowanie-pikseli-na-paletę">4.4 Mapowanie pikseli na paletę</a></li>
+  <li><a href="#eksperymenty" id="toc-eksperymenty" class="nav-link" data-scroll-target="#eksperymenty">4.5 Eksperymenty</a></li>
+  </ul></li>
+  <li><a href="#generowanie-wzorów" id="toc-generowanie-wzorów" class="nav-link" data-scroll-target="#generowanie-wzorów">5. Generowanie wzorów</a>
+  <ul class="collapse">
+  <li><a href="#szachownica" id="toc-szachownica" class="nav-link" data-scroll-target="#szachownica">5.1 Szachownica</a></li>
+  <li><a href="#gradient" id="toc-gradient" class="nav-link" data-scroll-target="#gradient">5.2 Gradient</a></li>
+  </ul></li>
+  <li><a href="#widoki-i-kopie" id="toc-widoki-i-kopie" class="nav-link" data-scroll-target="#widoki-i-kopie">6. Widoki i kopie</a>
+  <ul class="collapse">
+  <li><a href="#modyfikacja-in-place-przez-widok" id="toc-modyfikacja-in-place-przez-widok" class="nav-link" data-scroll-target="#modyfikacja-in-place-przez-widok">6.1 Modyfikacja in-place przez widok</a></li>
+  <li><a href="#indeksowanie-złożone-kopia" id="toc-indeksowanie-złożone-kopia" class="nav-link" data-scroll-target="#indeksowanie-złożone-kopia">6.2 Indeksowanie złożone — kopia</a></li>
+  </ul></li>
+  <li><a href="#zadania-dodatkowe" id="toc-zadania-dodatkowe" class="nav-link" data-scroll-target="#zadania-dodatkowe">7. Zadania dodatkowe</a>
+  <ul class="collapse">
+  <li><a href="#wymiana-kanałów" id="toc-wymiana-kanałów" class="nav-link" data-scroll-target="#wymiana-kanałów">7.1 Wymiana kanałów</a></li>
+  <li><a href="#mozaika-z-np.tile" id="toc-mozaika-z-np.tile" class="nav-link" data-scroll-target="#mozaika-z-np.tile">7.2 Mozaika z <code>np.tile()</code></a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_2.html">Lab 2: NumPy - obrazy rastrowe</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 2: NumPy - obrazy rastrowe</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_2.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<p>W tym arkuszu będziemy przetwarzać w NumPy obrazy rastrowe. Obrazy rastrowe to tablice pikseli, z których każdy ma przypisaną wartość koloru. W przypadku obrazów RGB każdy piksel ma trzy wartości: intensywność koloru czerwonego, zielonego i niebieskiego. Wartości te są zazwyczaj z zakresu 0–255, gdzie 0 oznacza brak danego koloru, a 255 — jego maksymalną intensywność. Zakres 0–255 to dokładnie jeden bajt, w NumPy reprezentowany jako <code>uint8</code>.</p>
+<p>Pomostem między obrazem reprezentowanym jako tablica NumPy a obrazem wyświetlanym na ekranie będzie dla nas biblioteka <a href="https://pillow.readthedocs.io/en/stable/index.html">Pillow</a> (<code>PIL</code> — <em>Python Imaging Library</em>).</p>
+<div id="cell-3" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Konwencja wyświetlania:</strong> Do wyświetlania obrazów używamy <code>Image.fromarray()</code> — obiekt PIL wyświetla się automatycznie w Jupyterze jako ostatnie wyrażenie w komórce. Matplotlib (<code>plt.imshow()</code>, <code>plt.subplots()</code>) stosujemy tam, gdzie potrzebujemy porównań obok siebie, colormap (np. <code>cmap='gray'</code> dla tablic 2D) lub wykresów (histogramy).</p>
+<section id="obraz-jako-tablica-numpy" class="level2">
+<h2 class="anchored" data-anchor-id="obraz-jako-tablica-numpy">1. Obraz jako tablica NumPy</h2>
+<section id="wczytanie-obrazu" class="level3">
+<h3 class="anchored" data-anchor-id="wczytanie-obrazu">1.1 Wczytanie obrazu</h3>
+<p>Pobierz dowolny kolorowy obraz RGB z internetu (np. <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/HepaticaNobilisSLO_flower.JPG/1024px-HepaticaNobilisSLO_flower.JPG">ten</a>) i wczytaj go za pomocą <code>Image.open()</code>. Możesz pobrać obraz ręcznie lub skorzystać z biblioteki <code>requests</code>:</p>
+<div id="cell-5" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://upload.wikimedia.org/wikipedia/commons/d/d3/HepaticaNobilisSLO_flower.JPG'</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    url,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    headers<span class="op">=</span>{<span class="st">"User-Agent"</span>: <span class="st">"Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0"</span>}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'kwiatek.jpg'</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    f.write(r.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wczytaj obraz i wyświetl go w notatniku.</p>
+<ol type="1">
+<li>Jakie są wymiary obrazu (<code>img.size</code>)?</li>
+<li>Jaki jest tryb kolorów (<code>img.mode</code>)?</li>
+<li>Jaki jest format pliku (<code>img.format</code>)?</li>
+</ol>
+<div id="cell-7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="konwersja-do-tablicy-numpy" class="level3">
+<h3 class="anchored" data-anchor-id="konwersja-do-tablicy-numpy">1.2 Konwersja do tablicy NumPy</h3>
+<p>Przekształć obiekt <code>Image</code> do tablicy NumPy za pomocą <code>np.array()</code>.</p>
+<ol type="1">
+<li>Jaki jest kształt (<code>shape</code>) powstałej tablicy? Zinterpretuj każdy wymiar.</li>
+<li>Jaki jest typ danych (<code>dtype</code>)?</li>
+<li>Ile wymiarów (<code>ndim</code>) ma tablica?</li>
+<li>Ile łącznie wartości (<code>size</code>) zawiera tablica?</li>
+</ol>
+<div id="cell-9" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="dostęp-do-kanałów" class="level3">
+<h3 class="anchored" data-anchor-id="dostęp-do-kanałów">1.3 Dostęp do kanałów</h3>
+<p>Każdy piksel obrazu RGB jest opisany trzema wartościami — kanałami R, G, B — zapisanymi w ostatnim wymiarze tablicy. Wyodrębnij poszczególne kanały i wyświetl je jako osobne obrazy w skali szarości obok siebie.</p>
+<p><em>Wskazówka:</em> Kanał czerwony to <code>img_array[:, :, 0]</code>, zielony — <code>img_array[:, :, 1]</code>, niebieski — <code>img_array[:, :, 2]</code>. Ponieważ pojedynczy kanał jest tablicą 2D, PIL nie wyświetli go poprawnie jako obraz RGB — tutaj wygodniej jest użyć <code>plt.subplots()</code> z <code>plt.imshow(..., cmap='gray')</code>, aby matplotlib potraktował tablicę 2D jako obraz szaroodcieniowy.</p>
+<div id="cell-11" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="konwersja-do-skali-szarości" class="level2">
+<h2 class="anchored" data-anchor-id="konwersja-do-skali-szarości">2. Konwersja do skali szarości</h2>
+<p>Konwersja obrazu RGB do skali szarości polega na zastąpieniu trzech wartości (R, G, B) każdego piksela jedną wartością jasności. Standardowy wzór, uwzględniający percepcję ludzkiego oka, to:</p>
+<p><span class="math display">\[L = 0{,}2126 \cdot R + 0{,}7152 \cdot G + 0{,}0722 \cdot B\]</span></p>
+<section id="implementacja-wektoryzowana" class="level3">
+<h3 class="anchored" data-anchor-id="implementacja-wektoryzowana">2.1 Implementacja wektoryzowana</h3>
+<p>Zaimplementuj konwersję RGB → skala szarości za pomocą jednej operacji NumPy, bez pętli. Wynik powinien być tablicą 2D typu <code>uint8</code>.</p>
+<p><em>Wskazówka:</em> Zdefiniuj wektor wag <code>w = np.array([0.2126, 0.7152, 0.0722])</code>. Broadcasting pozwoli pomnożyć tablicę o kształcie <code>(H, W, 3)</code> przez wektor o kształcie <code>(3,)</code> — jaka operacja da sumę ważoną po ostatniej osi?</p>
+<p>Wyświetl wynik za pomocą <code>Image.fromarray()</code> (PIL automatycznie rozpoznaje tablicę 2D <code>uint8</code> jako obraz w skali szarości).</p>
+<div id="cell-13" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="porównanie-z-pętlą" class="level3">
+<h3 class="anchored" data-anchor-id="porównanie-z-pętlą">2.2 Porównanie z pętlą</h3>
+<p>Napisz drugą implementację konwersji — za pomocą podwójnej pętli <code>for</code> iterującej po pikselach. Zmierz czas wykonania obu wersji za pomocą <code>%%timeit</code> (lub <code>time.time()</code> jeśli obraz jest duży). Jaka jest różnica?</p>
+<div id="cell-15" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-16" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="operacje-punktowe-na-obrazach" class="level2">
+<h2 class="anchored" data-anchor-id="operacje-punktowe-na-obrazach">3. Operacje punktowe na obrazach</h2>
+<p>Operacje punktowe to przekształcenia, w których nowa wartość piksela zależy wyłącznie od jego starej wartości (a nie od sąsiadów).</p>
+<section id="negatyw" class="level3">
+<h3 class="anchored" data-anchor-id="negatyw">3.1 Negatyw</h3>
+<p>Negatyw obrazu w skali szarości powstaje przez odwrócenie jasności: <span class="math inline">\(L' = 255 - L\)</span>. Utwórz negatyw obrazu szaroodcieniowego z zadania 2. Wyświetl oryginał i negatyw obok siebie (tu wygodnie jest użyć <code>plt.subplots()</code> z <code>cmap='gray'</code>, albo złożyć oba obrazy obok siebie za pomocą <code>np.hstack()</code> i wyświetlić przez <code>Image.fromarray()</code>).</p>
+</section>
+<section id="progowanie-thresholding" class="level3">
+<h3 class="anchored" data-anchor-id="progowanie-thresholding">3.2 Progowanie (thresholding)</h3>
+<p>Progowanie zamienia obraz szaroodcieniowy na obraz binarny (czarno-biały):</p>
+<p><span class="math display">\[L'(x,y) = \begin{cases} 255 &amp; \text{jeśli } L(x,y) &gt; t \\ 0 &amp; \text{w przeciwnym razie} \end{cases}\]</span></p>
+<p>gdzie <span class="math inline">\(t\)</span> to próg.</p>
+<ol type="1">
+<li>Zaimplementuj progowanie za pomocą porównania tablicowego (wynikiem porównania <code>gray &gt; t</code> jest tablica boolowska — jak zamienić ją na <code>uint8</code>?).</li>
+<li>Wyświetl wyniki dla kilku wartości progu: <span class="math inline">\(t \in \{64, 128, 192\}\)</span>.</li>
+</ol>
+</section>
+<section id="automatyczny-próg-otsu" class="level3">
+<h3 class="anchored" data-anchor-id="automatyczny-próg-otsu">3.3 Automatyczny próg Otsu</h3>
+<p>Ręczny dobór progu wymaga eksperymentowania. Metoda Otsu wyznacza próg automatycznie na podstawie rozkładu jasności pikseli.</p>
+<p><strong>Intuicja.</strong> Próg <span class="math inline">\(t\)</span> dzieli piksele na dwie klasy: ciemne (<span class="math inline">\(\leq t\)</span>) i jasne (<span class="math inline">\(&gt; t\)</span>). Dobry próg to taki, przy którym piksele w każdej klasie są do siebie <em>podobne</em> — mają małą wariancję jasności. Metoda Otsu szuka progu <span class="math inline">\(t^*\)</span> minimalizującego sumę ważonych wariancji obu klas:</p>
+<p><span class="math display">\[\sigma_w^2(t) = \frac{n_0(t)}{N}\,\sigma_0^2(t) + \frac{n_1(t)}{N}\,\sigma_1^2(t)\]</span></p>
+<p>gdzie <span class="math inline">\(n_0(t)\)</span> to liczba pikseli o jasności <span class="math inline">\(\leq t\)</span>, <span class="math inline">\(n_1(t) = N - n_0(t)\)</span>, a <span class="math inline">\(\sigma_0^2(t)\)</span>, <span class="math inline">\(\sigma_1^2(t)\)</span> to wariancje jasności w każdej z klas.</p>
+<p><strong>Algorytm.</strong> Naiwne podejście wymagałoby dla każdego <span class="math inline">\(t \in \{0, \ldots, 255\}\)</span> przejrzenia wszystkich <span class="math inline">\(N\)</span> pikseli — koszt <span class="math inline">\(O(255 \times N)\)</span>. Kluczowy trik polega na <em>kompresji danych do histogramu</em>: tablica 256 liczb zastępuje miliony pikseli, a wszystkie statystyki obliczamy z histogramu.</p>
+<ol type="1">
+<li><p><strong>Histogram.</strong> Oblicz histogram jasności:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> np.bincount(gray.ravel(), minlength<span class="op">=</span><span class="dv">256</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Teraz <code>h[i]</code> to liczba pikseli o jasności <span class="math inline">\(i\)</span>, a cała informacja o obrazie mieści się w 256 liczbach.</p></li>
+<li><p><strong>Wektor jasności.</strong> Zdefiniuj <code>bins = np.arange(256)</code>.</p></li>
+<li><p><strong>Sumy kumulacyjne.</strong> Oblicz:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cum_n <span class="op">=</span> np.cumsum(h)            <span class="co"># cum_n[t] = n_0(t) = sum h[0..t]</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>cum_sum <span class="op">=</span> np.cumsum(bins <span class="op">*</span> h)   <span class="co"># cum_sum[t] = sum i*h[i] dla i=0..t</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dzięki temu <span class="math inline">\(n_0(t)\)</span> i <span class="math inline">\(\sum_{i=0}^{t} i \cdot h[i]\)</span> są dostępne dla <em>wszystkich</em> progów jednocześnie — bez pętli po <span class="math inline">\(t\)</span>.</p></li>
+<li><p><strong>Statystyki klas.</strong> Dla każdego progu <span class="math inline">\(t\)</span>: <span class="math display">\[n_0(t) = \texttt{cum\_n}[t], \qquad \mu_0(t) = \frac{\texttt{cum\_sum}[t]}{n_0(t)}\]</span> Statystyki klasy 1 wynikają z różnicy z wartościami globalnymi (tzn. wartościami dla <span class="math inline">\(t = 255\)</span>).</p></li>
+<li><p><strong>Wariancje klas.</strong> To najtrudniejszy krok. Potrzebujesz sumy kumulacyjnej <span class="math inline">\(\sum_{i=0}^{t} h[i] \cdot i^2\)</span>, z której wariancja wynika ze wzoru <span class="math inline">\(\sigma^2 = \overline{x^2} - \bar{x}^2\)</span>. Uważaj na progi, przy których <span class="math inline">\(n_0(t) = 0\)</span> lub <span class="math inline">\(n_1(t) = 0\)</span> — dzielenie przez zero można zabezpieczyć np. przez <code>np.where</code> lub dodanie małej wartości <code>eps</code>.</p></li>
+<li><p><strong>Optymalny próg.</strong> Wybierz <span class="math inline">\(t^* = \arg\min_t \sigma_w^2(t)\)</span> za pomocą <code>np.argmin</code>.</p></li>
+</ol>
+<p><strong>Weryfikacja:</strong></p>
+<ul>
+<li>Wyświetl wykres <span class="math inline">\(\sigma_w^2(t)\)</span> w funkcji <span class="math inline">\(t\)</span> — powinien mieć wyraźne minimum.</li>
+<li>Zastosuj znaleziony próg <span class="math inline">\(t^*\)</span> do progowania obrazu i porównaj wynik z ręcznymi progami z zadania 3.2.</li>
+</ul>
+<div id="cell-24" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-25" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="rozciąganie-histogramu" class="level3">
+<h3 class="anchored" data-anchor-id="rozciąganie-histogramu">3.4 Rozciąganie histogramu</h3>
+<p>Rozciąganie histogramu (<em>contrast stretching</em>) poprawia kontrast obrazu, mapując zakres jasności <span class="math inline">\([\min L, \max L]\)</span> na pełen zakres <span class="math inline">\([0, 255]\)</span>:</p>
+<p><span class="math display">\[L' = \frac{L - \min L}{\max L - \min L} \cdot 255\]</span></p>
+<p>Zaimplementuj tę operację na tablicy szaroodcieniowej. Wyświetl obraz przed i po rozciągnięciu za pomocą <code>Image.fromarray()</code>. Wyświetl histogramy jasności przed i po rozciągnięciu za pomocą <code>plt.hist()</code> (tu matplotlib jest naturalnym wyborem, bo rysujemy wykres, nie obraz).</p>
+<div id="cell-27" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="wymiana-palety-kolorów-broadcasting-3d" class="level2">
+<h2 class="anchored" data-anchor-id="wymiana-palety-kolorów-broadcasting-3d">4. Wymiana palety kolorów (broadcasting 3D)</h2>
+<p>Celem tego zadania jest zamiana kolorów obrazu RGB na najbliższe kolory z zadanej palety. To kluczowe ćwiczenie z broadcastingu na tablicach trójwymiarowych.</p>
+<section id="definicja-palety" class="level3">
+<h3 class="anchored" data-anchor-id="definicja-palety">4.1 Definicja palety</h3>
+<p>Stwórz tablicę <code>paleta</code> o kształcie <code>(k, 3)</code>, gdzie <code>k</code> to liczba kolorów w palecie. Każdy wiersz zawiera wartości RGB jednego koloru. Możesz wybrać kolory dowolnie lub skorzystać z tablicy kolorów, np. <a href="https://www.rapidtables.com/web/color/RGB_Color.html">stąd</a>.</p>
+<p>Przykładowa paleta 8-kolorowa:</p>
+<div id="cell-29" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>paleta <span class="op">=</span> np.array([</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">0</span>],    <span class="co"># czarny</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">255</span>, <span class="dv">255</span>, <span class="dv">255</span>],  <span class="co"># biały</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">255</span>, <span class="dv">0</span>,   <span class="dv">0</span>],    <span class="co"># czerwony</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>,   <span class="dv">255</span>, <span class="dv">0</span>],    <span class="co"># zielony</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">255</span>],  <span class="co"># niebieski</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">255</span>, <span class="dv">255</span>, <span class="dv">0</span>],    <span class="co"># żółty</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">255</span>, <span class="dv">0</span>,   <span class="dv">255</span>],  <span class="co"># magenta</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>,   <span class="dv">255</span>, <span class="dv">255</span>],  <span class="co"># cyan</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>], dtype<span class="op">=</span>np.uint8)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-30" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="reshaping" class="level3">
+<h3 class="anchored" data-anchor-id="reshaping">4.2 Reshaping</h3>
+<p>Zamień tablicę obrazu o kształcie <code>(H, W, 3)</code> na tablicę 2D o kształcie <code>(N, 3)</code>, gdzie <code>N = H * W</code>. Każdy wiersz to wartości RGB jednego piksela.</p>
+<div id="cell-32" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="obliczenie-odległości-broadcasting" class="level3">
+<h3 class="anchored" data-anchor-id="obliczenie-odległości-broadcasting">4.3 Obliczenie odległości (broadcasting)</h3>
+<p>Dla każdego piksela oblicz odległość euklidesową do każdego koloru z palety. Powinno to dać tablicę o kształcie <code>(N, k)</code>.</p>
+<p><em>Wskazówka:</em> Wykorzystaj broadcasting. Przeanalizuj transformację kształtów:</p>
+<pre><code>piksele:  (N, 3)    →  (N, 1, 3)
+paleta:   (k, 3)    →  (1, k, 3)
+różnica:               (N, k, 3)
+kwadrat + suma po osi 2:  (N, k)</code></pre>
+<p>Użyj <code>np.newaxis</code> (lub <code>None</code>) do dodania wymiaru i <code>np.sum()</code> z parametrem <code>axis</code> do redukcji.</p>
+<div id="cell-34" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="mapowanie-pikseli-na-paletę" class="level3">
+<h3 class="anchored" data-anchor-id="mapowanie-pikseli-na-paletę">4.4 Mapowanie pikseli na paletę</h3>
+<p>Dla każdego piksela znajdź indeks najbliższego koloru w palecie (<code>np.argmin()</code> z odpowiednim <code>axis</code>). Następnie za pomocą indeksowania złożonego (<em>fancy indexing</em>) utwórz nową tablicę pikseli, w której każdy piksel ma wartości RGB najbliższego koloru z palety.</p>
+<p>Przywróć kształt <code>(H, W, 3)</code> i wyświetl wynikowy obraz za pomocą <code>Image.fromarray()</code>.</p>
+<div id="cell-36" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="eksperymenty" class="level3">
+<h3 class="anchored" data-anchor-id="eksperymenty">4.5 Eksperymenty</h3>
+<ol type="1">
+<li>Przetestuj palety o różnej liczbie kolorów: 2, 4, 8, 16, 32. Jak zmienia się jakość obrazu?</li>
+<li>Zamiast ręcznej palety, wylosuj <code>k</code> kolorów z rozkładu jednostajnego na <span class="math inline">\([0, 255]^3\)</span>. Porównaj wynik z paletą dobraną ręcznie.</li>
+</ol>
+<div id="cell-38" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="generowanie-wzorów" class="level2">
+<h2 class="anchored" data-anchor-id="generowanie-wzorów">5. Generowanie wzorów</h2>
+<section id="szachownica" class="level3">
+<h3 class="anchored" data-anchor-id="szachownica">5.1 Szachownica</h3>
+<p>Napisz program, który utworzy obrazek szachownicy 8×8 pól na tle o wymiarach 500×500 pikseli.</p>
+<p>Wymiary: * pola — 50×50 pikseli, czarne i białe, * tło — szarość o wartości 100, * szachownica wycentrowana, czarne pole w lewym dolnym rogu.</p>
+<p><em>Wskazówka:</em> Utwórz tablicę wypełnioną wartością tła. Następnie za pomocą indeksowania z przypisaniem (<code>A[slice] = value</code>) wypełnij odpowiednie fragmenty tablicy. Alternatywnie: skorzystaj z <code>np.tile()</code> na wzorcu 2×2. Wyświetl wynik za pomocą <code>Image.fromarray()</code>.</p>
+<div id="cell-40" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="gradient" class="level3">
+<h3 class="anchored" data-anchor-id="gradient">5.2 Gradient</h3>
+<p>Wygeneruj obraz o wymiarach 256×256 pikseli przedstawiający gradient kolorów: * w kierunku poziomym — od czarnego (0) do czerwonego (255, 0, 0), * w kierunku pionowym — od czarnego (0) do niebieskiego (0, 0, 255).</p>
+<p>W efekcie prawy dolny róg powinien być magentą (255, 0, 255).</p>
+<p><em>Wskazówka:</em> Utwórz tablicę <code>(256, 256, 3)</code> wypełnioną zerami. Kanał czerwony to funkcja kolumny, kanał niebieski — funkcja wiersza. Broadcasting z <code>np.arange()</code> lub <code>np.linspace()</code> pozwoli uniknąć pętli. Wyświetl wynik za pomocą <code>Image.fromarray()</code>.</p>
+<div id="cell-42" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="widoki-i-kopie" class="level2">
+<h2 class="anchored" data-anchor-id="widoki-i-kopie">6. Widoki i kopie</h2>
+<section id="modyfikacja-in-place-przez-widok" class="level3">
+<h3 class="anchored" data-anchor-id="modyfikacja-in-place-przez-widok">6.1 Modyfikacja in-place przez widok</h3>
+<ol type="1">
+<li>Utwórz kopię tablicy obrazu (<code>img_copy = img_array.copy()</code>).</li>
+<li>Za pomocą wycinków wyodrębnij prostokątny fragment obrazu (np. lewy górny kwadrant).</li>
+<li>Sprawdź, czy wyodrębniony fragment jest widokiem (<code>np.shares_memory()</code>).</li>
+<li>Ustaw wszystkie piksele fragmentu na kolor czerwony <code>[255, 0, 0]</code>. Czy oryginalna tablica <code>img_copy</code> też się zmieniła?</li>
+</ol>
+<div id="cell-44" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="indeksowanie-złożone-kopia" class="level3">
+<h3 class="anchored" data-anchor-id="indeksowanie-złożone-kopia">6.2 Indeksowanie złożone — kopia</h3>
+<ol type="1">
+<li>Utwórz tablicę boolowską (maskę) wskazującą piksele, których kanał czerwony jest większy niż 200.</li>
+<li>Wyodrębnij te piksele za pomocą maski. Czy wynik jest widokiem czy kopią? Sprawdź za pomocą <code>np.shares_memory()</code>.</li>
+<li>Ustaw kolor wyodrębnionych pikseli na zielony. Czy oryginalna tablica się zmieniła?</li>
+<li>Jak osiągnąć modyfikację oryginału za pomocą maski? (<em>Wskazówka:</em> <code>img_array[maska] = [0, 255, 0]</code>.)</li>
+</ol>
+<div id="cell-46" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-47" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="zadania-dodatkowe" class="level2">
+<h2 class="anchored" data-anchor-id="zadania-dodatkowe">7. Zadania dodatkowe</h2>
+<section id="wymiana-kanałów" class="level3">
+<h3 class="anchored" data-anchor-id="wymiana-kanałów">7.1 Wymiana kanałów</h3>
+<p>Utwórz wersję obrazu, w której kanały R i B są zamienione miejscami. Wyświetl wynik. Czy potrzebujesz kopii, czy wystarczy widok? Co się stanie, jeśli użyjesz <code>img_array[:, :, [2, 1, 0]]</code> a co jeśli napiszesz <code>img_array[:, :, ::-1]</code>? Sprawdź, które z tych podejść zwraca widok, a które kopię.</p>
+<div id="cell-49" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="mozaika-z-np.tile" class="level3">
+<h3 class="anchored" data-anchor-id="mozaika-z-np.tile">7.2 Mozaika z <code>np.tile()</code></h3>
+<p>Utwórz mozaikę 3×3 z pomniejszonego obrazu. Aby pomniejszyć obraz, weź co <code>n</code>-ty piksel w obu kierunkach (np. <code>img_array[::4, ::4]</code>). Następnie użyj <code>np.tile()</code> do powielenia tablicy.</p>
+<div id="cell-51" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
