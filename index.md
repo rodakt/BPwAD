@@ -19,14 +19,15 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 
 | Temat | Podgląd | Colab | Pobierz |
 |-------|---------|-------|---------|
-| Wykład 1: NumPy | [🔗 HTML](wyklady/wyklad_1.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_1.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_1.ipynb) |
+| 1. NumPy | [🔗 HTML](wyklady/wyklad_1.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_1.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_1.ipynb) |
+| 2. scikit-learn - estymatory, transformatory, potoki | [🔗 HTML](wyklady/wyklad_2.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_2.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_2.ipynb) |
 
 ## Laboratoria
 
 | Temat | Podgląd | Colab | Pobierz |
 |-------|---------|-------|---------|
-| Lab 1: NumPy - regresja liniowa | [🔗 HTML](laby/lab_1.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_1.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_1.ipynb) |
-| Lab 2: NumPy - obrazy rastrowe | [🔗 HTML](laby/lab_2.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_2.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_2.ipynb) |
+| 1. NumPy - regresja liniowa | [🔗 HTML](laby/lab_1.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_1.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_1.ipynb) |
+| 2. NumPy - obrazy rastrowe | [🔗 HTML](laby/lab_2.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_2.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_2.ipynb) |
 
 
 ## Zaliczenie

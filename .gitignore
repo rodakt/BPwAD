@@ -57,8 +57,9 @@ Thumbs.db
 *.bak
 *.swp
 
-# files containing `solved` in the name
+# files containing `solved` or `sandbox` in the name
 *solved*
+*sandbox*
 
 #  foldery
 projekty/

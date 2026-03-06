@@ -15,6 +15,7 @@ website:
       - section: "Wykłady"
         contents:
           - "wyklady/wyklad_1.ipynb"
+          - "wyklady/wyklad_2.ipynb"
       - section: "Laboratoria"
         contents:
           - "laby/lab_1.ipynb"
