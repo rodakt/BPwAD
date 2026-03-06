@@ -88,6 +88,88 @@
     ]
   },
   {
+    "objectID": "wyklady/wyklad_2.html",
+    "href": "wyklady/wyklad_2.html",
+    "title": "Wykład 2: scikit-learn - estymatory, transformatory, potoki.",
+    "section": "",
+    "text": "Open In Colab",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 2: scikit-learn - estymatory, transformatory, potoki."
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_2.html#potoki-pipeline",
+    "href": "wyklady/wyklad_2.html#potoki-pipeline",
+    "title": "Wykład 2: scikit-learn - estymatory, transformatory, potoki.",
+    "section": "Potoki (Pipeline)",
+    "text": "Potoki (Pipeline)\nPotoki to mechanizm, który umożliwia łączenie wielu kroków przetwarzania danych w jedną spójną jednostkę.\n\nPodstawowa idea\nPotok w scikit-learn pozwala na sekwencyjne łączenie różnych transformatorów i jednego estymatora końcowego w jedną całość. Zapewnia to:\n\nSpójny interfejs — cały potok zachowuje się jak pojedynczy estymator scikit-learn z metodami fit(), predict(), itd.\nOrganizacja kodu — potoki organizują kod w zrozumiały i łatwy do utrzymania sposób — ważne, gdy łańcuch przetwarzania jest złożony.\nAutomatyczne przekazywanie danych — dane są automatycznie przekazywane między etapami.\nEliminację wycieków danych — potok zapewnia, że transformacje (np. skalowanie) są dopasowywane tylko do danych treningowych.\n\n\n\nTworzenie potoku\nPodstawowy potok tworzy się przy użyciu klasy Pipeline. Każdy krok to para (nazwa, estymator):\n\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\n\nfrom sklearn.datasets import load_breast_cancer\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import confusion_matrix\n\n# Załaduj dane\ndata = load_breast_cancer()\nX, y = data.data, data.target\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n\npipe = Pipeline([\n    ('scaler', StandardScaler()),\n    ('classifier', LogisticRegression())\n])\n\n# Cały potok można trenować jak pojedynczy estymator\npipe.fit(X_train, y_train)\n\n# I używać do predykcji\npredictions = pipe.predict(X_test)\n\n# Ocena jakości modelu\nconf_matrix = confusion_matrix(y_test, predictions)\nconf_matrix\n\narray([[41,  2],\n       [ 1, 70]])\n\n\n\n\nDostęp do elementów potoku (Inspekcja)\nPo wykonaniu .fit() możemy wyciągnąć wyuczone parametry z dowolnego kroku, używając nazwy zdefiniowanej przy tworzeniu potoku.\n\n# 1. Pobranie średnich wyliczonych przez scaler\nsrednie = pipe['scaler'].mean_\nsrednie\n\narray([1.41176352e+01, 1.91850330e+01, 9.18822418e+01, 6.54377582e+02,\n       9.57440220e-02, 1.03619319e-01, 8.88981451e-02, 4.82798703e-02,\n       1.81098681e-01, 6.27567692e-02, 4.02015824e-01, 1.20268681e+00,\n       2.85825341e+00, 4.00712989e+01, 6.98907473e-03, 2.56354484e-02,\n       3.28236723e-02, 1.18939407e-02, 2.05735121e-02, 3.82045560e-03,\n       1.62351033e+01, 2.55356923e+01, 1.07103121e+02, 8.76987033e+02,\n       1.31532132e-01, 2.52741802e-01, 2.74594569e-01, 1.14182222e-01,\n       2.90502198e-01, 8.38678462e-02])\n\n\n\n# 2. Pobranie wag modelu (współczynników)\nwagi = pipe['classifier'].coef_\nwagi\n\narray([[-0.43190368, -0.38732553, -0.39343248, -0.46521006, -0.07166728,\n         0.54016395, -0.8014581 , -1.11980408,  0.23611852,  0.07592093,\n        -1.26817815,  0.18887738, -0.61058302, -0.9071857 , -0.31330675,\n         0.68249145,  0.17527452, -0.3112999 ,  0.50042502,  0.61622993,\n        -0.87984024, -1.35060559, -0.58945273, -0.84184594, -0.54416967,\n         0.01611019, -0.94305313, -0.77821726, -1.20820031, -0.15741387]])\n\n\n\n# 3. Wywołanie metod specyficznych dla modelu (np. prawdopodobieństwa)\nproby = pipe.predict_proba(X_test)\nproby[:3, :]\n\narray([[1.13590250e-01, 8.86409750e-01],\n       [9.99990991e-01, 9.00936206e-06],\n       [9.96920905e-01, 3.07909541e-03]])\n\n\n\n\nSchemat działania\nKlasa Pipeline automatyzuje przepływ danych, gwarantując rygorystyczne oddzielenie wiedzy o zbiorze treningowym od testowego.\n\n1. Faza uczenia: pipe.fit(X_train, y_train)\nPotok wykonuje sekwencję operacji uczących:\n\nTransformatory (np. scaler): Wywołują fit_transform(). Obliczają parametry statystyczne (np. średnią \\(\\mu\\) i odchylenie \\(\\sigma\\)) na podstawie X_train i przekształcają te dane.\nEstymator (klasyfikator): Wywołuje fit() na danych przetworzonych przez poprzednie kroki.\n\n\n\n2. Faza predykcji: pipe.predict(X_test)\nPotok przechodzi w tryb „użytkowy”, stosując wcześniej zdobytą wiedzę:\n\nTransformatory: Wywołują wyłącznie transform(). Używają parametrów (\\(\\mu, \\sigma\\)) wyliczonych podczas treningu. Nigdy nie wywołują fit na danych testowych.\nEstymator: Wywołuje predict() na przeskalowanych danych.\n\n\n\n\nDlaczego to rozróżnienie jest kluczowe?\n\nUnikanie wycieku danych (Data Leakage): Użycie fit_transform na zbiorze testowym pozwoliłoby modelowi pośrednio „poznać” rozkład danych, których nie powinien widzieć przed predykcją. Powoduje to sztuczne zawyżenie wyników ewaluacji.\nBrak istotności statystycznej małych próbek: Metoda fit wymaga odpowiednio dużej grupy danych, aby poprawnie wyznaczyć parametry statystyczne (np. wariancję). W warunkach produkcyjnych model często przetwarza pojedynczy rekord. Dla jednego wiersza obliczenie odchylenia standardowego jest matematycznie niemożliwe.\nSpójność matematyczna: Model został wytrenowany w określonej przestrzeni cech (np. dla \\(\\mu=0\\)). Aby prognoza była poprawna, dane testowe muszą zostać rzutowane na tę samą przestrzeń przy użyciu parametrów ze zbioru treningowego.\n\n\n\nAnalogia metodologiczna\n\n\n\n\n\n\n\n\n\nKomponent\nMetoda uczenia\nMetoda operacyjna\nRola\n\n\n\n\nTransformator\nfit()\ntransform()\nPrzygotowanie danych (X → X’)\n\n\nEstymator\nfit()\npredict()\nWydanie decyzji (X → y)\n\n\n\nIntuicja: transform jest dla transformatora tym, czym predict dla modelu – zastosowaniem wyuczonej wiedzy na nowych danych.\n\n\nOptymalizacja hiperparametrów\nPotoki są szczególnie przydatne w połączeniu z przeszukiwaniem przestrzeni hiperparametrów. Parametry poszczególnych kroków potoku adresuje się w formacie nazwa_kroku__nazwa_parametru (podwójne podkreślenie).\nGridSearchCV przeszukuje wszystkie kombinacje wartości z podanej siatki:\n\nfrom sklearn.model_selection import GridSearchCV\n\npipe = Pipeline([\n    ('scaler', StandardScaler()),\n    ('classifier', LogisticRegression(max_iter=1000, solver='liblinear'))\n])\n\nparam_grid = {\n    'scaler__with_mean': [True, False],\n    'classifier__C': [0.1, 1.0, 10.0],\n    'classifier__penalty': ['l1', 'l2']\n}\n\nsearch = GridSearchCV(pipe, param_grid, cv=5, scoring='accuracy')\nsearch.fit(X_train, y_train)\n\nprint(\"Najlepsze parametry:\", search.best_params_)\nprint(\"Najlepszy wynik:\", search.best_score_)\n\n# Po znalezieniu najlepszych parametrów można użyć najlepszego modelu do predykcji\nbest_model = search.best_estimator_\npredictions = best_model.predict(X_test)\n\n# Ocena jakości modelu\nconf_matrix = confusion_matrix(y_test, predictions)\nconf_matrix\n\nNajlepsze parametry: {'classifier__C': 0.1, 'classifier__penalty': 'l2', 'scaler__with_mean': True}\nNajlepszy wynik: 0.9780219780219781\n\n\narray([[42,  1],\n       [ 0, 71]])\n\n\nW powyższym przykładzie GridSearchCV przeszukuje 2 × 3 × 2 = 12 kombinacji, z pięciokrotną kroswalidacją — łącznie 60 dopasowań modelu. Przy większej liczbie hiperparametrów i ich wartości liczba kombinacji rośnie wykładniczo.\nRandomizedSearchCV losuje zadaną liczbę kombinacji zamiast przeszukiwać wszystkie. Jest znacznie wydajniejszy przy dużej przestrzeni hiperparametrów:\n\nfrom sklearn.model_selection import RandomizedSearchCV\nfrom scipy.stats import uniform, randint\n\npipe = Pipeline([\n    ('scaler', StandardScaler()),\n    ('classifier', LogisticRegression(max_iter=1000, solver='liblinear'))\n])\n\nparam_distributions = {\n    'classifier__C': uniform(0.01, 100),         # rozkład ciągły\n    'classifier__max_iter': randint(100, 1000),   # rozkład dyskretny\n}\n\nsearch = RandomizedSearchCV(\n    pipe, param_distributions,\n    n_iter=20,   # liczba losowanych kombinacji\n    cv=5,\n    scoring='accuracy',\n    random_state=42\n)\nsearch.fit(X_train, y_train)\n\nprint(\"Najlepsze parametry:\", search.best_params_)\nprint(\"Najlepszy wynik:\", search.best_score_)\n\n# Po znalezieniu najlepszych parametrów można użyć najlepszego modelu do predykcji\nbest_model = search.best_estimator_\npredictions = best_model.predict(X_test)\n\n# Ocena jakości modelu\nconf_matrix = confusion_matrix(y_test, predictions)\nconf_matrix\n\nNajlepsze parametry: {'classifier__C': np.float64(5.651157902710025), 'classifier__max_iter': 443}\nNajlepszy wynik: 0.9780219780219781\n\n\narray([[42,  1],\n       [ 2, 69]])\n\n\nOba narzędzia mają ograniczenia: GridSearchCV nie skaluje się do dużych przestrzeni, a RandomizedSearchCV nie uczy się z poprzednich prób. Bardziej zaawansowane podejścia — np. optymalizacja bayesowska — zostaną omówione w kolejnym wykładzie (Optuna).\n\nSerializacja i wdrażanie\nCały potok można zapisać jako jeden obiekt:\n\nfrom joblib import dump, load\n\n# Zapisz cały potok\ndump(pipe, 'model_pipeline.joblib')\n\n# Załaduj go później\nloaded_pipe = load('model_pipeline.joblib')\n\nSerializacja obejmuje zarówno wyuczone parametry estymatora, jak i stany wszystkich transformatorów — dzięki temu wdrożenie modelu polega na załadowaniu jednego pliku i wywołaniu predict().\n\n\n\nZaawansowane funkcje potoków\n\nColumnTransformer\nW praktyce dane zawierają kolumny różnych typów (numeryczne, kategoryczne), które wymagają różnych transformacji. ColumnTransformer pozwala przypisać osobny transformator do wybranych kolumn:\nfrom sklearn.compose import ColumnTransformer\nfrom sklearn.preprocessing import OneHotEncoder, StandardScaler\n\npreprocessor = ColumnTransformer(\n    transformers=[\n        ('num', StandardScaler(), ['wiek', 'dochod']),\n        ('cat', OneHotEncoder(), ['kategoria', 'region'])\n    ],\n    remainder='passthrough'  # kolumny nieuwzględnione powyżej — przekaż bez zmian\n    # remainder='drop'       # alternatywnie: pomiń nieuwzględnione kolumny\n)\n\npipe = Pipeline([\n    ('preprocess', preprocessor),\n    ('classifier', LogisticRegression())\n])\nParametr remainder kontroluje, co dzieje się z kolumnami, które nie zostały przypisane do żadnego transformatora. Domyślnie jest ustawiony na 'drop' (pominięcie), co może prowadzić do trudnych do wychwycenia błędów, gdy dodamy nową kolumnę do danych i zapomnimy zaktualizować ColumnTransformer.\n\n\nFeatureUnion\nFeatureUnion pozwala na równoległe przetwarzanie danych przez różne transformatory i konkatenację wyników. Przydaje się, gdy chcemy wzbogacić dane o cechy uzyskane różnymi metodami:\nfrom sklearn.pipeline import FeatureUnion\nfrom sklearn.decomposition import PCA\nfrom sklearn.feature_selection import SelectKBest\n\nfeatures = FeatureUnion([\n    ('pca', PCA(n_components=2)),\n    ('select_best', SelectKBest(k=2))\n])\n\npipe = Pipeline([\n    ('scaler', StandardScaler()),\n    ('features', features),\n    ('classifier', LogisticRegression())\n])\nW tym przykładzie dane po skalowaniu trafiają równolegle do PCA (redukcja wymiarów) i SelectKBest (selekcja cech). Wyniki obu transformatorów są łączone (horyzontalnie) i przekazywane do klasyfikatora. Końcowa macierz cech ma 2 + 2 = 4 kolumny.\nRóżnica między ColumnTransformer a FeatureUnion: ColumnTransformer dzieli dane po kolumnach (różne transformacje dla różnych cech), natomiast FeatureUnion przekazuje te same dane do wielu transformatorów i łączy wyniki.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 2: scikit-learn - estymatory, transformatory, potoki."
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "",
+    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#opis-przedmiotu",
+    "href": "index.html#opis-przedmiotu",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "",
+    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#wykłady",
+    "href": "index.html#wykłady",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Wykłady",
+    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\n1. NumPy\n🔗 HTML\n\n📥 .ipynb\n\n\n2. scikit-learn - estymatory, transformatory, potoki\n🔗 HTML\n\n📥 .ipynb",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#laboratoria",
+    "href": "index.html#laboratoria",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Laboratoria",
+    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\n1. NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb\n\n\n2. NumPy - obrazy rastrowe\n🔗 HTML\n\n📥 .ipynb",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#zaliczenie",
+    "href": "index.html#zaliczenie",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Zaliczenie",
+    "text": "Zaliczenie\n\nĆwiczenia: zaliczenie na podstawie pracy domowej oraz jej indywidualnej obrony.\nWykład: test sprawdzający wiedzę, przeprowadzany w formie tradycyjnej (arkusz papierowy), bez dostępu do urządzeń elektronicznych i materiałów pomocniczych.",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#literatura",
+    "href": "index.html#literatura",
+    "title": "Biblioteki Python w analizie danych",
+    "section": "Literatura",
+    "text": "Literatura\n\nBaza teoretyczna\n\nPRML Christopher M. Bishop, “Pattern Recognition and Machine Learning”, 2006.\nDL Ian Goodfellow, Yoshua Bengio, Aaron Courville, “Deep Learning”, 2016.\nBishop DL Christopher M. Bishop, “Deep Learning”, 2022.\nPML-1 Kevin P. Murphy, “Probabilistic Machine Learning: An Introduction”, 2022.\nFrom Python to NumPy Nicolas P. Rougier, 2017.\nPython Data Science Handbook Jake VanderPlas\n\n\n\nDokumentacja i tutoriale\n\nDokumentacja NumPy\nScikit-learn: User Guide\nMatplotlib: Tutorials",
+    "crumbs": [
+      "Biblioteki Python w analizie danych"
+    ]
+  },
+  {
     "objectID": "wyklady/wyklad_1.html",
     "href": "wyklady/wyklad_1.html",
     "title": "Wykład 1: NumPy",
@@ -206,66 +288,6 @@
     "crumbs": [
       "Wykłady",
       "Wykład 1: NumPy"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "",
-    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#opis-przedmiotu",
-    "href": "index.html#opis-przedmiotu",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "",
-    "text": "Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach numerycznych, uczeniu maszynowym i głębokim uczeniu. Zakres tematyczny obejmuje:\n\nNumPy — tablice wielowymiarowe, wektoryzacja, broadcasting, indeksowanie, algebra liniowa\nscikit-learn — architektura estymatorów i transformatorów, potoki przetwarzania danych, walidacja krzyżowa, tworzenie własnych modeli\nOptuna — automatyczna optymalizacja hiperparametrów, samplery (TPE), pruning, wizualizacja wyników\nPyTorch (podstawy) — tensory, metody gradientu schodzącego (batch, SGD, mini-batch), obsługa GPU\nPyTorch (autograd i sieci neuronowe) — różniczkowanie automatyczne, wsteczna propagacja, moduł nn, pętla treningowa\nSieci konwolucyjne (CNN) — konwolucje, pooling, architektura CNN, implementacja LeNet-5 na zbiorze MNIST\nTransfer learning z fastai — fine-tuning pretrenowanych modeli (ResNet), dobór learning rate, klasyfikacja obrazów",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#wykłady",
-    "href": "index.html#wykłady",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Wykłady",
-    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\n1. NumPy\n🔗 HTML\n\n📥 .ipynb\n\n\n2. scikit-learn - estymatory, transformatory, potoki\n🔗 HTML\n\n📥 .ipynb",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#laboratoria",
-    "href": "index.html#laboratoria",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Laboratoria",
-    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\n1. NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb\n\n\n2. NumPy - obrazy rastrowe\n🔗 HTML\n\n📥 .ipynb",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#zaliczenie",
-    "href": "index.html#zaliczenie",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Zaliczenie",
-    "text": "Zaliczenie\n\nĆwiczenia: zaliczenie na podstawie pracy domowej oraz jej indywidualnej obrony.\nWykład: test sprawdzający wiedzę, przeprowadzany w formie tradycyjnej (arkusz papierowy), bez dostępu do urządzeń elektronicznych i materiałów pomocniczych.",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#literatura",
-    "href": "index.html#literatura",
-    "title": "Biblioteki Python w analizie danych",
-    "section": "Literatura",
-    "text": "Literatura\n\nBaza teoretyczna\n\nPRML Christopher M. Bishop, “Pattern Recognition and Machine Learning”, 2006.\nDL Ian Goodfellow, Yoshua Bengio, Aaron Courville, “Deep Learning”, 2016.\nBishop DL Christopher M. Bishop, “Deep Learning”, 2022.\nPML-1 Kevin P. Murphy, “Probabilistic Machine Learning: An Introduction”, 2022.\nFrom Python to NumPy Nicolas P. Rougier, 2017.\nPython Data Science Handbook Jake VanderPlas\n\n\n\nDokumentacja i tutoriale\n\nDokumentacja NumPy\nScikit-learn: User Guide\nMatplotlib: Tutorials",
-    "crumbs": [
-      "Biblioteki Python w analizie danych"
     ]
   },
   {

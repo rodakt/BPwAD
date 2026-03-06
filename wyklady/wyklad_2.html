@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 2: scikit-learn - estymatory, transformatory, potoki. – Biblioteki Python w analizie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b938e67c0c3a38245966223dfb5d7d7b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_2.html">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#scikit-learn-estymatory-transformatory-potoki" id="toc-scikit-learn-estymatory-transformatory-potoki" class="nav-link active" data-scroll-target="#scikit-learn-estymatory-transformatory-potoki">scikit-learn — estymatory, transformatory, potoki</a>
+  <ul class="collapse">
+  <li><a href="#estymatory-predyktory-i-transformatory" id="toc-estymatory-predyktory-i-transformatory" class="nav-link" data-scroll-target="#estymatory-predyktory-i-transformatory">Estymatory, predyktory i transformatory</a></li>
+  <li><a href="#przykłady-estymatorów-wbudowanych-w-scikit-learn" id="toc-przykłady-estymatorów-wbudowanych-w-scikit-learn" class="nav-link" data-scroll-target="#przykłady-estymatorów-wbudowanych-w-scikit-learn">Przykłady estymatorów wbudowanych w scikit-learn</a></li>
+  <li><a href="#typowy-schemat-wykorzystania-estymatora" id="toc-typowy-schemat-wykorzystania-estymatora" class="nav-link" data-scroll-target="#typowy-schemat-wykorzystania-estymatora">Typowy schemat wykorzystania estymatora</a></li>
+  <li><a href="#tworzenie-własnych-estymatorów-w-scikit-learn" id="toc-tworzenie-własnych-estymatorów-w-scikit-learn" class="nav-link" data-scroll-target="#tworzenie-własnych-estymatorów-w-scikit-learn">Tworzenie własnych estymatorów w scikit-learn</a></li>
+  <li><a href="#potoki-pipeline" id="toc-potoki-pipeline" class="nav-link" data-scroll-target="#potoki-pipeline">Potoki (<em>Pipeline</em>)</a>
+  <ul class="collapse">
+  <li><a href="#podstawowa-idea" id="toc-podstawowa-idea" class="nav-link" data-scroll-target="#podstawowa-idea">Podstawowa idea</a></li>
+  <li><a href="#tworzenie-potoku" id="toc-tworzenie-potoku" class="nav-link" data-scroll-target="#tworzenie-potoku">Tworzenie potoku</a></li>
+  <li><a href="#dostęp-do-elementów-potoku-inspekcja" id="toc-dostęp-do-elementów-potoku-inspekcja" class="nav-link" data-scroll-target="#dostęp-do-elementów-potoku-inspekcja">Dostęp do elementów potoku (Inspekcja)</a></li>
+  <li><a href="#schemat-działania" id="toc-schemat-działania" class="nav-link" data-scroll-target="#schemat-działania">Schemat działania</a></li>
+  <li><a href="#dlaczego-to-rozróżnienie-jest-kluczowe" id="toc-dlaczego-to-rozróżnienie-jest-kluczowe" class="nav-link" data-scroll-target="#dlaczego-to-rozróżnienie-jest-kluczowe">Dlaczego to rozróżnienie jest kluczowe?</a></li>
+  <li><a href="#analogia-metodologiczna" id="toc-analogia-metodologiczna" class="nav-link" data-scroll-target="#analogia-metodologiczna">Analogia metodologiczna</a></li>
+  <li><a href="#optymalizacja-hiperparametrów" id="toc-optymalizacja-hiperparametrów" class="nav-link" data-scroll-target="#optymalizacja-hiperparametrów">Optymalizacja hiperparametrów</a></li>
+  <li><a href="#zaawansowane-funkcje-potoków" id="toc-zaawansowane-funkcje-potoków" class="nav-link" data-scroll-target="#zaawansowane-funkcje-potoków">Zaawansowane funkcje potoków</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_2.html">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_2.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<section id="scikit-learn-estymatory-transformatory-potoki" class="level1">
+<h1>scikit-learn — estymatory, transformatory, potoki</h1>
+<p>Biblioteka scikit-learn wprowadza następujące wysokopoziomowe pojęcia:</p>
+<ul>
+<li><strong>estymator</strong> (<em>estimator</em>) — obiekt tworzący deterministyczną funkcję na podstawie danych zgodnie z reprezentowanym w nim modelem. Każdy estymator posiada metodę <code>fit()</code>.</li>
+<li><strong>predyktor</strong> (<em>predictor</em>) — estymator posiadający metodę <code>predict()</code>. Służy do przewidywania wartości wyjściowych na podstawie nowych danych.</li>
+<li><strong>transformator</strong> (<em>transformer</em>) — estymator posiadający metodę <code>transform()</code>. Służy do przekształcania danych wejściowych na nową przestrzeń.</li>
+<li><strong>potok</strong> (<em>pipeline</em>) — sekwencja transformatorów i estymatora końcowego, które są stosowane w kolejności.</li>
+</ul>
+<section id="estymatory-predyktory-i-transformatory" class="level3">
+<h3 class="anchored" data-anchor-id="estymatory-predyktory-i-transformatory">Estymatory, predyktory i transformatory</h3>
+<p>Estymator to obiekt reprezentujący model. Każdy estymator powinien posiadać metodę <code>fit()</code>, która przyjmuje dane i uczy model, czyli tworzy deterministyczną funkcję na podstawie danych i zgodnie z reprezentowanym w nim modelem. W zależności od swojej roli estymator posiada również metodę <code>predict()</code> (predyktor) lub <code>transform()</code> (transformator), a także ewentualnie <code>fit_predict()</code> lub <code>fit_transform()</code>.</p>
+<p>Niektóre estymatory pełnią jednocześnie obie role — na przykład <code>KMeans</code> posiada zarówno <code>predict()</code>, jak i <code>transform()</code>.</p>
+<section id="metoda-fit" class="level4">
+<h4 class="anchored" data-anchor-id="metoda-fit">Metoda <code>fit()</code></h4>
+<p>Metoda <code>fit()</code> zwykle przyjmuje dwa argumenty: - <code>X</code> — dane wejściowe (np. cechy, obrazy, teksty) - <code>y</code> — dane wyjściowe (np. etykiety, wartości docelowe)</p>
+<p>Metoda <code>fit()</code> modyfikuje stan estymatora „w miejscu” oraz zwraca dopasowany estymator — pozwala to na łączenie wielu wywołań w potoku.</p>
+<p>Jeśli uczenie jest nienadzorowane, to argument <code>y</code> nie jest wymagany, zwykle automatycznie ustawiany jest na wartość <code>None</code>.</p>
+<p>Częstym efektem wywołania metody <code>fit()</code> jest utworzenie atrybutów w estymatorze o nazwach kończących się na <code>_</code> (np. <code>coef_</code>, <code>intercept_</code>, <code>n_features_in_</code>, <code>n_classes_</code>), które przechowują różne informacje o stanie estymatora po wywołaniu metody <code>fit()</code>.</p>
+</section>
+<section id="metoda-predict" class="level4">
+<h4 class="anchored" data-anchor-id="metoda-predict">Metoda <code>predict()</code></h4>
+<p>Metoda <code>predict()</code> przyjmuje dane wejściowe <code>X</code> i zwraca przewidywane wartości wyjściowe <code>y</code>. Jest to metoda, która jest wywoływana po <code>fit()</code> — model musi być najpierw wyuczony na danych, aby można było przewidywać nowe wartości.</p>
+</section>
+<section id="metoda-transform" class="level4">
+<h4 class="anchored" data-anchor-id="metoda-transform">Metoda <code>transform()</code></h4>
+<p>Metoda <code>transform()</code> przyjmuje dane wejściowe <code>X</code> i zwraca ich przekształcenie na jakąś nową przestrzeń. Zwrócone dane oznacza się często jako <code>Xt</code>. Jest to metoda, która również jest wywoływana po <code>fit()</code>.</p>
+</section>
+<section id="metody-fit_transform-i-fit_predict" class="level4">
+<h4 class="anchored" data-anchor-id="metody-fit_transform-i-fit_predict">Metody <code>fit_transform()</code> i <code>fit_predict()</code></h4>
+<p>Metody <code>fit_transform()</code> i <code>fit_predict()</code> są skrótami dla wywołania <code>fit()</code> i następnie <code>transform()</code> lub <code>predict()</code>. Metoda <code>fit_transform()</code> przyjmuje dane wejściowe <code>X</code>, uczy estymator na tych danych wywołując <code>fit()</code> i zwraca przekształcone dane wyjściowe <code>Xt</code> wywołując <code>transform()</code>. Podobnie <code>fit_predict()</code> przyjmuje dane wejściowe <code>X</code>, uczy estymator na tych danych wywołując <code>fit()</code> i zwraca przewidywane wartości wyjściowe <code>y</code> wywołując <code>predict()</code>.</p>
+</section>
+</section>
+<section id="przykłady-estymatorów-wbudowanych-w-scikit-learn" class="level3">
+<h3 class="anchored" data-anchor-id="przykłady-estymatorów-wbudowanych-w-scikit-learn">Przykłady estymatorów wbudowanych w scikit-learn</h3>
+<section id="regresja-logistyczna" class="level4">
+<h4 class="anchored" data-anchor-id="regresja-logistyczna">Regresja logistyczna</h4>
+<p>Model regresji logistycznej jest implementowany w <code>sklearn.linear_model.LogisticRegression</code>. Jest to przykład predyktora uczenia nadzorowanego. Spośród metod opisanych powyżej posiada: - <code>fit(X, y)</code> — uczy model na danych <code>X</code> i etykietach <code>y</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty: - <code>coef_</code> — współczynniki regresji - <code>intercept_</code> — wyraz wolny - <code>n_features_in_</code> — liczba cech w danych wejściowych - <code>feature_names_in_</code> — nazwy cech w danych wejściowych - <code>classes_</code> — etykiety klas - <code>n_iter_</code> — liczba iteracji w procesie uczenia - <code>predict(X)</code> — przewiduje etykiety klas dla nowych danych <code>X</code></p>
+<p>Dodatkowo, model ten, tak jak i wiele innych modeli szacujących prawdopodobieństwo przynależności do klas, posiada metodę <code>predict_proba(X)</code>, która zwraca prawdopodobieństwa przynależności do klas dla danych <code>X</code>.</p>
+</section>
+<section id="k-means" class="level4">
+<h4 class="anchored" data-anchor-id="k-means">K-means</h4>
+<p>Model K-średnich (<em>K-means</em>) jest implementowany w <code>sklearn.cluster.KMeans</code>. Jest to przykład estymatora uczenia nienadzorowanego, który pełni jednocześnie rolę predyktora i transformatora. Posiada wszystkie metody opisane powyżej: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty: - <code>cluster_centers_</code> — współrzędne centroidów klastrów - <code>labels_</code> — etykiety klastrów dla każdego punktu danych - <code>inertia_</code> — suma kwadratów odległości punktów danych do ich centroidów - <code>predict(X)</code> — przewiduje etykiety klastrów dla nowych danych <code>X</code> - <code>fit_predict(X)</code> — uczy model na danych <code>X</code> i zwraca etykiety klastrów dla tych danych - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń odległości do centroidów klastrów - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca <code>X</code> przekształcone na przestrzeń odległości do centroidów klastrów.</p>
+</section>
+<section id="pca" class="level4">
+<h4 class="anchored" data-anchor-id="pca">PCA</h4>
+<p>Model analizy głównych składowych (<em>PCA</em>) jest implementowany w <code>sklearn.decomposition.PCA</code>. Jest to przykład transformatora uczenia nienadzorowanego. Spośród metod opisanych powyżej posiada: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty: - <code>components_</code> — macierz głównych składowych - <code>explained_variance_</code> — wariancja wyjaśniona przez każdą główną składową - <code>singular_values_</code> — wartości osobliwe - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń głównych składowych - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni głównych składowych</p>
+<p>Dodatkowo, model ten, tak jak i wiele innych modeli transformujących dane, posiada metodę <code>inverse_transform(Xt)</code>, która przekształca dane <code>Xt</code> z powrotem do oryginalnej przestrzeni. Ponieważ PCA nie jest transformatorem różnowartościowym (podczas transformacji zmienia się liczba cech i część informacji jest tracona), to metoda <code>inverse_transform(Xt)</code> nie zwraca danych oryginalnych, a jedynie ich przybliżenie.</p>
+</section>
+<section id="minmaxscaler" class="level4">
+<h4 class="anchored" data-anchor-id="minmaxscaler"><code>MinMaxScaler</code></h4>
+<p>Model <code>MinMaxScaler</code> jest implementowany w <code>sklearn.preprocessing.MinMaxScaler</code>. Jest to przykład nienadzorowanego transformatora. Spośród metod opisanych powyżej posiada: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty: - <code>data_max_</code> — maksymalne wartości cech w danych - <code>data_min_</code> — minimalne wartości cech w danych - <code>data_range_</code> — zakres wartości cech w danych - <code>n_features_in_</code> — liczba cech w danych wejściowych - … - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń znormalizowaną do przedziału [0, 1] - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przedziale [0, 1]</p>
+<p>Dodatkowo, model ten, tak jak i wiele innych modeli transformujących dane, posiada metodę <code>inverse_transform(Xt)</code>, która przekształca dane <code>Xt</code> z powrotem do oryginalnej przestrzeni.</p>
+</section>
+<section id="polynomialfeatures" class="level4">
+<h4 class="anchored" data-anchor-id="polynomialfeatures"><code>PolynomialFeatures</code></h4>
+<p>Model <code>PolynomialFeatures</code> jest implementowany w <code>sklearn.preprocessing.PolynomialFeatures</code>. Jest to przykład nienadzorowanego transformatora służącego do generowania cech wielomianowych. Spośród metod opisanych powyżej posiada: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty: - <code>powers_</code> — wykładniki cech wejściowych w wyjściu - <code>n_features_in_</code> — liczba cech w danych wejściowych - <code>n_output_features_</code> — liczba cech wyjściowych - … - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń cech wielomianowych - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni cech wielomianowych</p>
+</section>
+</section>
+<section id="typowy-schemat-wykorzystania-estymatora" class="level3">
+<h3 class="anchored" data-anchor-id="typowy-schemat-wykorzystania-estymatora">Typowy schemat wykorzystania estymatora</h3>
+<ol type="1">
+<li>Inicjalizacja. Polega na stworzeniu obiektu estymatora, który reprezentuje model. Parametry estymatora są hiperparametrami modelu i są ustalane przed rozpoczęciem uczenia.</li>
+<li>Uczenie. Polega na wywołaniu metody <code>fit()</code> na obiekcie estymatora, co prowadzi do dopasowania modelu do danych.</li>
+<li>Przewidywanie lub transformacja. Polega na wywołaniu metody <code>predict()</code> lub <code>transform()</code> na obiekcie estymatora, co prowadzi do uzyskania przewidywanych wartości wyjściowych lub przekształconych danych wejściowych.</li>
+</ol>
+</section>
+<section id="tworzenie-własnych-estymatorów-w-scikit-learn" class="level3">
+<h3 class="anchored" data-anchor-id="tworzenie-własnych-estymatorów-w-scikit-learn">Tworzenie własnych estymatorów w scikit-learn</h3>
+<p>Tworzenie własnych estymatorów w scikit-learn wymaga zrozumienia interfejsu API biblioteki oraz konwencji, które ściśle definiują, jak powinien zachowywać się estymator.</p>
+<section id="podstawowe-zasady" class="level4">
+<h4 class="anchored" data-anchor-id="podstawowe-zasady">Podstawowe zasady</h4>
+<ol type="1">
+<li><strong>Dziedziczenie po odpowiednich klasach bazowych</strong>:
+<ul>
+<li><code>BaseEstimator</code> — zapewnia funkcje pomocnicze, np. <code>get_params()</code> / <code>set_params()</code></li>
+<li>Odpowiedni <em>mixin</em> w zależności od typu estymatora:
+<ul>
+<li><code>ClassifierMixin</code> — dla klasyfikatorów (dodaje domyślny <code>score()</code> = accuracy)</li>
+<li><code>RegressorMixin</code> — dla algorytmów regresji (dodaje domyślny <code>score()</code> = R²)</li>
+<li><code>TransformerMixin</code> — dla transformatorów danych (dodaje domyślny <code>fit_transform()</code>)</li>
+<li><code>ClusterMixin</code> — dla algorytmów klasteryzacji (dodaje domyślny <code>fit_predict()</code>)</li>
+</ul></li>
+</ul></li>
+<li><strong>Konwencje nazewnictwa</strong>:
+<ul>
+<li>Hiperparametry jako atrybuty inicjalizacji (np. <code>self.param = param</code> w <code>__init__</code>)</li>
+<li>Atrybuty wyuczone kończą się podkreślnikiem (np. <code>self.coef_</code>)</li>
+<li>Metoda <code>fit()</code> zwraca <code>self</code> dla umożliwienia łańcuchowania</li>
+</ul></li>
+<li><strong>Walidacja danych</strong> za pomocą funkcji z <code>sklearn.utils.validation</code>:
+<ul>
+<li><code>check_X_y(X, y)</code> — sprawdza dane wejściowe w metodzie <code>fit()</code></li>
+<li><code>check_array(X)</code> — sprawdza dane w metodzie <code>predict()</code> / <code>transform()</code></li>
+<li><code>check_is_fitted(self)</code> — sprawdza, czy model został wytrenowany</li>
+</ul></li>
+</ol>
+<p>Prawidłowo zaimplementowany estymator można używać w potokach (<code>Pipeline</code>), walidacji krzyżowej (<code>cross_val_score</code>) i przeszukiwaniu hiperparametrów (<code>GridSearchCV</code>).</p>
+</section>
+<section id="przykład-własny-regresor" class="level4">
+<h4 class="anchored" data-anchor-id="przykład-własny-regresor">Przykład: własny regresor</h4>
+<p>Klasa <code>RegresjaLiniowa</code> jest przykładem własnego estymatora regresji liniowej zgodnego z API scikit-learn. Model wyznacza współczynniki metodą najmniejszych kwadratów (równanie normalne), bez iteracyjnej optymalizacji.</p>
+<div id="ba94545d" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.base <span class="im">import</span> BaseEstimator, RegressorMixin</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.utils.validation <span class="im">import</span> check_X_y, check_array, check_is_fitted</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RegresjaLiniowa(BaseEstimator, RegressorMixin):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Regresja liniowa wyznaczana metodą najmniejszych kwadratów."""</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, fit_intercept<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fit_intercept <span class="op">=</span> fit_intercept</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fit(<span class="va">self</span>, X, y):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        X, y <span class="op">=</span> check_X_y(X, y)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_features_in_ <span class="op">=</span> X.shape[<span class="dv">1</span>]</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.fit_intercept:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            X_b <span class="op">=</span> np.c_[np.ones(X.shape[<span class="dv">0</span>]), X]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            X_b <span class="op">=</span> X</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Równanie normalne: β = (X^T X)^{-1} X^T y</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># W praktyce korzystamy z pseudoodwrotności (lstsq),</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># która działa również dla macierzy osobliwych.</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        beta, _, _, _ <span class="op">=</span> np.linalg.lstsq(X_b, y, rcond<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.fit_intercept:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.intercept_ <span class="op">=</span> beta[<span class="dv">0</span>]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.coef_ <span class="op">=</span> beta[<span class="dv">1</span>:]</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.intercept_ <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.coef_ <span class="op">=</span> beta</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, X):</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        check_is_fitted(<span class="va">self</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> check_array(X)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> X <span class="op">@</span> <span class="va">self</span>.coef_ <span class="op">+</span> <span class="va">self</span>.intercept_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Porównanie z wbudowaną implementacją scikit-learn:</p>
+<div id="82a70c3c" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.random.rand(<span class="dv">100</span>, <span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> X[:, <span class="dv">0</span>] <span class="op">+</span> <span class="dv">5</span> <span class="op">*</span> X[:, <span class="dv">1</span>] <span class="op">+</span> np.random.randn(<span class="dv">100</span>) <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Nasz estymator</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>model_wlasny <span class="op">=</span> RegresjaLiniowa()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>model_wlasny.fit(X, y)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R² (własny):"</span>, model_wlasny.score(X, y))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Estymator scikit-learn</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>model_sklearn <span class="op">=</span> LinearRegression()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>model_sklearn.fit(X, y)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R² (sklearn):"</span>, model_sklearn.score(X, y))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R² (własny): 0.8931444893408352
+R² (sklearn): 0.8931444893408352</code></pre>
+</div>
+</div>
+<p>Metoda <code>score()</code> nie jest zdefiniowana w klasie <code>RegresjaLiniowa</code> — jest dostarczana automatycznie przez <code>RegressorMixin</code> (zwraca współczynnik determinacji R²).</p>
+</section>
+<section id="przykład-własny-transformator" class="level4">
+<h4 class="anchored" data-anchor-id="przykład-własny-transformator">Przykład: własny transformator</h4>
+<p>Poniższy transformator standaryzuje dane (odejmuje średnią, dzieli przez odchylenie standardowe). Ilustruje wzorzec <code>fit()</code> → <code>transform()</code> → <code>inverse_transform()</code>:</p>
+<div id="2552252c" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.base <span class="im">import</span> BaseEstimator, TransformerMixin</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.utils.validation <span class="im">import</span> check_array, check_is_fitted</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Standaryzator(BaseEstimator, TransformerMixin):</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Standaryzacja cech: (X - średnia) / odchylenie."""</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fit(<span class="va">self</span>, X, y<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> check_array(X)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mean_ <span class="op">=</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.scale_ <span class="op">=</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_features_in_ <span class="op">=</span> X.shape[<span class="dv">1</span>]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> transform(<span class="va">self</span>, X):</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        check_is_fitted(<span class="va">self</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> check_array(X)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (X <span class="op">-</span> <span class="va">self</span>.mean_) <span class="op">/</span> <span class="va">self</span>.scale_</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> inverse_transform(<span class="va">self</span>, Xt):</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        check_is_fitted(<span class="va">self</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        Xt <span class="op">=</span> check_array(Xt)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Xt <span class="op">*</span> <span class="va">self</span>.scale_ <span class="op">+</span> <span class="va">self</span>.mean_</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Dzięki <code>TransformerMixin</code> klasa automatycznie zyskuje metodę <code>fit_transform()</code>. Transformator ten można od razu użyć w potoku — co pokazują kolejne sekcje.</p>
+</section>
+</section>
+<section id="potoki-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="potoki-pipeline">Potoki (<em>Pipeline</em>)</h2>
+<p>Potoki to mechanizm, który umożliwia łączenie wielu kroków przetwarzania danych w jedną spójną jednostkę.</p>
+<section id="podstawowa-idea" class="level3">
+<h3 class="anchored" data-anchor-id="podstawowa-idea">Podstawowa idea</h3>
+<p>Potok w scikit-learn pozwala na sekwencyjne łączenie różnych transformatorów i jednego estymatora końcowego w jedną całość. Zapewnia to:</p>
+<ol type="1">
+<li><strong>Spójny interfejs</strong> — cały potok zachowuje się jak pojedynczy estymator scikit-learn z metodami <code>fit()</code>, <code>predict()</code>, itd.</li>
+<li><strong>Organizacja kodu</strong> — potoki organizują kod w zrozumiały i łatwy do utrzymania sposób — ważne, gdy łańcuch przetwarzania jest złożony.</li>
+<li><strong>Automatyczne przekazywanie danych</strong> — dane są automatycznie przekazywane między etapami.</li>
+<li><strong>Eliminację wycieków danych</strong> — potok zapewnia, że transformacje (np. skalowanie) są dopasowywane tylko do danych treningowych.</li>
+</ol>
+</section>
+<section id="tworzenie-potoku" class="level3">
+<h3 class="anchored" data-anchor-id="tworzenie-potoku">Tworzenie potoku</h3>
+<p>Podstawowy potok tworzy się przy użyciu klasy <code>Pipeline</code>. Każdy krok to para <code>(nazwa, estymator)</code>:</p>
+<div id="e757accf" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Załaduj dane</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> load_breast_cancer()</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> data.data, data.target</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>pipe <span class="op">=</span> Pipeline([</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler()),</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression())</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Cały potok można trenować jak pojedynczy estymator</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>pipe.fit(X_train, y_train)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># I używać do predykcji</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> pipe.predict(X_test)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Ocena jakości modelu</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>conf_matrix <span class="op">=</span> confusion_matrix(y_test, predictions)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>conf_matrix</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>array([[41,  2],
+       [ 1, 70]])</code></pre>
+</div>
+</div>
+</section>
+<section id="dostęp-do-elementów-potoku-inspekcja" class="level3">
+<h3 class="anchored" data-anchor-id="dostęp-do-elementów-potoku-inspekcja">Dostęp do elementów potoku (Inspekcja)</h3>
+<p>Po wykonaniu <code>.fit()</code> możemy wyciągnąć wyuczone parametry z dowolnego kroku, używając nazwy zdefiniowanej przy tworzeniu potoku.</p>
+<div id="67785d2e" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Pobranie średnich wyliczonych przez scaler</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>srednie <span class="op">=</span> pipe[<span class="st">'scaler'</span>].mean_</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>srednie</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>array([1.41176352e+01, 1.91850330e+01, 9.18822418e+01, 6.54377582e+02,
+       9.57440220e-02, 1.03619319e-01, 8.88981451e-02, 4.82798703e-02,
+       1.81098681e-01, 6.27567692e-02, 4.02015824e-01, 1.20268681e+00,
+       2.85825341e+00, 4.00712989e+01, 6.98907473e-03, 2.56354484e-02,
+       3.28236723e-02, 1.18939407e-02, 2.05735121e-02, 3.82045560e-03,
+       1.62351033e+01, 2.55356923e+01, 1.07103121e+02, 8.76987033e+02,
+       1.31532132e-01, 2.52741802e-01, 2.74594569e-01, 1.14182222e-01,
+       2.90502198e-01, 8.38678462e-02])</code></pre>
+</div>
+</div>
+<div id="d17d8bb4" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Pobranie wag modelu (współczynników)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>wagi <span class="op">=</span> pipe[<span class="st">'classifier'</span>].coef_</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>wagi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>array([[-0.43190368, -0.38732553, -0.39343248, -0.46521006, -0.07166728,
+         0.54016395, -0.8014581 , -1.11980408,  0.23611852,  0.07592093,
+        -1.26817815,  0.18887738, -0.61058302, -0.9071857 , -0.31330675,
+         0.68249145,  0.17527452, -0.3112999 ,  0.50042502,  0.61622993,
+        -0.87984024, -1.35060559, -0.58945273, -0.84184594, -0.54416967,
+         0.01611019, -0.94305313, -0.77821726, -1.20820031, -0.15741387]])</code></pre>
+</div>
+</div>
+<div id="077ff60a" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Wywołanie metod specyficznych dla modelu (np. prawdopodobieństwa)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>proby <span class="op">=</span> pipe.predict_proba(X_test)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>proby[:<span class="dv">3</span>, :]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>array([[1.13590250e-01, 8.86409750e-01],
+       [9.99990991e-01, 9.00936206e-06],
+       [9.96920905e-01, 3.07909541e-03]])</code></pre>
+</div>
+</div>
+</section>
+<section id="schemat-działania" class="level3">
+<h3 class="anchored" data-anchor-id="schemat-działania">Schemat działania</h3>
+<p>Klasa <code>Pipeline</code> automatyzuje przepływ danych, gwarantując rygorystyczne oddzielenie wiedzy o zbiorze treningowym od testowego.</p>
+<section id="faza-uczenia-pipe.fitx_train-y_train" class="level4">
+<h4 class="anchored" data-anchor-id="faza-uczenia-pipe.fitx_train-y_train">1. Faza uczenia: <code>pipe.fit(X_train, y_train)</code></h4>
+<p>Potok wykonuje sekwencję operacji uczących:</p>
+<ul>
+<li><strong>Transformatory (np. scaler):</strong> Wywołują <code>fit_transform()</code>. Obliczają parametry statystyczne (np. średnią <span class="math inline">\(\mu\)</span> i odchylenie <span class="math inline">\(\sigma\)</span>) na podstawie <code>X_train</code> i przekształcają te dane.</li>
+<li><strong>Estymator (klasyfikator):</strong> Wywołuje <code>fit()</code> na danych przetworzonych przez poprzednie kroki.</li>
+</ul>
+</section>
+<section id="faza-predykcji-pipe.predictx_test" class="level4">
+<h4 class="anchored" data-anchor-id="faza-predykcji-pipe.predictx_test">2. Faza predykcji: <code>pipe.predict(X_test)</code></h4>
+<p>Potok przechodzi w tryb „użytkowy”, stosując wcześniej zdobytą wiedzę:</p>
+<ul>
+<li><strong>Transformatory:</strong> Wywołują wyłącznie <code>transform()</code>. Używają parametrów (<span class="math inline">\(\mu, \sigma\)</span>) wyliczonych podczas treningu. <strong>Nigdy nie wywołują <code>fit</code> na danych testowych.</strong></li>
+<li><strong>Estymator:</strong> Wywołuje <code>predict()</code> na przeskalowanych danych.</li>
+</ul>
+</section>
+</section>
+<section id="dlaczego-to-rozróżnienie-jest-kluczowe" class="level3">
+<h3 class="anchored" data-anchor-id="dlaczego-to-rozróżnienie-jest-kluczowe">Dlaczego to rozróżnienie jest kluczowe?</h3>
+<ol type="1">
+<li><strong>Unikanie wycieku danych (Data Leakage):</strong> Użycie <code>fit_transform</code> na zbiorze testowym pozwoliłoby modelowi pośrednio „poznać” rozkład danych, których nie powinien widzieć przed predykcją. Powoduje to sztuczne zawyżenie wyników ewaluacji.</li>
+<li><strong>Brak istotności statystycznej małych próbek:</strong> Metoda <code>fit</code> wymaga odpowiednio dużej grupy danych, aby poprawnie wyznaczyć parametry statystyczne (np. wariancję). W warunkach produkcyjnych model często przetwarza <strong>pojedynczy rekord</strong>. Dla jednego wiersza obliczenie odchylenia standardowego jest matematycznie niemożliwe.</li>
+<li><strong>Spójność matematyczna:</strong> Model został wytrenowany w określonej przestrzeni cech (np. dla <span class="math inline">\(\mu=0\)</span>). Aby prognoza była poprawna, dane testowe muszą zostać rzutowane na tę samą przestrzeń przy użyciu parametrów ze zbioru treningowego.</li>
+</ol>
+</section>
+<section id="analogia-metodologiczna" class="level3">
+<h3 class="anchored" data-anchor-id="analogia-metodologiczna">Analogia metodologiczna</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Komponent</th>
+<th>Metoda uczenia</th>
+<th>Metoda operacyjna</th>
+<th>Rola</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Transformator</strong></td>
+<td><code>fit()</code></td>
+<td><code>transform()</code></td>
+<td>Przygotowanie danych (X → X’)</td>
+</tr>
+<tr class="even">
+<td><strong>Estymator</strong></td>
+<td><code>fit()</code></td>
+<td><code>predict()</code></td>
+<td>Wydanie decyzji (X → y)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Intuicja:</strong> <code>transform</code> jest dla transformatora tym, czym <code>predict</code> dla modelu – zastosowaniem wyuczonej wiedzy na nowych danych.</p>
+</section>
+<section id="optymalizacja-hiperparametrów" class="level3">
+<h3 class="anchored" data-anchor-id="optymalizacja-hiperparametrów">Optymalizacja hiperparametrów</h3>
+<p>Potoki są szczególnie przydatne w połączeniu z przeszukiwaniem przestrzeni hiperparametrów. Parametry poszczególnych kroków potoku adresuje się w formacie <code>nazwa_kroku__nazwa_parametru</code> (podwójne podkreślenie).</p>
+<p><strong><code>GridSearchCV</code></strong> przeszukuje wszystkie kombinacje wartości z podanej siatki:</p>
+<div id="16e8372d" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>pipe <span class="op">=</span> Pipeline([</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler()),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>, solver<span class="op">=</span><span class="st">'liblinear'</span>))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'scaler__with_mean'</span>: [<span class="va">True</span>, <span class="va">False</span>],</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__C'</span>: [<span class="fl">0.1</span>, <span class="fl">1.0</span>, <span class="fl">10.0</span>],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__penalty'</span>: [<span class="st">'l1'</span>, <span class="st">'l2'</span>]</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>search <span class="op">=</span> GridSearchCV(pipe, param_grid, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>search.fit(X_train, y_train)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Najlepsze parametry:"</span>, search.best_params_)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Najlepszy wynik:"</span>, search.best_score_)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Po znalezieniu najlepszych parametrów można użyć najlepszego modelu do predykcji</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>best_model <span class="op">=</span> search.best_estimator_</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> best_model.predict(X_test)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Ocena jakości modelu</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>conf_matrix <span class="op">=</span> confusion_matrix(y_test, predictions)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>conf_matrix</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Najlepsze parametry: {'classifier__C': 0.1, 'classifier__penalty': 'l2', 'scaler__with_mean': True}
+Najlepszy wynik: 0.9780219780219781</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>array([[42,  1],
+       [ 0, 71]])</code></pre>
+</div>
+</div>
+<p>W powyższym przykładzie <code>GridSearchCV</code> przeszukuje 2 × 3 × 2 = 12 kombinacji, z pięciokrotną kroswalidacją — łącznie 60 dopasowań modelu. Przy większej liczbie hiperparametrów i ich wartości liczba kombinacji rośnie wykładniczo.</p>
+<p><strong><code>RandomizedSearchCV</code></strong> losuje zadaną liczbę kombinacji zamiast przeszukiwać wszystkie. Jest znacznie wydajniejszy przy dużej przestrzeni hiperparametrów:</p>
+<div id="1b1299fc" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> RandomizedSearchCV</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> uniform, randint</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>pipe <span class="op">=</span> Pipeline([</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler()),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>, solver<span class="op">=</span><span class="st">'liblinear'</span>))</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>param_distributions <span class="op">=</span> {</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__C'</span>: uniform(<span class="fl">0.01</span>, <span class="dv">100</span>),         <span class="co"># rozkład ciągły</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__max_iter'</span>: randint(<span class="dv">100</span>, <span class="dv">1000</span>),   <span class="co"># rozkład dyskretny</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>search <span class="op">=</span> RandomizedSearchCV(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    pipe, param_distributions,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    n_iter<span class="op">=</span><span class="dv">20</span>,   <span class="co"># liczba losowanych kombinacji</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    cv<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    scoring<span class="op">=</span><span class="st">'accuracy'</span>,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>search.fit(X_train, y_train)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Najlepsze parametry:"</span>, search.best_params_)</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Najlepszy wynik:"</span>, search.best_score_)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Po znalezieniu najlepszych parametrów można użyć najlepszego modelu do predykcji</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>best_model <span class="op">=</span> search.best_estimator_</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> best_model.predict(X_test)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Ocena jakości modelu</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>conf_matrix <span class="op">=</span> confusion_matrix(y_test, predictions)</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>conf_matrix</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Najlepsze parametry: {'classifier__C': np.float64(5.651157902710025), 'classifier__max_iter': 443}
+Najlepszy wynik: 0.9780219780219781</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>array([[42,  1],
+       [ 2, 69]])</code></pre>
+</div>
+</div>
+<p>Oba narzędzia mają ograniczenia: <code>GridSearchCV</code> nie skaluje się do dużych przestrzeni, a <code>RandomizedSearchCV</code> nie uczy się z poprzednich prób. Bardziej zaawansowane podejścia — np. optymalizacja bayesowska — zostaną omówione w kolejnym wykładzie (Optuna).</p>
+<section id="serializacja-i-wdrażanie" class="level4">
+<h4 class="anchored" data-anchor-id="serializacja-i-wdrażanie">Serializacja i wdrażanie</h4>
+<p>Cały potok można zapisać jako jeden obiekt:</p>
+<div id="82307896" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> joblib <span class="im">import</span> dump, load</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Zapisz cały potok</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>dump(pipe, <span class="st">'model_pipeline.joblib'</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Załaduj go później</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>loaded_pipe <span class="op">=</span> load(<span class="st">'model_pipeline.joblib'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Serializacja obejmuje zarówno wyuczone parametry estymatora, jak i stany wszystkich transformatorów — dzięki temu wdrożenie modelu polega na załadowaniu jednego pliku i wywołaniu <code>predict()</code>.</p>
+</section>
+</section>
+<section id="zaawansowane-funkcje-potoków" class="level3">
+<h3 class="anchored" data-anchor-id="zaawansowane-funkcje-potoków">Zaawansowane funkcje potoków</h3>
+<section id="columntransformer" class="level4">
+<h4 class="anchored" data-anchor-id="columntransformer"><code>ColumnTransformer</code></h4>
+<p>W praktyce dane zawierają kolumny różnych typów (numeryczne, kategoryczne), które wymagają różnych transformacji. <code>ColumnTransformer</code> pozwala przypisać osobny transformator do wybranych kolumn:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder, StandardScaler</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>preprocessor <span class="op">=</span> ColumnTransformer(</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    transformers<span class="op">=</span>[</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'num'</span>, StandardScaler(), [<span class="st">'wiek'</span>, <span class="st">'dochod'</span>]),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'cat'</span>, OneHotEncoder(), [<span class="st">'kategoria'</span>, <span class="st">'region'</span>])</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    remainder<span class="op">=</span><span class="st">'passthrough'</span>  <span class="co"># kolumny nieuwzględnione powyżej — przekaż bez zmian</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># remainder='drop'       # alternatywnie: pomiń nieuwzględnione kolumny</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>pipe <span class="op">=</span> Pipeline([</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'preprocess'</span>, preprocessor),</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression())</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Parametr <code>remainder</code> kontroluje, co dzieje się z kolumnami, które nie zostały przypisane do żadnego transformatora. Domyślnie jest ustawiony na <code>'drop'</code> (pominięcie), co może prowadzić do trudnych do wychwycenia błędów, gdy dodamy nową kolumnę do danych i zapomnimy zaktualizować <code>ColumnTransformer</code>.</p>
+</section>
+<section id="featureunion" class="level4">
+<h4 class="anchored" data-anchor-id="featureunion"><code>FeatureUnion</code></h4>
+<p><code>FeatureUnion</code> pozwala na równoległe przetwarzanie danych przez różne transformatory i konkatenację wyników. Przydaje się, gdy chcemy wzbogacić dane o cechy uzyskane różnymi metodami:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> FeatureUnion</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_selection <span class="im">import</span> SelectKBest</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> FeatureUnion([</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'pca'</span>, PCA(n_components<span class="op">=</span><span class="dv">2</span>)),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'select_best'</span>, SelectKBest(k<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>pipe <span class="op">=</span> Pipeline([</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler()),</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'features'</span>, features),</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression())</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>W tym przykładzie dane po skalowaniu trafiają równolegle do PCA (redukcja wymiarów) i <code>SelectKBest</code> (selekcja cech). Wyniki obu transformatorów są łączone (horyzontalnie) i przekazywane do klasyfikatora. Końcowa macierz cech ma 2 + 2 = 4 kolumny.</p>
+<p>Różnica między <code>ColumnTransformer</code> a <code>FeatureUnion</code>: <code>ColumnTransformer</code> dzieli dane <em>po kolumnach</em> (różne transformacje dla różnych cech), natomiast <code>FeatureUnion</code> przekazuje <em>te same dane</em> do wielu transformatorów i łączy wyniki.</p>
+
+
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
