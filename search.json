@@ -233,7 +233,7 @@
     "href": "index.html#wykłady",
     "title": "Biblioteki Python w analizie danych",
     "section": "Wykłady",
-    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nWykład 1: NumPy\n🔗 HTML\n\n📥 .ipynb",
+    "text": "Wykłady\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\n1. NumPy\n🔗 HTML\n\n📥 .ipynb\n\n\n2. scikit-learn - estymatory, transformatory, potoki\n🔗 HTML\n\n📥 .ipynb",
     "crumbs": [
       "Biblioteki Python w analizie danych"
     ]
@@ -243,7 +243,7 @@
     "href": "index.html#laboratoria",
     "title": "Biblioteki Python w analizie danych",
     "section": "Laboratoria",
-    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\nLab 1: NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb\n\n\nLab 2: NumPy - obrazy rastrowe\n🔗 HTML\n\n📥 .ipynb",
+    "text": "Laboratoria\n\n\n\nTemat\nPodgląd\nColab\nPobierz\n\n\n\n\n1. NumPy - regresja liniowa\n🔗 HTML\n\n📥 .ipynb\n\n\n2. NumPy - obrazy rastrowe\n🔗 HTML\n\n📥 .ipynb",
     "crumbs": [
       "Biblioteki Python w analizie danych"
     ]
