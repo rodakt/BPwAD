@@ -304,7 +304,11 @@ window.Quarto = {
 <p>Niektóre estymatory pełnią jednocześnie obie role — na przykład <code>KMeans</code> posiada zarówno <code>predict()</code>, jak i <code>transform()</code>.</p>
 <section id="metoda-fit" class="level4">
 <h4 class="anchored" data-anchor-id="metoda-fit">Metoda <code>fit()</code></h4>
-<p>Metoda <code>fit()</code> zwykle przyjmuje dwa argumenty: - <code>X</code> — dane wejściowe (np. cechy, obrazy, teksty) - <code>y</code> — dane wyjściowe (np. etykiety, wartości docelowe)</p>
+<p>Metoda <code>fit()</code> zwykle przyjmuje dwa argumenty:</p>
+<ul>
+<li><code>X</code> — dane wejściowe (np. cechy, obrazy, teksty)</li>
+<li><code>y</code> — dane wyjściowe (np. etykiety, wartości docelowe)</li>
+</ul>
 <p>Metoda <code>fit()</code> modyfikuje stan estymatora „w miejscu” oraz zwraca dopasowany estymator — pozwala to na łączenie wielu wywołań w potoku.</p>
 <p>Jeśli uczenie jest nienadzorowane, to argument <code>y</code> nie jest wymagany, zwykle automatycznie ustawiany jest na wartość <code>None</code>.</p>
 <p>Częstym efektem wywołania metody <code>fit()</code> jest utworzenie atrybutów w estymatorze o nazwach kończących się na <code>_</code> (np. <code>coef_</code>, <code>intercept_</code>, <code>n_features_in_</code>, <code>n_classes_</code>), które przechowują różne informacje o stanie estymatora po wywołaniu metody <code>fit()</code>.</p>
@@ -326,26 +330,83 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="przykłady-estymatorów-wbudowanych-w-scikit-learn">Przykłady estymatorów wbudowanych w scikit-learn</h3>
 <section id="regresja-logistyczna" class="level4">
 <h4 class="anchored" data-anchor-id="regresja-logistyczna">Regresja logistyczna</h4>
-<p>Model regresji logistycznej jest implementowany w <code>sklearn.linear_model.LogisticRegression</code>. Jest to przykład predyktora uczenia nadzorowanego. Spośród metod opisanych powyżej posiada: - <code>fit(X, y)</code> — uczy model na danych <code>X</code> i etykietach <code>y</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty: - <code>coef_</code> — współczynniki regresji - <code>intercept_</code> — wyraz wolny - <code>n_features_in_</code> — liczba cech w danych wejściowych - <code>feature_names_in_</code> — nazwy cech w danych wejściowych - <code>classes_</code> — etykiety klas - <code>n_iter_</code> — liczba iteracji w procesie uczenia - <code>predict(X)</code> — przewiduje etykiety klas dla nowych danych <code>X</code></p>
+<p>Model regresji logistycznej jest implementowany w <code>sklearn.linear_model.LogisticRegression</code>. Jest to przykład predyktora uczenia nadzorowanego. Spośród metod opisanych powyżej posiada:</p>
+<ul>
+<li><code>fit(X, y)</code> — uczy model na danych <code>X</code> i etykietach <code>y</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty:
+<ul>
+<li><code>coef_</code> — współczynniki regresji</li>
+<li><code>intercept_</code> — wyraz wolny</li>
+<li><code>n_features_in_</code> — liczba cech w danych wejściowych</li>
+<li><code>feature_names_in_</code> — nazwy cech w danych wejściowych</li>
+<li><code>classes_</code> — etykiety klas</li>
+<li><code>n_iter_</code> — liczba iteracji w procesie uczenia</li>
+</ul></li>
+<li><code>predict(X)</code> — przewiduje etykiety klas dla nowych danych <code>X</code></li>
+</ul>
 <p>Dodatkowo, model ten, tak jak i wiele innych modeli szacujących prawdopodobieństwo przynależności do klas, posiada metodę <code>predict_proba(X)</code>, która zwraca prawdopodobieństwa przynależności do klas dla danych <code>X</code>.</p>
 </section>
 <section id="k-means" class="level4">
 <h4 class="anchored" data-anchor-id="k-means">K-means</h4>
-<p>Model K-średnich (<em>K-means</em>) jest implementowany w <code>sklearn.cluster.KMeans</code>. Jest to przykład estymatora uczenia nienadzorowanego, który pełni jednocześnie rolę predyktora i transformatora. Posiada wszystkie metody opisane powyżej: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty: - <code>cluster_centers_</code> — współrzędne centroidów klastrów - <code>labels_</code> — etykiety klastrów dla każdego punktu danych - <code>inertia_</code> — suma kwadratów odległości punktów danych do ich centroidów - <code>predict(X)</code> — przewiduje etykiety klastrów dla nowych danych <code>X</code> - <code>fit_predict(X)</code> — uczy model na danych <code>X</code> i zwraca etykiety klastrów dla tych danych - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń odległości do centroidów klastrów - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca <code>X</code> przekształcone na przestrzeń odległości do centroidów klastrów.</p>
+<p>Model K-średnich (<em>K-means</em>) jest implementowany w <code>sklearn.cluster.KMeans</code>. Jest to przykład estymatora uczenia nienadzorowanego, który pełni jednocześnie rolę predyktora i transformatora. Posiada wszystkie metody opisane powyżej:</p>
+<ul>
+<li><code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze są dostępne atrybuty:
+<ul>
+<li><code>cluster_centers_</code> — współrzędne centroidów klastrów</li>
+<li><code>labels_</code> — etykiety klastrów dla każdego punktu danych</li>
+<li><code>inertia_</code> — suma kwadratów odległości punktów danych do ich centroidów</li>
+</ul></li>
+<li><code>predict(X)</code> — przewiduje etykiety klastrów dla nowych danych <code>X</code></li>
+<li><code>fit_predict(X)</code> — uczy model na danych <code>X</code> i zwraca etykiety klastrów dla tych danych</li>
+<li><code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń odległości do centroidów klastrów</li>
+<li><code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca <code>X</code> przekształcone na przestrzeń odległości do centroidów klastrów.</li>
+</ul>
 </section>
 <section id="pca" class="level4">
 <h4 class="anchored" data-anchor-id="pca">PCA</h4>
-<p>Model analizy głównych składowych (<em>PCA</em>) jest implementowany w <code>sklearn.decomposition.PCA</code>. Jest to przykład transformatora uczenia nienadzorowanego. Spośród metod opisanych powyżej posiada: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty: - <code>components_</code> — macierz głównych składowych - <code>explained_variance_</code> — wariancja wyjaśniona przez każdą główną składową - <code>singular_values_</code> — wartości osobliwe - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń głównych składowych - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni głównych składowych</p>
+<p>Model analizy głównych składowych (<em>PCA</em>) jest implementowany w <code>sklearn.decomposition.PCA</code>. Jest to przykład transformatora uczenia nienadzorowanego. Spośród metod opisanych powyżej posiada:</p>
+<ul>
+<li><code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty:
+<ul>
+<li><code>components_</code> — macierz głównych składowych</li>
+<li><code>explained_variance_</code> — wariancja wyjaśniona przez każdą główną składową</li>
+<li><code>singular_values_</code> — wartości osobliwe</li>
+</ul></li>
+<li><code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń głównych składowych</li>
+<li><code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni głównych składowych</li>
+</ul>
 <p>Dodatkowo, model ten, tak jak i wiele innych modeli transformujących dane, posiada metodę <code>inverse_transform(Xt)</code>, która przekształca dane <code>Xt</code> z powrotem do oryginalnej przestrzeni. Ponieważ PCA nie jest transformatorem różnowartościowym (podczas transformacji zmienia się liczba cech i część informacji jest tracona), to metoda <code>inverse_transform(Xt)</code> nie zwraca danych oryginalnych, a jedynie ich przybliżenie.</p>
 </section>
 <section id="minmaxscaler" class="level4">
 <h4 class="anchored" data-anchor-id="minmaxscaler"><code>MinMaxScaler</code></h4>
-<p>Model <code>MinMaxScaler</code> jest implementowany w <code>sklearn.preprocessing.MinMaxScaler</code>. Jest to przykład nienadzorowanego transformatora. Spośród metod opisanych powyżej posiada: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty: - <code>data_max_</code> — maksymalne wartości cech w danych - <code>data_min_</code> — minimalne wartości cech w danych - <code>data_range_</code> — zakres wartości cech w danych - <code>n_features_in_</code> — liczba cech w danych wejściowych - … - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń znormalizowaną do przedziału [0, 1] - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przedziale [0, 1]</p>
+<p>Model <code>MinMaxScaler</code> jest implementowany w <code>sklearn.preprocessing.MinMaxScaler</code>. Jest to przykład nienadzorowanego transformatora. Spośród metod opisanych powyżej posiada:</p>
+<ul>
+<li><code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty:
+<ul>
+<li><code>data_max_</code> — maksymalne wartości cech w danych</li>
+<li><code>data_min_</code> — minimalne wartości cech w danych</li>
+<li><code>data_range_</code> — zakres wartości cech w danych</li>
+<li><code>n_features_in_</code> — liczba cech w danych wejściowych</li>
+<li>…</li>
+</ul></li>
+<li><code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń znormalizowaną do przedziału [0, 1]</li>
+<li><code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przedziale [0, 1]</li>
+</ul>
 <p>Dodatkowo, model ten, tak jak i wiele innych modeli transformujących dane, posiada metodę <code>inverse_transform(Xt)</code>, która przekształca dane <code>Xt</code> z powrotem do oryginalnej przestrzeni.</p>
 </section>
 <section id="polynomialfeatures" class="level4">
 <h4 class="anchored" data-anchor-id="polynomialfeatures"><code>PolynomialFeatures</code></h4>
-<p>Model <code>PolynomialFeatures</code> jest implementowany w <code>sklearn.preprocessing.PolynomialFeatures</code>. Jest to przykład nienadzorowanego transformatora służącego do generowania cech wielomianowych. Spośród metod opisanych powyżej posiada: - <code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty: - <code>powers_</code> — wykładniki cech wejściowych w wyjściu - <code>n_features_in_</code> — liczba cech w danych wejściowych - <code>n_output_features_</code> — liczba cech wyjściowych - … - <code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń cech wielomianowych - <code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni cech wielomianowych</p>
+<p>Model <code>PolynomialFeatures</code> jest implementowany w <code>sklearn.preprocessing.PolynomialFeatures</code>. Jest to przykład nienadzorowanego transformatora służącego do generowania cech wielomianowych. Spośród metod opisanych powyżej posiada:</p>
+<ul>
+<li><code>fit(X)</code> — uczy model na danych <code>X</code>. Po wywołaniu tej metody w estymatorze dostępne są m.in. atrybuty:
+<ul>
+<li><code>powers_</code> — wykładniki cech wejściowych w wyjściu</li>
+<li><code>n_features_in_</code> — liczba cech w danych wejściowych</li>
+<li><code>n_output_features_</code> — liczba cech wyjściowych</li>
+<li>…</li>
+</ul></li>
+<li><code>transform(X)</code> — przekształca dane <code>X</code> na przestrzeń cech wielomianowych</li>
+<li><code>fit_transform(X)</code> — uczy model na danych <code>X</code> i zwraca przekształcone dane <code>X</code> w przestrzeni cech wielomianowych</li>
+</ul>
 </section>
 </section>
 <section id="typowy-schemat-wykorzystania-estymatora" class="level3">
