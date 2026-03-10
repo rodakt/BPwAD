@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 1: NumPy - algorytm k-średnich – Biblioteki Python w analizie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b938e67c0c3a38245966223dfb5d7d7b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_3.html">Lab 1: NumPy - algorytm k-średnich</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#algorytm-k-średnich" id="toc-algorytm-k-średnich" class="nav-link active" data-scroll-target="#algorytm-k-średnich">1. Algorytm k-średnich</a>
+  <ul class="collapse">
+  <li><a href="#pseudokod" id="toc-pseudokod" class="nav-link" data-scroll-target="#pseudokod">Pseudokod</a></li>
+  </ul></li>
+  <li><a href="#dane-testowe" id="toc-dane-testowe" class="nav-link" data-scroll-target="#dane-testowe">2. Dane testowe</a></li>
+  <li><a href="#implementacja-krok-po-kroku" id="toc-implementacja-krok-po-kroku" class="nav-link" data-scroll-target="#implementacja-krok-po-kroku">3. Implementacja krok po kroku</a>
+  <ul class="collapse">
+  <li><a href="#inicjalizacja-centroidów" id="toc-inicjalizacja-centroidów" class="nav-link" data-scroll-target="#inicjalizacja-centroidów">3.1 Inicjalizacja centroidów</a></li>
+  <li><a href="#obliczenie-odległości-broadcasting" id="toc-obliczenie-odległości-broadcasting" class="nav-link" data-scroll-target="#obliczenie-odległości-broadcasting">3.2 Obliczenie odległości (broadcasting)</a></li>
+  <li><a href="#przypisanie-etykiet" id="toc-przypisanie-etykiet" class="nav-link" data-scroll-target="#przypisanie-etykiet">3.3 Przypisanie etykiet</a></li>
+  <li><a href="#aktualizacja-centroidów" id="toc-aktualizacja-centroidów" class="nav-link" data-scroll-target="#aktualizacja-centroidów">3.4 Aktualizacja centroidów</a></li>
+  <li><a href="#całość-algorytmu" id="toc-całość-algorytmu" class="nav-link" data-scroll-target="#całość-algorytmu">3.5 Całość algorytmu</a></li>
+  </ul></li>
+  <li><a href="#testy-na-danych-syntetycznych" id="toc-testy-na-danych-syntetycznych" class="nav-link" data-scroll-target="#testy-na-danych-syntetycznych">4. Testy na danych syntetycznych</a>
+  <ul class="collapse">
+  <li><a href="#wizualizacja-wyników" id="toc-wizualizacja-wyników" class="nav-link" data-scroll-target="#wizualizacja-wyników">4.1 Wizualizacja wyników</a></li>
+  <li><a href="#porównanie-z-sklearn" id="toc-porównanie-z-sklearn" class="nav-link" data-scroll-target="#porównanie-z-sklearn">4.2 Porównanie z sklearn</a></li>
+  <li><a href="#wpływ-inicjalizacji" id="toc-wpływ-inicjalizacji" class="nav-link" data-scroll-target="#wpływ-inicjalizacji">4.3 Wpływ inicjalizacji</a></li>
+  </ul></li>
+  <li><a href="#segmentacja-obrazów" id="toc-segmentacja-obrazów" class="nav-link" data-scroll-target="#segmentacja-obrazów">5. Segmentacja obrazów</a>
+  <ul class="collapse">
+  <li><a href="#wczytanie-obrazu" id="toc-wczytanie-obrazu" class="nav-link" data-scroll-target="#wczytanie-obrazu">5.1 Wczytanie obrazu</a></li>
+  <li><a href="#przygotowanie-danych" id="toc-przygotowanie-danych" class="nav-link" data-scroll-target="#przygotowanie-danych">5.2 Przygotowanie danych</a></li>
+  <li><a href="#segmentacja" id="toc-segmentacja" class="nav-link" data-scroll-target="#segmentacja">5.3 Segmentacja</a></li>
+  <li><a href="#rekonstrukcja-obrazu" id="toc-rekonstrukcja-obrazu" class="nav-link" data-scroll-target="#rekonstrukcja-obrazu">5.4 Rekonstrukcja obrazu</a></li>
+  <li><a href="#eksperymenty" id="toc-eksperymenty" class="nav-link" data-scroll-target="#eksperymenty">5.5 Eksperymenty</a></li>
+  </ul></li>
+  <li><a href="#zadanie-dodatkowe-kompresja-obrazu" id="toc-zadanie-dodatkowe-kompresja-obrazu" class="nav-link" data-scroll-target="#zadanie-dodatkowe-kompresja-obrazu">6. Zadanie dodatkowe: kompresja obrazu</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_3.html">Lab 1: NumPy - algorytm k-średnich</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 1: NumPy - algorytm k-średnich</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_3.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<p>W tym arkuszu zaimplementujemy algorytm k-średnich od podstaw, korzystając wyłącznie z NumPy. Następnie zastosujemy go do segmentacji obrazów. Ćwiczenie łączy broadcasting, indeksowanie złożone, agregacje z <code>axis</code> i operacje na tablicach 3D.</p>
+<div id="cell-3" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="algorytm-k-średnich" class="level2">
+<h2 class="anchored" data-anchor-id="algorytm-k-średnich">1. Algorytm k-średnich</h2>
+<p>Algorytm k-średnich (<em>k-means</em>) dzieli zbiór <span class="math inline">\(N\)</span> punktów w <span class="math inline">\(\mathbb{R}^d\)</span> na <span class="math inline">\(k\)</span> grup (klastrów) tak, aby punkty wewnątrz każdej grupy były jak najbliżej środka (centroidu) swojej grupy. Jest to algorytm uczenia nienadzorowanego — nie korzysta z etykiet.</p>
+<section id="pseudokod" class="level3">
+<h3 class="anchored" data-anchor-id="pseudokod">Pseudokod</h3>
+<p><strong>Wejście:</strong> macierz danych <span class="math inline">\(X\)</span> o kształcie <span class="math inline">\((N, d)\)</span>, liczba klastrów <span class="math inline">\(k\)</span>, maksymalna liczba iteracji <span class="math inline">\(I_{\max}\)</span>.</p>
+<ol type="1">
+<li><strong>Inicjalizacja:</strong> Wylosuj <span class="math inline">\(k\)</span> różnych punktów z <span class="math inline">\(X\)</span> jako początkowe centroidy <span class="math inline">\(C\)</span> o kształcie <span class="math inline">\((k, d)\)</span>.</li>
+<li><strong>Powtarzaj</strong> (do zbieżności lub <span class="math inline">\(I_{\max}\)</span> iteracji):
+<ol type="1">
+<li><strong>Przypisanie:</strong> Dla każdego punktu <span class="math inline">\(x_i\)</span> wyznacz najbliższy centroid: <span class="math display">\[\text{labels}[i] = \operatorname{arg\,min}_{j=1,\ldots,k} \|x_i - c_j\|^2\]</span></li>
+<li><strong>Aktualizacja:</strong> Oblicz nowe centroidy jako średnie punktów przypisanych do każdego klastra: <span class="math display">\[c_j = \frac{1}{|S_j|}\sum_{x_i \in S_j} x_i, \qquad S_j = \{x_i : \text{labels}[i] = j\}\]</span></li>
+<li><strong>Sprawdzenie zbieżności:</strong> Jeśli centroidy nie zmieniły się (lub zmieniły się o mniej niż zadana tolerancja <span class="math inline">\(\varepsilon\)</span>), zakończ.</li>
+</ol></li>
+</ol>
+<p><strong>Wyjście:</strong> wektor etykiet <code>labels</code> o kształcie <span class="math inline">\((N,)\)</span>, macierz centroidów <span class="math inline">\(C\)</span> o kształcie <span class="math inline">\((k, d)\)</span>.</p>
+</section>
+</section>
+<section id="dane-testowe" class="level2">
+<h2 class="anchored" data-anchor-id="dane-testowe">2. Dane testowe</h2>
+<p>Do testowania implementacji użyjemy funkcji <code>make_blobs()</code> z biblioteki scikit-learn, która generuje grupy punktów na płaszczyźnie:</p>
+<div id="cell-7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>X, y_true <span class="op">=</span> make_blobs(n_samples<span class="op">=</span>N, centers<span class="op">=</span>k, n_features<span class="op">=</span>d, random_state<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[:, <span class="dv">0</span>], X[:, <span class="dv">1</span>], s<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Dane testowe'</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'equal'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wektor <code>y_true</code> zawiera prawdziwe etykiety — posłuży do oceny wyników, ale algorytm k-średnich go nie otrzymuje.</p>
+</section>
+<section id="implementacja-krok-po-kroku" class="level2">
+<h2 class="anchored" data-anchor-id="implementacja-krok-po-kroku">3. Implementacja krok po kroku</h2>
+<section id="inicjalizacja-centroidów" class="level3">
+<h3 class="anchored" data-anchor-id="inicjalizacja-centroidów">3.1 Inicjalizacja centroidów</h3>
+<p>Wylosuj <span class="math inline">\(k\)</span> różnych indeksów ze zbioru <span class="math inline">\(\{0, 1, \ldots, N-1\}\)</span> i wybierz odpowiadające im punkty z <span class="math inline">\(X\)</span> jako początkowe centroidy.</p>
+<p><em>Wskazówka:</em> <code>rng.choice(N, size=k, replace=False)</code>, gdzie <code>rng = np.random.default_rng(seed=42)</code>.</p>
+<p>Jaki jest kształt tablicy centroidów?</p>
+<div id="cell-10" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="obliczenie-odległości-broadcasting" class="level3">
+<h3 class="anchored" data-anchor-id="obliczenie-odległości-broadcasting">3.2 Obliczenie odległości (broadcasting)</h3>
+<p>Oblicz kwadrat odległości euklidesowej między każdym punktem a każdym centroidem. Wynikiem powinna być tablica o kształcie <span class="math inline">\((N, k)\)</span>.</p>
+<p>Przeanalizuj transformację kształtów:</p>
+<pre><code>X:          (N, d)  →  (N, 1, d)
+C:          (k, d)  →  (1, k, d)
+różnica:               (N, k, d)
+kwadrat + suma po osi 2:  (N, k)</code></pre>
+<div id="cell-12" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="przypisanie-etykiet" class="level3">
+<h3 class="anchored" data-anchor-id="przypisanie-etykiet">3.3 Przypisanie etykiet</h3>
+<p>Na podstawie tablicy odległości z kroku 3.2, przypisz każdemu punktowi etykietę najbliższego centroidu.</p>
+<p><em>Wskazówka:</em> <code>np.argmin()</code> z odpowiednim <code>axis</code>.</p>
+<p>Jaki jest kształt wynikowego wektora etykiet?</p>
+<div id="cell-14" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="aktualizacja-centroidów" class="level3">
+<h3 class="anchored" data-anchor-id="aktualizacja-centroidów">3.4 Aktualizacja centroidów</h3>
+<p>Oblicz nowe centroidy jako średnie współrzędne punktów przypisanych do każdego klastra.</p>
+<p><em>Wskazówka:</em> Dla klastra <span class="math inline">\(j\)</span> maska <code>labels == j</code> daje tablicę boolowską, którą można użyć do wybrania odpowiednich wierszy z <span class="math inline">\(X\)</span>. Następnie <code>np.mean(..., axis=0)</code> daje nowy centroid.</p>
+<p>Napisz pętlę po <span class="math inline">\(j \in \{0, \ldots, k-1\}\)</span>, która buduje nową macierz centroidów. Zwróć uwagę na przypadek brzegowy: co jeśli żaden punkt nie został przypisany do klastra <span class="math inline">\(j\)</span>? (W praktyce zdarza się to rzadko, ale warto obsłużyć — np. zachować stary centroid.)</p>
+<div id="cell-16" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="całość-algorytmu" class="level3">
+<h3 class="anchored" data-anchor-id="całość-algorytmu">3.5 Całość algorytmu</h3>
+<p>Połącz kroki 3.1–3.4 w funkcję:</p>
+<div id="cell-18" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kmeans(X, k, max_iter<span class="op">=</span><span class="dv">100</span>, tol<span class="op">=</span><span class="fl">1e-6</span>, seed<span class="op">=</span><span class="dv">42</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Algorytm k-średnich.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parametry</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ---------</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    X : ndarray, kształt (N, d)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">        Dane wejściowe.</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">    k : int</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">        Liczba klastrów.</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">    max_iter : int</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">        Maksymalna liczba iteracji.</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">    tol : float</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">        Tolerancja zbieżności (maksymalna zmiana centroidu).</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">    seed : int</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">        Ziarno generatora losowego.</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">    Zwraca</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">    ------</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">    labels : ndarray, kształt (N,)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">        Etykiety klastrów.</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">    centroids : ndarray, kształt (k, d)</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">        Końcowe centroidy.</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Inicjalizacja</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ...</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2a. Oblicz odległości</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ...</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2b. Przypisz etykiety</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ...</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2c. Oblicz nowe centroidy</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ...</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2d. Sprawdź zbieżność</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ...</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> labels, centroids</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Uzupełnij ciało funkcji, wykorzystując kod z kroków 3.2–3.4.</p>
+<p>Kryterium zbieżności: oblicz maksymalną zmianę pozycji centroidu (<code>np.max(np.linalg.norm(new_centroids - centroids, axis=1))</code>) i przerwij pętlę, jeśli jest mniejsza niż <code>tol</code>.</p>
+</section>
+</section>
+<section id="testy-na-danych-syntetycznych" class="level2">
+<h2 class="anchored" data-anchor-id="testy-na-danych-syntetycznych">4. Testy na danych syntetycznych</h2>
+<section id="wizualizacja-wyników" class="level3">
+<h3 class="anchored" data-anchor-id="wizualizacja-wyników">4.1 Wizualizacja wyników</h3>
+<p>Uruchom swoją implementację na danych z sekcji 2. Narysuj wynik: punkty pokolorowane według przypisanych etykiet oraz centroidy oznaczone wyraźnym markerem (np. <code>plt.scatter(..., marker='x', s=200, c='red')</code>).</p>
+<div id="cell-21" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="porównanie-z-sklearn" class="level3">
+<h3 class="anchored" data-anchor-id="porównanie-z-sklearn">4.2 Porównanie z sklearn</h3>
+<p>Uruchom <code>sklearn.cluster.KMeans</code> na tych samych danych i porównaj wyniki:</p>
+<div id="cell-23" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>km <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, n_init<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>km.fit(X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ol type="1">
+<li>Porównaj centroidy: <code>km.cluster_centers_</code> vs twoje centroidy. Czy są zbliżone? (Etykiety mogą być permutacją — klaster 0 u ciebie może odpowiadać klastrowi 3 w sklearn.)</li>
+<li>Porównaj wartość funkcji celu (<em>inertia</em>): <span class="math inline">\(\sum_{i=1}^{N} \|x_i - c_{\text{labels}[i]}\|^2\)</span>. Oblicz ją dla swoich wyników i porównaj z <code>km.inertia_</code>.</li>
+</ol>
+<div id="cell-25" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="wpływ-inicjalizacji" class="level3">
+<h3 class="anchored" data-anchor-id="wpływ-inicjalizacji">4.3 Wpływ inicjalizacji</h3>
+<p>Uruchom swoją implementację kilka razy z różnymi wartościami <code>seed</code>. Czy wyniki zawsze są takie same? Jak zmienia się <em>inertia</em>?</p>
+<p>Sklearn domyślnie uruchamia algorytm <code>n_init=10</code> razy i wybiera najlepszy wynik. Zaimplementuj analogiczną strategię: uruchom <code>kmeans()</code> dla kilku ziaren i wybierz wynik o najniższej wartości funkcji celu.</p>
+<div id="cell-27" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="segmentacja-obrazów" class="level2">
+<h2 class="anchored" data-anchor-id="segmentacja-obrazów">5. Segmentacja obrazów</h2>
+<p>Segmentacja obrazu polega na podziale pikseli na grupy o podobnych kolorach. Algorytm k-średnich nadaje się do tego idealnie: traktujemy wartości RGB każdego piksela jako punkt w przestrzeni <span class="math inline">\(\mathbb{R}^3\)</span> i grupujemy je w <span class="math inline">\(k\)</span> klastrów. Każdy piksel zastępujemy kolorem centroidu jego klastra.</p>
+<section id="wczytanie-obrazu" class="level3">
+<h3 class="anchored" data-anchor-id="wczytanie-obrazu">5.1 Wczytanie obrazu</h3>
+<p>Pobierz dowolny kolorowy obraz RGB z internetu i wczytaj go jako tablicę NumPy. Możesz skorzystać z biblioteki <code>requests</code>:</p>
+<div id="cell-29" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>HEADERS <span class="op">=</span> {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'User-Agent'</span>: <span class="st">'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://upload.wikimedia.org/wikipedia/commons/3/34/Issoria_lathonia-01_</span><span class="sc">%28x</span><span class="st">ndr%29.jpg'</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(url, headers<span class="op">=</span>HEADERS)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()  </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'motyl.jpg'</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    f.write(r.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-30" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="przygotowanie-danych" class="level3">
+<h3 class="anchored" data-anchor-id="przygotowanie-danych">5.2 Przygotowanie danych</h3>
+<p>Przekształć tablicę obrazu o kształcie <span class="math inline">\((H, W, 3)\)</span> na tablicę 2D o kształcie <span class="math inline">\((N, 3)\)</span>, gdzie <span class="math inline">\(N = H \times W\)</span>.</p>
+<p>Algorytm k-średnich operuje na liczbach zmiennoprzecinkowych, a piksele są typu <code>uint8</code>. Przekształć tablicę do typu <code>float64</code>.</p>
+<p>Zapamiętaj oryginalny kształt obrazu — będzie potrzebny do odtworzenia obrazu wynikowego.</p>
+<div id="cell-32" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="segmentacja" class="level3">
+<h3 class="anchored" data-anchor-id="segmentacja">5.3 Segmentacja</h3>
+<p>Uruchom swoją implementację <code>kmeans()</code> na przygotowanej tablicy pikseli. Zacznij od <span class="math inline">\(k = 3\)</span>.</p>
+<p><strong>Uwaga dotycząca wydajności:</strong> Obraz może mieć setki tysięcy pikseli i prawdopodobnie program na pełnym obrazie będzie działał wolno. W takim przypadku możesz zastąpić pełny obraz przez jego losową próbkę.</p>
+<div id="cell-34" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="rekonstrukcja-obrazu" class="level3">
+<h3 class="anchored" data-anchor-id="rekonstrukcja-obrazu">5.4 Rekonstrukcja obrazu</h3>
+<ol type="1">
+<li>Utwórz tablicę wynikową, w której każdy piksel ma wartości RGB centroidu swojego klastra. Wykorzystaj indeksowanie złożone: jeśli <code>labels</code> to wektor etykiet, a <code>centroids</code> to macierz centroidów, to <code>centroids[labels]</code> daje tablicę <span class="math inline">\((N, 3)\)</span>, w której <span class="math inline">\(i\)</span>-ty wiersz to centroid klastra, do którego należy <span class="math inline">\(i\)</span>-ty piksel.</li>
+<li>Przekształć wynik do typu <code>uint8</code> (metoda <code>.astype(np.uint8)</code>).</li>
+<li>Przywróć oryginalny kształt (<code>reshape()</code>).</li>
+<li>Wyświetl obraz za pomocą <code>Image.fromarray()</code>.</li>
+</ol>
+<div id="cell-36" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="eksperymenty" class="level3">
+<h3 class="anchored" data-anchor-id="eksperymenty">5.5 Eksperymenty</h3>
+<ol type="1">
+<li>Przetestuj segmentację dla różnych wartości <span class="math inline">\(k\)</span>: 2, 4, 8, 16. Wyświetl wyniki obok siebie.</li>
+<li>Ile iteracji potrzebuje algorytm do zbieżności? Dodaj do swojej funkcji <code>kmeans()</code> zliczanie iteracji i wypisywanie wartości funkcji celu w każdej iteracji.</li>
+<li>Porównaj wynik swojej implementacji z <code>sklearn.cluster.KMeans</code> na tym samym obrazie. Czy segmentacje wyglądają podobnie?</li>
+</ol>
+<div id="cell-38" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="cell-39" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="zadanie-dodatkowe-kompresja-obrazu" class="level2">
+<h2 class="anchored" data-anchor-id="zadanie-dodatkowe-kompresja-obrazu">6. Zadanie dodatkowe: kompresja obrazu</h2>
+<p>Segmentacja k-średnich to de facto kompresja kolorów: zamiast <span class="math inline">\(256^3 \approx 16{,}7\)</span> mln możliwych kolorów, obraz używa tylko <span class="math inline">\(k\)</span>.</p>
+<ol type="1">
+<li>Oblicz współczynnik kompresji. Oryginalny obraz potrzebuje <span class="math inline">\(H \times W \times 3\)</span> bajtów. Obraz skompresowany potrzebuje: tablicę etykiet (<span class="math inline">\(H \times W\)</span> wartości, każda wymagająca <span class="math inline">\(\lceil\log_2 k\rceil\)</span> bitów) plus tablicę centroidów (<span class="math inline">\(k \times 3\)</span> bajtów). Jaki jest stosunek rozmiaru skompresowanego do oryginalnego dla <span class="math inline">\(k = 4, 8, 16\)</span>?</li>
+<li>Zbadaj zależność między <span class="math inline">\(k\)</span> a jakością wizualną. Jaka jest najmniejsza wartość <span class="math inline">\(k\)</span>, przy której obraz wygląda akceptowalnie?</li>
+</ol>
+<div id="cell-41" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
