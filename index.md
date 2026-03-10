@@ -28,6 +28,7 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 |-------|---------|-------|---------|
 | 1. NumPy - regresja liniowa | [🔗 HTML](laby/lab_1.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_1.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_1.ipynb) |
 | 2. NumPy - obrazy rastrowe | [🔗 HTML](laby/lab_2.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_2.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_2.ipynb) |
+| 3. NumPy - algorytm k-średnich | [🔗 HTML](laby/lab_3.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_3.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_3.ipynb) |
 
 
 ## Zaliczenie
