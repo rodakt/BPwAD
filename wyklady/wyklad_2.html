@@ -227,6 +227,12 @@ window.Quarto = {
  <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Własne estymatory scikit-learn</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -513,8 +519,8 @@ window.Quarto = {
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>model_sklearn.fit(X, y)</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R² (sklearn):"</span>, model_sklearn.score(X, y))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>R² (własny): 0.8931444893408352
-R² (sklearn): 0.8931444893408352</code></pre>
+<pre><code>R² (własny): 0.9175390935545591
+R² (sklearn): 0.9175390935545591</code></pre>
 </div>
 </div>
 <p>Metoda <code>score()</code> nie jest zdefiniowana w klasie <code>RegresjaLiniowa</code> — jest dostarczana automatycznie przez <code>RegressorMixin</code> (zwraca współczynnik determinacji R²).</p>
@@ -751,12 +757,12 @@ Najlepszy wynik: 0.9780219780219781</code></pre>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>pipe <span class="op">=</span> Pipeline([</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler()),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>, solver<span class="op">=</span><span class="st">'liblinear'</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'classifier'</span>, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>))</span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>])</span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>param_distributions <span class="op">=</span> {</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__C'</span>: uniform(<span class="fl">0.01</span>, <span class="dv">100</span>),         <span class="co"># rozkład ciągły</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__max_iter'</span>: randint(<span class="dv">100</span>, <span class="dv">1000</span>),   <span class="co"># rozkład dyskretny</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__C'</span>: uniform(<span class="fl">1e-3</span>, <span class="dv">1</span>),                     <span class="co"># rozkład ciągły</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'classifier__solver'</span>: [<span class="st">'liblinear'</span>, <span class="st">'saga'</span>, <span class="st">'lbfgs'</span>],  <span class="co"># rozkład dyskretny</span></span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>search <span class="op">=</span> RandomizedSearchCV(</span>
@@ -779,12 +785,12 @@ Najlepszy wynik: 0.9780219780219781</code></pre>
 <span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>conf_matrix <span class="op">=</span> confusion_matrix(y_test, predictions)</span>
 <span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>conf_matrix</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Najlepsze parametry: {'classifier__C': np.float64(5.651157902710025), 'classifier__max_iter': 443}
+<pre><code>Najlepsze parametry: {'classifier__C': np.float64(0.3755401188473625), 'classifier__solver': 'liblinear'}
 Najlepszy wynik: 0.9780219780219781</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>array([[42,  1],
-       [ 2, 69]])</code></pre>
+       [ 1, 70]])</code></pre>
 </div>
 </div>
 <p>Oba narzędzia mają ograniczenia: <code>GridSearchCV</code> nie skaluje się do dużych przestrzeni, a <code>RandomizedSearchCV</code> nie uczy się z poprzednich prób. Bardziej zaawansowane podejścia — np. optymalizacja bayesowska — zostaną omówione w kolejnym wykładzie (Optuna).</p>
