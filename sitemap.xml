@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://rodakt.github.io/BPwAD/laby/lab_4.html</loc>
-    <lastmod>2026-03-17T21:36:37.398Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rodakt.github.io/BPwAD/laby/lab_2.html</loc>
-    <lastmod>2026-03-17T21:36:37.398Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rodakt.github.io/BPwAD/wyklady/wyklad_2.html</loc>
-    <lastmod>2026-03-17T21:36:37.401Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rodakt.github.io/BPwAD/index.html</loc>
-    <lastmod>2026-03-17T21:36:37.397Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rodakt.github.io/BPwAD/wyklady/wyklad_1.html</loc>
-    <lastmod>2026-03-17T21:36:37.401Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rodakt.github.io/BPwAD/laby/lab_1.html</loc>
-    <lastmod>2026-03-17T21:36:37.398Z</lastmod>
+    <loc>https://rodakt.github.io/BPwAD/laby/lab_5.html</loc>
+    <lastmod>2026-03-22T10:47:31.055Z</lastmod>
   </url>
   <url>
     <loc>https://rodakt.github.io/BPwAD/laby/lab_3.html</loc>
-    <lastmod>2026-03-17T21:36:37.398Z</lastmod>
+    <lastmod>2026-03-22T10:47:31.055Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/laby/lab_1.html</loc>
+    <lastmod>2026-03-22T10:47:31.054Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/wyklady/wyklad_1.html</loc>
+    <lastmod>2026-03-22T10:47:31.058Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/index.html</loc>
+    <lastmod>2026-03-22T10:47:31.054Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/wyklady/wyklad_2.html</loc>
+    <lastmod>2026-03-22T10:47:31.058Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/laby/lab_2.html</loc>
+    <lastmod>2026-03-22T10:47:31.055Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rodakt.github.io/BPwAD/laby/lab_4.html</loc>
+    <lastmod>2026-03-22T10:47:31.055Z</lastmod>
   </url>
 </urlset>
