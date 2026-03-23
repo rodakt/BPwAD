@@ -5,6 +5,7 @@ project:
     - index.md
     - "wyklady/wyklad_1.ipynb"
     - "wyklady/wyklad_2.ipynb"
+    - "wyklady/wyklad_3.ipynb"
     - "laby/lab_1.ipynb"
     - "laby/lab_2.ipynb"
     - "laby/lab_3.ipynb"
@@ -20,6 +21,7 @@ website:
         contents:
           - "wyklady/wyklad_1.ipynb"
           - "wyklady/wyklad_2.ipynb"
+          - "wyklady/wyklad_3.ipynb"
       - section: "Laboratoria"
         contents:
           - "laby/lab_1.ipynb"
