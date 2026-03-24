@@ -484,9 +484,9 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="inspekcja-potoku">3.5 Inspekcja potoku</h3>
 <p>Po dopasowaniu potoku można zajrzeć do jego wnętrza. Spróbuj odpowiedzieć na poniższe pytania, odwołując się do atrybutów dopasowanego potoku.</p>
 <ol type="1">
-<li>Jakie mediany obliczył <code>SimpleImputer</code> w ścieżce numerycznej? (<code>pipe['preprocessor'].transformers_[0][1]['imputer'].statistics_</code>)</li>
-<li>Jakie kategorie wykrył <code>OneHotEncoder</code>? (<code>pipe['preprocessor'].transformers_[1][1]['encoder'].categories_</code>)</li>
-<li>Ile cech ma macierz po transformacji? (<code>pipe['preprocessor'].transform(X_train).shape[1]</code>)</li>
+<li>Jakie mediany obliczył <code>SimpleImputer</code> w ścieżce numerycznej?</li>
+<li>Jakie kategorie wykrył <code>OneHotEncoder</code>?</li>
+<li>Ile cech ma macierz po transformacji?</li>
 </ol>
 <p><em>Wskazówka:</em> Do kroków potoku można się dostać za pomocą składni słownikowej (<code>pipe['nazwa_kroku']</code>) lub atrybutu <code>named_steps</code>.</p>
 </section>
