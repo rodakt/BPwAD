@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 6: Optuna – Biblioteki Python w analizie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-aecdd43c4514f2b38fab7e68317576c9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_6.html">Lab 6: Optuna</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: Optuna - optymalizacja hiperparametrów</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Własne estymatory scikit-learn</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Potoki i kroswalidacja</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 6: Optuna</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#funkcja-himmelblaua" id="toc-funkcja-himmelblaua" class="nav-link active" data-scroll-target="#funkcja-himmelblaua">1. Funkcja Himmelblau’a</a>
+  <ul class="collapse">
+  <li><a href="#mapa-konturowa" id="toc-mapa-konturowa" class="nav-link" data-scroll-target="#mapa-konturowa">1.1 Mapa konturowa</a></li>
+  <li><a href="#funkcja-celu" id="toc-funkcja-celu" class="nav-link" data-scroll-target="#funkcja-celu">1.2 Funkcja celu</a></li>
+  <li><a href="#optymalizacja-z-tpesampler" id="toc-optymalizacja-z-tpesampler" class="nav-link" data-scroll-target="#optymalizacja-z-tpesampler">1.3 Optymalizacja z TPESampler</a></li>
+  <li><a href="#wizualizacja-triali" id="toc-wizualizacja-triali" class="nav-link" data-scroll-target="#wizualizacja-triali">1.4 Wizualizacja triali</a></li>
+  <li><a href="#powtórzenie-z-innym-seedem" id="toc-powtórzenie-z-innym-seedem" class="nav-link" data-scroll-target="#powtórzenie-z-innym-seedem">1.5 Powtórzenie z innym seedem</a></li>
+  </ul></li>
+  <li><a href="#porównanie-samplerów" id="toc-porównanie-samplerów" class="nav-link" data-scroll-target="#porównanie-samplerów">2. Porównanie samplerów</a>
+  <ul class="collapse">
+  <li><a href="#trzy-study" id="toc-trzy-study" class="nav-link" data-scroll-target="#trzy-study">2.1 Trzy study</a></li>
+  <li><a href="#porównanie-wizualne" id="toc-porównanie-wizualne" class="nav-link" data-scroll-target="#porównanie-wizualne">2.2 Porównanie wizualne</a></li>
+  <li><a href="#zbieżność" id="toc-zbieżność" class="nav-link" data-scroll-target="#zbieżność">2.3 Zbieżność</a></li>
+  </ul></li>
+  <li><a href="#optymalizacja-hiperparametrów-z-kroswalidacją" id="toc-optymalizacja-hiperparametrów-z-kroswalidacją" class="nav-link" data-scroll-target="#optymalizacja-hiperparametrów-z-kroswalidacją">3. Optymalizacja hiperparametrów z kroswalidacją</a>
+  <ul class="collapse">
+  <li><a href="#funkcja-celu-z-warunkową-przestrzenią" id="toc-funkcja-celu-z-warunkową-przestrzenią" class="nav-link" data-scroll-target="#funkcja-celu-z-warunkową-przestrzenią">3.1 Funkcja celu z warunkową przestrzenią</a></li>
+  <li><a href="#optymalizacja" id="toc-optymalizacja" class="nav-link" data-scroll-target="#optymalizacja">3.2 Optymalizacja</a></li>
+  <li><a href="#optuna-dashboard" id="toc-optuna-dashboard" class="nav-link" data-scroll-target="#optuna-dashboard">3.3 Optuna Dashboard</a></li>
+  <li><a href="#finalny-model" id="toc-finalny-model" class="nav-link" data-scroll-target="#finalny-model">3.4 Finalny model</a></li>
+  </ul></li>
+  <li><a href="#pruning-na-foldach-kroswalidacji" id="toc-pruning-na-foldach-kroswalidacji" class="nav-link" data-scroll-target="#pruning-na-foldach-kroswalidacji">4. Pruning na foldach kroswalidacji</a>
+  <ul class="collapse">
+  <li><a href="#funkcja-celu-z-pruningiem" id="toc-funkcja-celu-z-pruningiem" class="nav-link" data-scroll-target="#funkcja-celu-z-pruningiem">4.1 Funkcja celu z pruningiem</a></li>
+  <li><a href="#optymalizacja-z-pruningiem" id="toc-optymalizacja-z-pruningiem" class="nav-link" data-scroll-target="#optymalizacja-z-pruningiem">4.2 Optymalizacja z pruningiem</a></li>
+  <li><a href="#statystyki-pruningu" id="toc-statystyki-pruningu" class="nav-link" data-scroll-target="#statystyki-pruningu">4.3 Statystyki pruningu</a></li>
+  <li><a href="#wizualizacja-w-dashboardzie" id="toc-wizualizacja-w-dashboardzie" class="nav-link" data-scroll-target="#wizualizacja-w-dashboardzie">4.4 Wizualizacja w dashboardzie</a></li>
+  <li><a href="#finalny-model-1" id="toc-finalny-model-1" class="nav-link" data-scroll-target="#finalny-model-1">4.5 Finalny model</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_6.html">Lab 6: Optuna</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 6: Optuna</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_6.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<p>Na wykładzie 3 poznaliśmy Optunę: koncepcję study i trial, metody <code>suggest_*</code>, samplery (TPE, Random, Grid) oraz pruning. W tym arkuszu przećwiczymy te narzędzia na dwóch rodzajach problemów — najpierw na optymalizacji funkcji matematycznej (gdzie możemy zobaczyć, co robi sampler na mapie konturowej), a następnie na optymalizacji hiperparametrów modeli uczenia maszynowego z kroswalidacją i pruningiem.</p>
+<div id="cell-1" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> optuna</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>optuna.logging.set_verbosity(optuna.logging.WARNING)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="funkcja-himmelblaua" class="level2">
+<h2 class="anchored" data-anchor-id="funkcja-himmelblaua">1. Funkcja Himmelblau’a</h2>
+<p>Funkcja Himmelblau’a to klasyczny benchmark w optymalizacji. Jest zdefiniowana jako:</p>
+<p><span class="math display">\[f(x, y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2\]</span></p>
+<p>Ma cztery minima globalne, w których <span class="math inline">\(f = 0\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(x\)</span></th>
+<th><span class="math inline">\(y\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(3.0\)</span></td>
+<td><span class="math inline">\(2.0\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(-2.805118\)</span></td>
+<td><span class="math inline">\(3.131312\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(-3.779310\)</span></td>
+<td><span class="math inline">\(-3.283186\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(3.584428\)</span></td>
+<td><span class="math inline">\(-1.848126\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Będziemy szukać tych minimów za pomocą Optuny, obserwując, jak różne samplery eksplorują przestrzeń przeszukiwania.</p>
+<section id="mapa-konturowa" class="level3">
+<h3 class="anchored" data-anchor-id="mapa-konturowa">1.1 Mapa konturowa</h3>
+<p>Zanim uruchomimy optymalizację, narysujmy mapę konturową funkcji Himmelblau’a. Będzie nam służyć jako tło do wizualizacji triali.</p>
+<p>Utwórz siatkę punktów na <span class="math inline">\([-5, 5]^2\)</span> za pomocą <code>np.meshgrid</code> i oblicz wartości <span class="math inline">\(f(x, y)\)</span> na tej siatce. Narysuj mapę konturową (<code>plt.contourf</code>) z nałożonymi liniami konturu (<code>plt.contour</code>). Użyj skali logarytmicznej dla poziomów, np. <code>levels = np.logspace(-2, 3, 30)</code>, aby lepiej rozróżnić okolicę minimów.</p>
+<p>Zaznacz cztery minima globalne kolorowymi punktami.</p>
+</section>
+<section id="funkcja-celu" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-celu">1.2 Funkcja celu</h3>
+<p>Napisz funkcję <code>objective(trial)</code>, która:</p>
+<ol type="1">
+<li>Pobiera dwie zmienne <code>x</code> i <code>y</code> z przedziału <span class="math inline">\([-5, 5]\)</span> za pomocą <code>trial.suggest_float</code>.</li>
+<li>Zwraca wartość funkcji Himmelblau’a.</li>
+</ol>
+</section>
+<section id="optymalizacja-z-tpesampler" class="level3">
+<h3 class="anchored" data-anchor-id="optymalizacja-z-tpesampler">1.3 Optymalizacja z TPESampler</h3>
+<p>Utwórz study z domyślnym samplerem (<code>TPESampler</code>) i uruchom optymalizację z <code>n_trials=200</code>. Ustaw <code>seed</code> w <code>TPESampler(seed=...)</code> dla powtarzalności wyników. Wyświetl najlepszy znaleziony punkt i wartość funkcji celu.</p>
+</section>
+<section id="wizualizacja-triali" class="level3">
+<h3 class="anchored" data-anchor-id="wizualizacja-triali">1.4 Wizualizacja triali</h3>
+<p>Pobierz historię triali z <code>study.trials_dataframe()</code>. Nałóż punkty na mapę konturową z sekcji 1.1, kolorując je wartością funkcji celu (użyj <code>plt.scatter</code> z argumentem <code>c</code>).</p>
+<p>Czy TPE skupia próby w okolicy minimów, czy rozrzuca równomiernie?</p>
+</section>
+<section id="powtórzenie-z-innym-seedem" class="level3">
+<h3 class="anchored" data-anchor-id="powtórzenie-z-innym-seedem">1.5 Powtórzenie z innym seedem</h3>
+<p>Uruchom optymalizację ponownie z innym <code>seed</code> w <code>TPESampler(seed=...)</code>. Czy algorytm znalazł inne minimum? Czy rozkład triali wygląda podobnie?</p>
+</section>
+</section>
+<section id="porównanie-samplerów" class="level2">
+<h2 class="anchored" data-anchor-id="porównanie-samplerów">2. Porównanie samplerów</h2>
+<p>Porównamy trzy samplery na tym samym problemie: <code>TPESampler</code>, <code>RandomSampler</code> i <code>GridSampler</code>.</p>
+<section id="trzy-study" class="level3">
+<h3 class="anchored" data-anchor-id="trzy-study">2.1 Trzy study</h3>
+<p>Utwórz trzy study, każde z innym samplerem:</p>
+<ol type="1">
+<li><strong>TPE</strong>: <code>optuna.samplers.TPESampler(seed=42)</code>, <code>n_trials=200</code>.</li>
+<li><strong>Random</strong>: <code>optuna.samplers.RandomSampler(seed=42)</code>, <code>n_trials=200</code>.</li>
+<li><strong>Grid</strong>: <code>optuna.samplers.GridSampler(search_space)</code>, gdzie <code>search_space</code> to słownik z siatkami wartości dla <code>x</code> i <code>y</code>. Dobierz siatkę tak, aby pokrywała <span class="math inline">\([-5, 5]^2\)</span> — np. <code>np.linspace(-5, 5, 15)</code> dla obu zmiennych (225 punktów).</li>
+</ol>
+</section>
+<section id="porównanie-wizualne" class="level3">
+<h3 class="anchored" data-anchor-id="porównanie-wizualne">2.2 Porównanie wizualne</h3>
+<p>Narysuj trzy panele obok siebie (<code>plt.subplots(1, 3, ...)</code>), każdy z mapą konturową funkcji Himmelblau’a i nałożonymi punktami triali z odpowiedniego study.</p>
+<p>Porównaj rozkłady punktów:</p>
+<ul>
+<li>Czy TPE skupia próby w okolicach minimów?</li>
+<li>Czy Random rozrzuca je równomiernie?</li>
+<li>Jak wygląda regularna siatka Grida?</li>
+</ul>
+</section>
+<section id="zbieżność" class="level3">
+<h3 class="anchored" data-anchor-id="zbieżność">2.3 Zbieżność</h3>
+<p>Dla każdego study narysuj na jednym wykresie krzywą <em>best-so-far</em>: dla każdej próby <span class="math inline">\(t\)</span> wyznacz najlepszą (najmniejszą) wartość funkcji celu wśród prób <span class="math inline">\(1, \ldots, t\)</span>.</p>
+<p>Który sampler osiągnął dobre rozwiązanie najszybciej? Który potrzebował najwięcej prób?</p>
+<p><em>Wskazówka:</em> <code>np.minimum.accumulate</code> oblicza bieżące minimum kumulatywne.</p>
+</section>
+</section>
+<section id="optymalizacja-hiperparametrów-z-kroswalidacją" class="level2">
+<h2 class="anchored" data-anchor-id="optymalizacja-hiperparametrów-z-kroswalidacją">3. Optymalizacja hiperparametrów z kroswalidacją</h2>
+<p>Przechodzimy od funkcji matematycznych do rzeczywistego problemu ML. Użyjemy Optuny do optymalizacji hiperparametrów klasyfikatorów na zbiorze danych, korzystając z potoków scikit-learn i kroswalidacji.</p>
+<div id="cell-19" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> load_breast_cancer()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> data.data, data.target</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">42</span>, stratify<span class="op">=</span>y</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Treningowy: </span><span class="sc">{</span>X_train<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, testowy: </span><span class="sc">{</span>X_test<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="funkcja-celu-z-warunkową-przestrzenią" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-celu-z-warunkową-przestrzenią">3.1 Funkcja celu z warunkową przestrzenią</h3>
+<p>Napisz funkcję <code>objective(trial)</code>, która:</p>
+<ol type="1">
+<li>Wybiera klasyfikator za pomocą <code>trial.suggest_categorical("classifier", ["knn", "svc", "logreg"])</code>.</li>
+<li>W zależności od wyboru definiuje hiperparametry warunkowe:
+<ul>
+<li><strong>knn</strong>: <code>n_neighbors</code> (int, 1–30), <code>weights</code> (categorical: <code>"uniform"</code>, <code>"distance"</code>).</li>
+<li><strong>svc</strong>: <code>C</code> (float, <span class="math inline">\(10^{-2}\)</span>–<span class="math inline">\(10^{2}\)</span>, skala log), <code>kernel</code> (categorical: <code>"rbf"</code>, <code>"linear"</code>).</li>
+<li><strong>logreg</strong>: <code>C</code> (float, <span class="math inline">\(10^{-2}\)</span>–<span class="math inline">\(10^{2}\)</span>, skala log), <code>penalty</code> (categorical: <code>"l1"</code>, <code>"l2"</code>), <code>solver</code> ustawiony na <code>"liblinear"</code>.</li>
+</ul></li>
+<li>Buduje potok: <code>StandardScaler</code> → wybrany klasyfikator.</li>
+<li>Ewaluuje potok za pomocą <code>cross_val_score</code> z 5-krotną kroswalidacją i <code>scoring="accuracy"</code>.</li>
+<li>Zwraca średnią accuracy.</li>
+</ol>
+<p>To jest przykład <em>define-by-run</em>: przestrzeń przeszukiwania zależy od wyboru klasyfikatora w danej próbie. Tego nie można zrobić z <code>GridSearchCV</code>.</p>
+<div id="cell-21" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsClassifier</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="optymalizacja" class="level3">
+<h3 class="anchored" data-anchor-id="optymalizacja">3.2 Optymalizacja</h3>
+<p>Utwórz study z <code>direction="maximize"</code> (maksymalizujemy accuracy) i uruchom optymalizację z <code>n_trials=100</code>.</p>
+<p>Wyświetl najlepsze hiperparametry i najlepszy wynik kroswalidacji.</p>
+</section>
+<section id="optuna-dashboard" class="level3">
+<h3 class="anchored" data-anchor-id="optuna-dashboard">3.3 Optuna Dashboard</h3>
+<p>Dotychczas korzystaliśmy z wykresów matplotlib. Optuna oferuje też interaktywny dashboard, który pozwala eksplorować wyniki optymalizacji w przeglądarce.</p>
+<p>Aby go uruchomić, potrzebujemy zapisać study w bazie SQLite (zamiast trzymać je w pamięci):</p>
+<div id="cell-25" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>storage <span class="op">=</span> <span class="st">"sqlite:///lab6.db"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>study_db <span class="op">=</span> optuna.create_study(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    study_name<span class="op">=</span><span class="st">"breast_cancer"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    storage<span class="op">=</span>storage,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"maximize"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    load_if_exists<span class="op">=</span><span class="va">True</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>study_db.optimize(objective, n_trials<span class="op">=</span><span class="dv">100</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>W osobnym terminalu (lub w nowej komórce z <code>!</code>) uruchom dashboard:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install optuna-dashboard</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">optuna-dashboard</span> sqlite:///lab6.db</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dashboard domyślnie uruchamia się na <code>http://localhost:8080</code>. Otwórz go w przeglądarce i przejrzyj dostępne wizualizacje:</p>
+<ul>
+<li><strong>Optimization History</strong> — wykres wartości celu w kolejnych próbach.</li>
+<li><strong>Hyperparameter Importances</strong> — które hiperparametry mają największy wpływ.</li>
+<li><strong>Parallel Coordinate</strong> — wzorce w najlepszych próbach.</li>
+<li><strong>Slice Plot</strong> — zależność wartości celu od poszczególnych hiperparametrów.</li>
+</ul>
+<p>Zanotuj, który klasyfikator i jakie hiperparametry okazały się najlepsze.</p>
+</section>
+<section id="finalny-model" class="level3">
+<h3 class="anchored" data-anchor-id="finalny-model">3.4 Finalny model</h3>
+<p>Na podstawie najlepszych hiperparametrów (<code>study_db.best_params</code>) zbuduj finalny potok, wytrenuj go na pełnym zbiorze treningowym i oceń na zbiorze testowym.</p>
+</section>
+</section>
+<section id="pruning-na-foldach-kroswalidacji" class="level2">
+<h2 class="anchored" data-anchor-id="pruning-na-foldach-kroswalidacji">4. Pruning na foldach kroswalidacji</h2>
+<p>W sekcji 3 użyliśmy <code>cross_val_score</code>, który zawsze wykonuje pełną kroswalidację — nawet jeśli po pierwszych dwóch foldach widać, że dana konfiguracja jest beznadziejna. <code>MedianPruner</code> pozwala przerywać takie próby wcześnie, oszczędzając czas obliczeniowy.</p>
+<p>Mechanizm: po każdym foldzie raportujemy bieżącą średnią accuracy. Jeśli jest gorsza od mediany wyników innych prób na tym samym etapie (foldzie), próba zostaje odrzucona.</p>
+<section id="funkcja-celu-z-pruningiem" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-celu-z-pruningiem">4.1 Funkcja celu z pruningiem</h3>
+<p>Napisz funkcję <code>objective_with_pruning(trial)</code>, która:</p>
+<ol type="1">
+<li>Definiuje klasyfikator i hiperparametry tak samo jak w sekcji 3.1.</li>
+<li>Zamiast <code>cross_val_score</code> używa ręcznej pętli po foldach (<code>StratifiedKFold</code>, <code>n_splits=5</code>).</li>
+<li>Po każdym foldzie:
+<ul>
+<li>oblicza bieżącą średnią accuracy ze wszystkich dotychczasowych foldów,</li>
+<li>raportuje ją: <code>trial.report(running_mean, step)</code>,</li>
+<li>sprawdza: <code>if trial.should_prune(): raise optuna.TrialPruned()</code>.</li>
+</ul></li>
+<li>Po przejściu wszystkich foldów zwraca końcową średnią accuracy.</li>
+</ol>
+<div id="cell-29" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> StratifiedKFold</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="optymalizacja-z-pruningiem" class="level3">
+<h3 class="anchored" data-anchor-id="optymalizacja-z-pruningiem">4.2 Optymalizacja z pruningiem</h3>
+<p>Utwórz study z <code>MedianPruner</code>:</p>
+<div id="cell-31" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>study_pruned <span class="op">=</span> optuna.create_study(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"maximize"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    pruner<span class="op">=</span>optuna.pruners.MedianPruner(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        n_startup_trials<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        n_warmup_steps<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>study_pruned.optimize(objective_with_pruning, n_trials<span class="op">=</span><span class="dv">100</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Parametr <code>n_startup_trials=5</code> oznacza, że pierwsze 5 prób zawsze jest wykonywanych w całości — pruner potrzebuje danych referencyjnych. <code>n_warmup_steps=1</code> oznacza, że pruning zaczyna działać od drugiego folda (po pierwszym foldzie nie ma jeszcze dość informacji).</p>
+</section>
+<section id="statystyki-pruningu" class="level3">
+<h3 class="anchored" data-anchor-id="statystyki-pruningu">4.3 Statystyki pruningu</h3>
+<p>Sprawdź, ile prób zostało odrzuconych, a ile zakończonych w pełni:</p>
+<div id="cell-33" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pruned <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> study_pruned.trials</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> t.state <span class="op">==</span> optuna.trial.TrialState.PRUNED]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>complete <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> study_pruned.trials</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> t.state <span class="op">==</span> optuna.trial.TrialState.COMPLETE]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zakończone: </span><span class="sc">{</span><span class="bu">len</span>(complete)<span class="sc">}</span><span class="ss">, odrzucone (pruned): </span><span class="sc">{</span><span class="bu">len</span>(pruned)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Najlepszy wynik: </span><span class="sc">{</span>study_pruned<span class="sc">.</span>best_value<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Najlepsze parametry: </span><span class="sc">{</span>study_pruned<span class="sc">.</span>best_params<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Jaki procent prób został odrzucony? Porównaj najlepszy wynik z wynikiem z sekcji 3.2 (bez pruningu). Czy pruning pogorszył jakość końcowego rozwiązania?</p>
+</section>
+<section id="wizualizacja-w-dashboardzie" class="level3">
+<h3 class="anchored" data-anchor-id="wizualizacja-w-dashboardzie">4.4 Wizualizacja w dashboardzie</h3>
+<p>Zapisz study z pruningiem do tej samej bazy SQLite:</p>
+<div id="cell-35" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>study_pruned_db <span class="op">=</span> optuna.create_study(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    study_name<span class="op">=</span><span class="st">"breast_cancer_pruned"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    storage<span class="op">=</span>storage,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    direction<span class="op">=</span><span class="st">"maximize"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    pruner<span class="op">=</span>optuna.pruners.MedianPruner(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        n_startup_trials<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        n_warmup_steps<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    load_if_exists<span class="op">=</span><span class="va">True</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>study_pruned_db.optimize(objective_with_pruning, n_trials<span class="op">=</span><span class="dv">100</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Odśwież dashboard w przeglądarce. Teraz widoczne są dwa study. W study z pruningiem zwróć uwagę na:</p>
+<ul>
+<li>Próby oznaczone jako <em>pruned</em> na wykresie Optimization History.</li>
+<li>Intermediate Values — wykres wartości pośrednich (średnia accuracy po kolejnych foldach) dla poszczególnych prób. Odrzucone próby mają krótsze serie.</li>
+</ul>
+</section>
+<section id="finalny-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="finalny-model-1">4.5 Finalny model</h3>
+<p>Zbuduj finalny potok na podstawie najlepszych hiperparametrów z <code>study_pruned</code>, wytrenuj na pełnym zbiorze treningowym i oceń na zbiorze testowym. Porównaj wynik z modelem z sekcji 3.4.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
