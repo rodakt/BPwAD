@@ -8,7 +8,7 @@
 
 <meta name="author" content="Tomasz Rodak">
 
-<title>Lab 1: NumPy - regresja liniowa – Biblioteki Python w analizie danych</title>
+<title>Lab 7: Metoda gradientu prostego – Biblioteki Python w analizie danych</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -148,7 +148,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_1.html">Lab 1: NumPy - regresja liniowa</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_7.html">Lab 7: Metoda gradientu prostego</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -219,7 +219,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link active">
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
   </div>
 </li>
@@ -255,7 +255,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link">
+  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Lab 7: Metoda gradientu prostego</span></a>
   </div>
 </li>
@@ -271,22 +271,41 @@ window.Quarto = {
     <h2 id="toc-title">Spis treści</h2>
    
   <ul>
-  <li><a href="#numpy" id="toc-numpy" class="nav-link active" data-scroll-target="#numpy">NumPy</a></li>
-  <li><a href="#regresja-liniowa-z-wykorzystaniem-numpy" id="toc-regresja-liniowa-z-wykorzystaniem-numpy" class="nav-link" data-scroll-target="#regresja-liniowa-z-wykorzystaniem-numpy">1. Regresja liniowa z wykorzystaniem NumPy</a>
+  <li><a href="#gradient-descent-w-1d" id="toc-gradient-descent-w-1d" class="nav-link active" data-scroll-target="#gradient-descent-w-1d">1. Gradient descent w 1D</a>
   <ul class="collapse">
-  <li><a href="#generowanie-danych" id="toc-generowanie-danych" class="nav-link" data-scroll-target="#generowanie-danych">1.1 Generowanie danych</a></li>
-  <li><a href="#obliczenie-całkowitej-sumy-kwadratów-tss" id="toc-obliczenie-całkowitej-sumy-kwadratów-tss" class="nav-link" data-scroll-target="#obliczenie-całkowitej-sumy-kwadratów-tss">1.2 Obliczenie całkowitej sumy kwadratów (TSS)</a></li>
-  <li><a href="#implementacja-regresji-liniowej" id="toc-implementacja-regresji-liniowej" class="nav-link" data-scroll-target="#implementacja-regresji-liniowej">1.3 Implementacja regresji liniowej</a></li>
-  <li><a href="#macierz-grama-i-uwarunkowanie-przypadek-zdrowy" id="toc-macierz-grama-i-uwarunkowanie-przypadek-zdrowy" class="nav-link" data-scroll-target="#macierz-grama-i-uwarunkowanie-przypadek-zdrowy">1.4 Macierz Grama i uwarunkowanie (przypadek „zdrowy”)</a></li>
-  <li><a href="#ocena-jakości-modelu" id="toc-ocena-jakości-modelu" class="nav-link" data-scroll-target="#ocena-jakości-modelu">1.5 Ocena jakości modelu</a></li>
-  <li><a href="#pytania-dodatkowe" id="toc-pytania-dodatkowe" class="nav-link" data-scroll-target="#pytania-dodatkowe">Pytania dodatkowe</a></li>
+  <li><a href="#funkcja-z-kilkoma-minimami-lokalnymi" id="toc-funkcja-z-kilkoma-minimami-lokalnymi" class="nav-link" data-scroll-target="#funkcja-z-kilkoma-minimami-lokalnymi">1.1 Funkcja z kilkoma minimami lokalnymi</a></li>
+  <li><a href="#pochodna-analityczna" id="toc-pochodna-analityczna" class="nav-link" data-scroll-target="#pochodna-analityczna">1.2 Pochodna analityczna</a></li>
+  <li><a href="#gradient-descent-krok-po-kroku" id="toc-gradient-descent-krok-po-kroku" class="nav-link" data-scroll-target="#gradient-descent-krok-po-kroku">1.3 Gradient descent krok po kroku</a></li>
+  <li><a href="#wizualizacja-trajektorii" id="toc-wizualizacja-trajektorii" class="nav-link" data-scroll-target="#wizualizacja-trajektorii">1.4 Wizualizacja trajektorii</a></li>
+  <li><a href="#styczna-jako-wizualizacja-gradientu" id="toc-styczna-jako-wizualizacja-gradientu" class="nav-link" data-scroll-target="#styczna-jako-wizualizacja-gradientu">1.5 Styczna jako wizualizacja gradientu</a></li>
+  <li><a href="#krzywa-zbieżności" id="toc-krzywa-zbieżności" class="nav-link" data-scroll-target="#krzywa-zbieżności">1.6 Krzywa zbieżności</a></li>
   </ul></li>
-  <li><a href="#przypadek-współliniowości-zmiennych" id="toc-przypadek-współliniowości-zmiennych" class="nav-link" data-scroll-target="#przypadek-współliniowości-zmiennych">2. Przypadek współliniowości zmiennych</a></li>
-  <li><a href="#schemat-aktywności-słońca" id="toc-schemat-aktywności-słońca" class="nav-link" data-scroll-target="#schemat-aktywności-słońca">3. Schemat aktywności Słońca</a>
+  <li><a href="#gradient-descent-w-2d" id="toc-gradient-descent-w-2d" class="nav-link" data-scroll-target="#gradient-descent-w-2d">2. Gradient descent w 2D</a>
   <ul class="collapse">
-  <li><a href="#wczytanie-danych" id="toc-wczytanie-danych" class="nav-link" data-scroll-target="#wczytanie-danych">3.1. Wczytanie danych</a></li>
-  <li><a href="#przygotowanie-i-wizualizacja" id="toc-przygotowanie-i-wizualizacja" class="nav-link" data-scroll-target="#przygotowanie-i-wizualizacja">3.2. Przygotowanie i wizualizacja</a></li>
-  <li><a href="#regresja-liniowa" id="toc-regresja-liniowa" class="nav-link" data-scroll-target="#regresja-liniowa">3.3 Regresja liniowa</a></li>
+  <li><a href="#funkcja-rosenbrocka" id="toc-funkcja-rosenbrocka" class="nav-link" data-scroll-target="#funkcja-rosenbrocka">2.1 Funkcja Rosenbrocka</a></li>
+  <li><a href="#mapa-konturowa" id="toc-mapa-konturowa" class="nav-link" data-scroll-target="#mapa-konturowa">2.2 Mapa konturowa</a></li>
+  <li><a href="#gd-na-rosenbrocku" id="toc-gd-na-rosenbrocku" class="nav-link" data-scroll-target="#gd-na-rosenbrocku">2.3 GD na Rosenbrocku</a></li>
+  <li><a href="#funkcja-himmelblaua" id="toc-funkcja-himmelblaua" class="nav-link" data-scroll-target="#funkcja-himmelblaua">2.4 Funkcja Himmelblau’a</a></li>
+  <li><a href="#gd-z-różnych-punktów-startowych" id="toc-gd-z-różnych-punktów-startowych" class="nav-link" data-scroll-target="#gd-z-różnych-punktów-startowych">2.5 GD z różnych punktów startowych</a></li>
+  <li><a href="#punkt-siodłowy" id="toc-punkt-siodłowy" class="nav-link" data-scroll-target="#punkt-siodłowy">2.6 Punkt siodłowy</a></li>
+  </ul></li>
+  <li><a href="#wpływ-learning-rateu" id="toc-wpływ-learning-rateu" class="nav-link" data-scroll-target="#wpływ-learning-rateu">3. Wpływ learning rate’u</a>
+  <ul class="collapse">
+  <li><a href="#eksperymenty-na-rosenbrocku" id="toc-eksperymenty-na-rosenbrocku" class="nav-link" data-scroll-target="#eksperymenty-na-rosenbrocku">3.1 Eksperymenty na Rosenbrocku</a></li>
+  <li><a href="#rozbieżność-w-1d" id="toc-rozbieżność-w-1d" class="nav-link" data-scroll-target="#rozbieżność-w-1d">3.2 Rozbieżność w 1D</a></li>
+  </ul></li>
+  <li><a href="#momentum" id="toc-momentum" class="nav-link" data-scroll-target="#momentum">4. Momentum</a>
+  <ul class="collapse">
+  <li><a href="#algorytm" id="toc-algorytm" class="nav-link" data-scroll-target="#algorytm">4.1 Algorytm</a></li>
+  <li><a href="#implementacja" id="toc-implementacja" class="nav-link" data-scroll-target="#implementacja">4.2 Implementacja</a></li>
+  <li><a href="#porównanie-na-rosenbrocku" id="toc-porównanie-na-rosenbrocku" class="nav-link" data-scroll-target="#porównanie-na-rosenbrocku">4.3 Porównanie na Rosenbrocku</a></li>
+  <li><a href="#eksperymenty-z-beta" id="toc-eksperymenty-z-beta" class="nav-link" data-scroll-target="#eksperymenty-z-beta">4.4 Eksperymenty z <span class="math inline">\(\beta\)</span></a></li>
+  </ul></li>
+  <li><a href="#zadania-dodatkowe" id="toc-zadania-dodatkowe" class="nav-link" data-scroll-target="#zadania-dodatkowe">5. Zadania dodatkowe</a>
+  <ul class="collapse">
+  <li><a href="#mapa-basenów-przyciągania-himmelblau" id="toc-mapa-basenów-przyciągania-himmelblau" class="nav-link" data-scroll-target="#mapa-basenów-przyciągania-himmelblau">5.1 Mapa basenów przyciągania — Himmelblau</a></li>
+  <li><a href="#gd-vs-optuna-na-himmelblau" id="toc-gd-vs-optuna-na-himmelblau" class="nav-link" data-scroll-target="#gd-vs-optuna-na-himmelblau">5.2 GD vs Optuna na Himmelblau</a></li>
+  <li><a href="#momentum-na-punkcie-siodłowym" id="toc-momentum-na-punkcie-siodłowym" class="nav-link" data-scroll-target="#momentum-na-punkcie-siodłowym">5.3 Momentum na punkcie siodłowym</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -294,9 +313,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_1.html">Lab 1: NumPy - regresja liniowa</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_7.html">Lab 7: Metoda gradientu prostego</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Lab 1: NumPy - regresja liniowa</h1>
+<h1 class="title">Lab 7: Metoda gradientu prostego</h1>
 <p class="subtitle lead">Biblioteki Python w analizie danych</p>
 </div>
 
@@ -320,181 +339,208 @@ window.Quarto = {
 </header>
 
 
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_1.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
-<figcaption>Open In Colab</figcaption>
-</figure>
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_7.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<p>Na lab 6 szukaliśmy minimów funkcji Himmelblau’a za pomocą Optuny -algorytmu, który <strong>nie korzysta z gradientu</strong>. Optuna traktowała funkcję celu jak czarną skrzynkę: podawała punkty do ewaluacji i na podstawie wyników decydowała, gdzie szukać dalej.</p>
+<p>W tym arkuszu poznamy zupełnie inne podejście: <strong>metodę gradientu prostego</strong> (<em>gradient descent</em>, GD). Zamiast próbkować punkty na ślepo, wykorzystamy informację o pochodnej funkcji, aby w każdym kroku przesunąć się w kierunku najszybszego spadku. Będziemy pracować na funkcjach matematycznych — bez danych, bez modeli, bez terminologii ML. Celem jest zrozumienie samej mechaniki algorytmu, zanim na wykładzie 4 zastosujemy go do trenowania modeli.</p>
+<div id="cell-3" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<section id="numpy" class="level2">
-<h2 class="anchored" data-anchor-id="numpy">NumPy</h2>
-<p>Podstawowy NumPy: <a href="https://numpy.org/doc/stable/user/absolute_beginners.html">Numpy: the absolute basics for beginners</a>.</p>
-<p>W zadaniach poniżej wykorzystaj:</p>
+<section id="gradient-descent-w-1d" class="level2">
+<h2 class="anchored" data-anchor-id="gradient-descent-w-1d">1. Gradient descent w 1D</h2>
+<p>Zaczniemy od funkcji jednej zmiennej, gdzie gradient redukuje się do zwykłej pochodnej.</p>
+<section id="funkcja-z-kilkoma-minimami-lokalnymi" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-z-kilkoma-minimami-lokalnymi">1.1 Funkcja z kilkoma minimami lokalnymi</h3>
+<p>Rozważmy funkcję:</p>
+<p><span class="math display">\[f(x) = x^4 - 5x^2 + 4x\]</span></p>
+<p><strong>Intuicja.</strong> Pochodna <span class="math inline">\(f'(x)\)</span> mówi nam, jak szybko i w którym kierunku rośnie funkcja. Jeśli <span class="math inline">\(f'(x) &gt; 0\)</span>, funkcja rośnie - więc w celu znalezienia wartości mniejszej powinniśmy przesunąć się w lewo (w kierunku ujemnym). Jeśli <span class="math inline">\(f'(x) &lt; 0\)</span>, funkcja maleje - przesuwamy się w prawo. Gradient descent formalizuje tę intuicję: w każdym kroku przesuwamy się o mały krok w kierunku przeciwnym do pochodnej.</p>
+<p>Narysuj wykres funkcji <span class="math inline">\(f(x)\)</span> na przedziale <span class="math inline">\([-3, 3]\)</span>.</p>
+</section>
+<section id="pochodna-analityczna" class="level3">
+<h3 class="anchored" data-anchor-id="pochodna-analityczna">1.2 Pochodna analityczna</h3>
+<p>Oblicz pochodną <span class="math inline">\(f'(x)\)</span>. Zaimplementuj dwie funkcje Pythona: <code>f(x)</code> zwracającą wartość funkcji oraz <code>df(x)</code> zwracającą wartość pochodnej. Obie powinny działać zarówno dla skalarów, jak i dla tablic NumPy.</p>
+</section>
+<section id="gradient-descent-krok-po-kroku" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-descent-krok-po-kroku">1.3 Gradient descent krok po kroku</h3>
+<p>Reguła aktualizacji w 1D:</p>
+<p><span class="math display">\[x^{(\tau)} = x^{(\tau-1)} - \eta \, f'(x^{(\tau-1)})\]</span></p>
+<p>gdzie <span class="math inline">\(\eta &gt; 0\)</span> to <strong>współczynnik uczenia</strong> (<em>learning rate</em>).</p>
+<p>Zaimplementuj pętlę gradientu prostego:</p>
+<ol type="1">
+<li>Ustaw punkt startowy <span class="math inline">\(x^{(0)} = 2.9\)</span> i <span class="math inline">\(\eta = 0.001\)</span>.</li>
+<li>W każdym kroku oblicz <span class="math inline">\(f'(x)\)</span> i zaktualizuj <span class="math inline">\(x\)</span>.</li>
+<li>Zapisuj historię: listę wartości <span class="math inline">\(x\)</span> i <span class="math inline">\(f(x)\)</span> w kolejnych krokach.</li>
+<li>Wykonaj 100 kroków.</li>
+</ol>
+<p>Wypisz końcową wartość <span class="math inline">\(x\)</span> i <span class="math inline">\(f(x)\)</span>.</p>
+</section>
+<section id="wizualizacja-trajektorii" class="level3">
+<h3 class="anchored" data-anchor-id="wizualizacja-trajektorii">1.4 Wizualizacja trajektorii</h3>
+<p>Narysuj wykres funkcji <span class="math inline">\(f(x)\)</span> i nałóż na niego trajektorię GD: zaznacz kolejne punkty <span class="math inline">\((x^{(\tau)}, f(x^{(\tau)}))\)</span> markerami połączonymi linią. Użyj <code>plt.plot</code> z markerami (np. <code>'o-'</code>) i ogranicz liczbę pokazywanych punktów do np. co 5. krok, żeby wykres był czytelny.</p>
+</section>
+<section id="styczna-jako-wizualizacja-gradientu" class="level3">
+<h3 class="anchored" data-anchor-id="styczna-jako-wizualizacja-gradientu">1.5 Styczna jako wizualizacja gradientu</h3>
+<p>W punkcie <span class="math inline">\(x_0\)</span> styczna do wykresu <span class="math inline">\(f\)</span> ma równanie:</p>
+<p><span class="math display">\[y = f(x_0) + f'(x_0)(x - x_0)\]</span></p>
+<p>Narysuj wykres <span class="math inline">\(f(x)\)</span> i nałóż na niego styczne w trzech wybranych punktach trajektorii (np. krok 0, 10, 50). Każda styczna to krótki odcinek wykresu funkcji liniowej w otoczeniu punktu.</p>
+</section>
+<section id="krzywa-zbieżności" class="level3">
+<h3 class="anchored" data-anchor-id="krzywa-zbieżności">1.6 Krzywa zbieżności</h3>
+<p>Narysuj wykres <span class="math inline">\(f(x^{(\tau)})\)</span> w funkcji numeru kroku <span class="math inline">\(\tau\)</span> (<em>convergence curve</em>). Oś <span class="math inline">\(y\)</span> pokazuje wartość funkcji, oś <span class="math inline">\(x\)</span> — numer iteracji.</p>
+<p>Czy funkcja monotonicznie maleje? Czy algorytm osiągnął minimum globalne, czy lokalne?</p>
+</section>
+</section>
+<section id="gradient-descent-w-2d" class="level2">
+<h2 class="anchored" data-anchor-id="gradient-descent-w-2d">2. Gradient descent w 2D</h2>
+<p>Przechodzimy do funkcji dwóch zmiennych. Gradient jest teraz wektorem dwóch pochodnych cząstkowych:</p>
+<p><span class="math display">\[\nabla f(x, y) = \left[\frac{\partial f}{\partial x},\; \frac{\partial f}{\partial y}\right]\]</span></p>
+<p>a reguła aktualizacji to:</p>
+<p><span class="math display">\[\mathbf{w}^{(\tau)} = \mathbf{w}^{(\tau-1)} - \eta \, \nabla f(\mathbf{w}^{(\tau-1)})\]</span></p>
+<p>gdzie <span class="math inline">\(\mathbf{w} = [x, y]\)</span>.</p>
+<section id="funkcja-rosenbrocka" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-rosenbrocka">2.1 Funkcja Rosenbrocka</h3>
+<p>Funkcja Rosenbrocka to klasyczny benchmark optymalizacji:</p>
+<p><span class="math display">\[f(x, y) = (1 - x)^2 + 100(y - x^2)^2\]</span></p>
+<p>Ma jedno minimum globalne w <span class="math inline">\((1, 1)\)</span>, ale otoczone jest wąską, zakrzywioną doliną, która sprawia kłopoty algorytmom optymalizacji.</p>
+<p><strong>Dlaczego Rosenbrock jest trudny?</strong> Dotarcie do punktu <span class="math inline">\((1, 1)\)</span> wymaga przejścia dnem zakrzywionej doliny. Gradient wskazuje w stronę dna doliny (prostopadle do jej osi), ale niekoniecznie wzdłuż niej - algorytm oscyluje między ścianami zamiast posuwać się naprzód. To jeden z motywów, dla których wymyślono momentum (sekcja 4).</p>
+<p>Zaimplementuj:</p>
 <ul>
-<li><code>rng = np.random.default_rng()</code> do generowania zmiennych losowych,</li>
-<li>wektoryzację operacji arytmetycznych, np. jeśli <code>A</code> i <code>B</code> to tablice numeryczne NumPy o takich samych wymiarach, to <code>A + B</code> zwraca tablicę, której elementy to sumy odpowiadających elementów tablic <code>A</code> i <code>B</code>,</li>
-<li>operator <code>@</code> do mnożenia macierzy,</li>
-<li><code>np.linalg.inv()</code> do obliczenia odwrotności macierzy,</li>
-<li><code>np.linalg.svd()</code> do rozkładu SVD macierzy,</li>
-<li><code>np.transpose()</code> lub <code>.T</code> do transpozycji macierzy,</li>
-<li><code>@</code> do mnożenia macierzy.</li>
-<li><code>np.column_stack()</code> lub <code>np.hstack()</code> do łączenia tablic wzdłuż kolumn,</li>
-<li><code>np.linalg.eigvalsh()</code> do obliczania wartości własnych symetrycznej macierzy rzeczywistej (wersja zoptymalizowana dla macierzy <span class="math inline">\(\mathbf{X}^T\mathbf{X}\)</span>),</li>
-<li><code>np.linalg.lstsq()</code> do rozwiązywania układów równań metodą najmniejszych kwadratów.</li>
+<li><code>rosenbrock(x, y)</code> — wartość funkcji,</li>
+<li><code>grad_rosenbrock(x, y)</code> — gradient jako tablicę <code>np.array([df/dx, df/dy])</code>.</li>
 </ul>
 </section>
-<section id="regresja-liniowa-z-wykorzystaniem-numpy" class="level2">
-<h2 class="anchored" data-anchor-id="regresja-liniowa-z-wykorzystaniem-numpy">1. Regresja liniowa z wykorzystaniem NumPy</h2>
-<p>Celem ćwiczenia jest implementacja regresji liniowej z wykorzystaniem biblioteki NumPy. Zamiast gotowych narzędzi jak sklearn, wykorzystamy operacje algebraiczne do obliczenia współczynników modelu oraz oceny jego jakości.</p>
-<p>Zaczniemy od wygenerowania sztucznych danych, które posłużą nam do przetestowania implementacji.</p>
-<section id="generowanie-danych" class="level3">
-<h3 class="anchored" data-anchor-id="generowanie-danych">1.1 Generowanie danych</h3>
-<p>Niech <span class="math inline">\(w_0,w_1,\ldots,w_p\)</span>, <span class="math inline">\(X_1,X_2,\ldots,X_p\)</span> oraz <span class="math inline">\(\varepsilon\)</span> będą niezależnymi zmiennymi losowymi o rozkładach:</p>
-<p><span class="math display">\[\begin{align*}
-w_i&amp;\sim\mathcal{N}(0,1),\ i=0,1,\ldots,p,\\
-X_j&amp;\sim\mathcal{N}(0,1),\ j=1,2,\ldots,p,\\
-\varepsilon&amp;\sim\mathcal{N}(0,\sigma^2),
-\end{align*}\]</span></p>
-<p>gdzie <span class="math inline">\(\mathcal{N}(\mu,\sigma^2)\)</span> oznacza rozkład normalny o średniej <span class="math inline">\(\mu\)</span> i wariancji <span class="math inline">\(\sigma^2\)</span>.</p>
-<p>Gdy parametry <span class="math inline">\(w_0,w_1,\ldots,w_p\)</span> są znane, to zmienną zależną <span class="math inline">\(Y\)</span> definiujemy wzorem:</p>
-<p><span class="math display">\[\begin{equation}
-Y = w_0 + w_1 X_1 + w_2 X_2 + \ldots + w_p X_p + \varepsilon.
-\end{equation}\]</span></p>
-<p>Wygeneruj w Numpy zbiór danych zgodnie z powyższym modelem:</p>
+<section id="mapa-konturowa" class="level3">
+<h3 class="anchored" data-anchor-id="mapa-konturowa">2.2 Mapa konturowa</h3>
+<p>Narysuj mapę konturową funkcji Rosenbrocka na <span class="math inline">\([-2, 2]^2\)</span>. Użyj <code>plt.contourf</code> z <code>levels = np.logspace(-1, 3.5, 30)</code> i nałóż linie konturu (<code>plt.contour</code>). Zaznacz minimum <span class="math inline">\((1, 1)\)</span> markerem.</p>
+</section>
+<section id="gd-na-rosenbrocku" class="level3">
+<h3 class="anchored" data-anchor-id="gd-na-rosenbrocku">2.3 GD na Rosenbrocku</h3>
+<p>Uruchom gradient descent z punktem startowym <span class="math inline">\((-1.0,\; 1.0)\)</span>, <span class="math inline">\(\eta = 0.001\)</span> i 100 kroków. Zapisz historię punktów <span class="math inline">\([x^{(\tau)}, y^{(\tau)}]\)</span>.</p>
+<p>Nałóż trajektorię na mapę konturową z sekcji 2.2. Użyj <code>plt.plot(xs, ys, '.-', markersize=2)</code> - przy dużej liczbie kroków wystarczą drobne markery.</p>
+<p>Wypisz końcowy punkt i wartość funkcji.</p>
+</section>
+<section id="funkcja-himmelblaua" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-himmelblaua">2.4 Funkcja Himmelblau’a</h3>
+<p>Znamy ją z lab 6 — tam szukaliśmy minimów Optuną. Teraz użyjemy gradientu:</p>
+<p><span class="math display">\[f(x, y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2\]</span></p>
+<p>Zaimplementuj <code>himmelblau(x, y)</code> i <code>grad_himmelblau(x, y)</code>.</p>
+</section>
+<section id="gd-z-różnych-punktów-startowych" class="level3">
+<h3 class="anchored" data-anchor-id="gd-z-różnych-punktów-startowych">2.5 GD z różnych punktów startowych</h3>
+<p>Funkcja Himmelblau’a ma cztery minima globalne (patrz lab 6). To, do którego minimum trafi GD, zależy od punktu startowego.</p>
 <ol type="1">
-<li>Wygeneruj losowy wektor współczynników <span class="math display">\[\mathbf{w} = [w_0, w_1, \ldots, w_p]^T\]</span> o długości <span class="math inline">\(p+1\)</span> (uwzględniając wyraz wolny). Przyjmij <span class="math inline">\(p=5\)</span>.</li>
-<li>Utwórz zbiór obserwacji zmiennych niezależnych <span class="math display">\[\mathbf{X} = [\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_p]\]</span> składający się z <span class="math inline">\(N=1000\)</span> obserwacji. Symbolem <span class="math display">\[\mathbf{x}_j=[x_{1j}, x_{2j}, \ldots, x_{Nj}]^T\]</span> oznaczamy wektor obserwacji zmiennej <span class="math inline">\(X_j\)</span>.</li>
-<li>Niech <span class="math inline">\(\tilde{\mathbf{X}} = [\mathbf{1} \quad \mathbf{X}]\)</span> będzie macierzą obserwacji <span class="math inline">\(\mathbf{X}\)</span> rozszerzoną o kolumnę jedynek (tzw. <em>bias term</em>). Wygeneruj wektor szumu <span class="math display">\[\boldsymbol{\varepsilon} = [\varepsilon_1, \varepsilon_2, \ldots, \varepsilon_N]^T\]</span> o rozkładzie <span class="math inline">\(\mathcal{N}(0,\sigma^2)\)</span>. Zgodnie z podanym wyżej modelem, stwórz zmienną zależną <span class="math display">\[\mathbf{y} = \tilde{\mathbf{X}}\mathbf{w} + \boldsymbol{\varepsilon}.\]</span> Przyjmij <span class="math inline">\(\sigma=2.0\)</span>.</li>
+<li>Narysuj mapę konturową na <span class="math inline">\([-5, 5]^2\)</span> (tak samo jak w lab 6).</li>
+<li>Uruchom GD z czterech różnych punktów startowych, np.: <span class="math inline">\((-4, -3)\)</span>, <span class="math inline">\((4, 3)\)</span>, <span class="math inline">\((-3, 3)\)</span>, <span class="math inline">\((3, -3)\)</span>. Użyj <span class="math inline">\(\eta = 0.01\)</span> i 200 kroków.</li>
+<li>Nałóż cztery trajektorie na jedną mapę konturową, każdą w innym kolorze. Zaznacz punkt startowy (kwadrat) i końcowy (gwiazda).</li>
+</ol>
+<p>Do którego minimum trafiła każda trajektoria?</p>
+</section>
+<section id="punkt-siodłowy" class="level3">
+<h3 class="anchored" data-anchor-id="punkt-siodłowy">2.6 Punkt siodłowy</h3>
+<p>Rozważmy funkcję:</p>
+<p><span class="math display">\[f(x, y) = x^2 - y^2\]</span></p>
+<p>Punkt <span class="math inline">\((0, 0)\)</span> to <strong>punkt siodłowy</strong> (<em>saddle point</em>): gradient jest tam zerowy (<span class="math inline">\(\nabla f = [0, 0]\)</span>), ale nie jest to minimum - w kierunku <span class="math inline">\(x\)</span> funkcja rośnie, w kierunku <span class="math inline">\(y\)</span> maleje.</p>
+<p><strong>Dlaczego punkt siodłowy to problem?</strong> Gradient w punkcie siodłowym jest bliski zeru, więc GD zwalnia lub zatrzymuje się, mimo że punkt nie jest minimum. W przestrzeniach wielowymiarowych punkty siodłowe występują znacznie częściej niż minima lokalne.</p>
+<ol type="1">
+<li>Narysuj mapę konturową na <span class="math inline">\([-2, 2]^2\)</span>.</li>
+<li>Uruchom GD z punktu <span class="math inline">\((0.01, 0.01)\)</span> — celowo blisko punktu siodłowego. Użyj <span class="math inline">\(\eta = 0.1\)</span> i 50 kroków.</li>
+<li>Nałóż trajektorię na mapę konturową.</li>
+</ol>
+<p>Co się stało? Czy algorytm zbiegł do minimum?</p>
+</section>
+</section>
+<section id="wpływ-learning-rateu" class="level2">
+<h2 class="anchored" data-anchor-id="wpływ-learning-rateu">3. Wpływ learning rate’u</h2>
+<p>Learning rate <span class="math inline">\(\eta\)</span> jest kluczowym hiperparametrem GD. Zbyt mały - algorytm postępuje zbyt wolno. Zbyt duży — algorytm oscyluje lub ucieka do nieskończoności.</p>
+<section id="eksperymenty-na-rosenbrocku" class="level3">
+<h3 class="anchored" data-anchor-id="eksperymenty-na-rosenbrocku">3.1 Eksperymenty na Rosenbrocku</h3>
+<p>Uruchom GD na funkcji Rosenbrocka z tego samego punktu startowego <span class="math inline">\((-1.0,\; 1.0)\)</span> i 100 kroków, ale z trzema różnymi wartościami <span class="math inline">\(\eta\)</span>: za mały, dobry i za duży.</p>
+<p>Eksperymentalnie dobierz <span class="math inline">\(\eta\)</span>, tak aby zobaczyć wpływ learning rate’u na trajektorię i zbieżność.</p>
+<p>Narysuj dwa porównania:</p>
+<ol type="1">
+<li><strong>Trajektorie</strong> — trzy trajektorie na jednej mapie konturowej, każda w innym kolorze.</li>
+<li><strong>Krzywe zbieżności</strong> — trzy krzywe <span class="math inline">\(f(\mathbf{w}^{(\tau)})\)</span> vs <span class="math inline">\(\tau\)</span> na jednym wykresie. Użyj skali logarytmicznej na osi <span class="math inline">\(y\)</span> (<code>plt.yscale('log')</code>).</li>
 </ol>
 </section>
-<section id="obliczenie-całkowitej-sumy-kwadratów-tss" class="level3">
-<h3 class="anchored" data-anchor-id="obliczenie-całkowitej-sumy-kwadratów-tss">1.2 Obliczenie całkowitej sumy kwadratów (TSS)</h3>
-<p>TSS (<em>Total Sum of Squares</em>) to suma kwadratów różnic między wartościami zmiennej zależnej <code>y</code> a ich średnią:</p>
-<p><span class="math display">\[\begin{equation*}
-\text{TSS} = \sum_{i=1}^{N} (y_i - \bar{y})^2
-\end{equation*}\]</span></p>
-<p>gdzie <span class="math inline">\(\bar{y}\)</span> to średnia wartość zmiennej <code>y</code>. Wielkość tę można interpretować jako całkowitą wariancję zmiennej zależnej. Można też powiedzieć, że jest to ocena bazowego modelu wyznaczonego przez średnią wartość zmiennej zależnej.</p>
+<section id="rozbieżność-w-1d" class="level3">
+<h3 class="anchored" data-anchor-id="rozbieżność-w-1d">3.2 Rozbieżność w 1D</h3>
+<p>Wróćmy do funkcji <span class="math inline">\(f(x) = x^4 - 5x^2 + 4x\)</span> z sekcji 1. Uruchom GD z <span class="math inline">\(x^{(0)} = 2.9\)</span> i <span class="math inline">\(\eta = 0.1\)</span>.</p>
+<p>Narysuj na jednym wykresie:</p>
+<ul>
+<li>funkcję <span class="math inline">\(f(x)\)</span>,</li>
+<li>trajektorię GD (punkty z numerami kroków).</li>
+</ul>
+<p>Co się dzieje? Czy algorytm zbiegł?</p>
+</section>
+</section>
+<section id="momentum" class="level2">
+<h2 class="anchored" data-anchor-id="momentum">4. Momentum</h2>
+<p>Algorytm gradientu prostego ma tendencję do oscylacji w wąskich dolinach (jak na Rosenbrocku) - gradient jest duży prostopadle do dna doliny, ale mały wzdłuż niej. <strong>Momentum</strong> łagodzi ten problem, dodając „bezwładność”: aktualizacja uwzględnia nie tylko bieżący gradient, ale też kierunek z poprzednich kroków.</p>
+<section id="algorytm" class="level3">
+<h3 class="anchored" data-anchor-id="algorytm">4.1 Algorytm</h3>
+<p>Gradient descent z momentum utrzymuje wektor prędkości <span class="math inline">\(\mathbf{v}\)</span>:</p>
+<p><span class="math display">\[\mathbf{v}^{(\tau)} = \beta\,\mathbf{v}^{(\tau-1)} + \nabla f(\mathbf{w}^{(\tau-1)})\]</span> <span class="math display">\[\mathbf{w}^{(\tau)} = \mathbf{w}^{(\tau-1)} - \eta\,\mathbf{v}^{(\tau)}\]</span></p>
+<p>gdzie <span class="math inline">\(\beta \in [0, 1)\)</span> to hiperparametr momentum. Inicjalizacja: <span class="math inline">\(\mathbf{v}^{(0)} = \mathbf{0}\)</span>.</p>
+<p><strong>Analogia fizyczna.</strong> Wyobraź sobie kulkę toczącą się po powierzchni funkcji. Bez momentum kulka natychmiast reaguje na nachylenie terenu - na grani doliny zmienia kierunek co krok. Z momentum kulka ma masę: gromadzi prędkość w kierunku, w którym gradient jest spójny (wzdłuż doliny), a oscylacje prostopadłe wzajemnie się znoszą, bo gradient zmienia tam znak co krok. Momentum pozwala kulce „przeskoczyć” przez wąskie grzbiety i szybciej dotrzeć do minimum.</p>
+</section>
+<section id="implementacja" class="level3">
+<h3 class="anchored" data-anchor-id="implementacja">4.2 Implementacja</h3>
+<p>Napisz funkcję <code>gd_momentum(grad_fn, w0, lr, beta, n_steps)</code>, która:</p>
 <ol type="1">
-<li>Oblicz średnią wartość zmiennej <code>y</code>.</li>
-<li>Korzystając z definicji oblicz TSS.</li>
+<li>Przyjmuje: funkcję gradientu <code>grad_fn(w)</code>, punkt startowy <code>w0</code> (tablica NumPy), learning rate <code>lr</code>, parametr momentum <code>beta</code>, liczbę kroków <code>n_steps</code>.</li>
+<li>Inicjalizuje <span class="math inline">\(\mathbf{v} = \mathbf{0}\)</span> o takim samym kształcie jak <code>w0</code>.</li>
+<li>W każdym kroku oblicza <span class="math inline">\(\mathbf{v}\)</span> i <span class="math inline">\(\mathbf{w}\)</span> według wzoru z sekcji 4.1.</li>
+<li>Zwraca tablicę historii punktów o kształcie <code>(n_steps + 1, len(w0))</code>.</li>
+</ol>
+<p>Dla porównania napisz analogiczną funkcję <code>gd_vanilla(grad_fn, w0, lr, n_steps)</code> bez momentum.</p>
+<p><em>Wskazówka:</em> Obie funkcje mogą operować na <code>np.array</code> — działają zarówno w 1D, jak i 2D.</p>
+</section>
+<section id="porównanie-na-rosenbrocku" class="level3">
+<h3 class="anchored" data-anchor-id="porównanie-na-rosenbrocku">4.3 Porównanie na Rosenbrocku</h3>
+<p>Uruchom obie metody na funkcji Rosenbrocka z punktem startowym <span class="math inline">\((-1.0,\; 1.0)\)</span>, <span class="math inline">\(\eta = 0.001\)</span> i 100 kroków. Dla momentum użyj <span class="math inline">\(\beta = 0.9\)</span>.</p>
+<p>Narysuj:</p>
+<ol type="1">
+<li><strong>Trajektorie</strong> — obie na jednej mapie konturowej, w różnych kolorach.</li>
+<li><strong>Krzywe zbieżności</strong> — <span class="math inline">\(f(\mathbf{w}^{(\tau)})\)</span> vs <span class="math inline">\(\tau\)</span>, skala log na osi <span class="math inline">\(y\)</span>.</li>
 </ol>
 </section>
-<section id="implementacja-regresji-liniowej" class="level3">
-<h3 class="anchored" data-anchor-id="implementacja-regresji-liniowej">1.3 Implementacja regresji liniowej</h3>
-<p>Estymator współczynników regresji <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> wyznaczany jest za pomocą metody najmniejszych kwadratów (<em>Ordinary Least Squares</em>):</p>
-<p><span class="math display">\[\mathbf{w}_{\text{ML}} = (\mathbf{\tilde X}^T\mathbf{\tilde X})^{-1}\mathbf{\tilde X}^T\mathbf{y}\]</span></p>
-<p>gdzie <span class="math inline">\(\mathbf{\tilde X} = [\mathbf{1} \quad \mathbf{X}]\)</span> to macierz obserwacji <span class="math inline">\(\mathbf{X}\)</span> rozszerzona o kolumnę jedynek (tzw. <em>bias term</em>). Szczegółowe wyprowadzenie oraz właściwości statystyczne estymatora znajdziesz w artykule <a href="https://pl.wikipedia.org/wiki/Regresja_liniowa">Regresja liniowa w serwisie Wikipedia</a>.</p>
+<section id="eksperymenty-z-beta" class="level3">
+<h3 class="anchored" data-anchor-id="eksperymenty-z-beta">4.4 Eksperymenty z <span class="math inline">\(\beta\)</span></h3>
+<p>Na funkcji Rosenbrocka z tymi samymi ustawieniami co w 4.3 porównaj momentum z kilkoma wartościami <span class="math inline">\(\beta\)</span>: 0.0, 0.5, 0.9, 0.99.</p>
+<p>Narysuj krzywe zbieżności na jednym wykresie. Jaka wartość <span class="math inline">\(\beta\)</span> daje najszybszą zbieżność? Czy <span class="math inline">\(\beta = 0.99\)</span> jest stabilne?</p>
+<p><em>Uwaga:</em> <span class="math inline">\(\beta = 0.0\)</span> to vanilla GD (wektor prędkości zeruje się w każdym kroku).</p>
+</section>
+</section>
+<section id="zadania-dodatkowe" class="level2">
+<h2 class="anchored" data-anchor-id="zadania-dodatkowe">5. Zadania dodatkowe</h2>
+<section id="mapa-basenów-przyciągania-himmelblau" class="level3">
+<h3 class="anchored" data-anchor-id="mapa-basenów-przyciągania-himmelblau">5.1 Mapa basenów przyciągania — Himmelblau</h3>
+<p>Funkcja Himmelblau’a ma cztery minima. To, do którego zbiegnie GD, zależy od punktu startowego. Zbadaj tę zależność systematycznie:</p>
 <ol type="1">
-<li><strong>Oblicz współczynniki</strong> <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> zgodnie z powyższym wzorem macierzowym.</li>
-<li><strong>Oblicz przewidywane wartości</strong> zmiennej zależnej korzystając z zależności: <span class="math inline">\(\hat{\mathbf{y}} = \mathbf{\tilde X} \mathbf{w}_{\text{ML}}\)</span>.</li>
-<li><strong>Dokonaj ewaluacji modelu</strong>: porównaj wartości estymowanych parametrów z wartościami rzeczywistymi i oblicz błędy względne dla poszczególnych obserwacji.</li>
+<li>Utwórz siatkę punktów startowych na <span class="math inline">\([-5, 5]^2\)</span>, np. <span class="math inline">\(100 \times 100\)</span>.</li>
+<li>Dla każdego punktu uruchom GD (200 kroków, <span class="math inline">\(\eta = 0.01\)</span>) i sprawdź, do którego z czterech minimów zbiegł algorytm (wybierz najbliższe).</li>
+<li>Pokoloruj siatkę według numeru minimum i narysuj wynikową mapę.</li>
 </ol>
+<p><em>Wskazówka:</em> Cztery znane minima to: <span class="math inline">\((3.0,\; 2.0)\)</span>, <span class="math inline">\((-2.805,\; 3.131)\)</span>, <span class="math inline">\((-3.779,\; -3.283)\)</span>, <span class="math inline">\((3.584,\; -1.848)\)</span>. Dla każdego końcowego punktu oblicz odległość do każdego minimum i przypisz numer najbliższego.</p>
 </section>
-<section id="macierz-grama-i-uwarunkowanie-przypadek-zdrowy" class="level3">
-<h3 class="anchored" data-anchor-id="macierz-grama-i-uwarunkowanie-przypadek-zdrowy">1.4 Macierz Grama i uwarunkowanie (przypadek „zdrowy”)</h3>
-<p>Niech <span class="math inline">\(G = \mathbf{\tilde X}^T \mathbf{\tilde X}\)</span>. Zauważ, że <span class="math inline">\(G\)</span> jest <strong>macierzą Grama</strong> kolumn macierzy <span class="math inline">\(\mathbf{\tilde X}\)</span>: jeśli <span class="math inline">\(\mathbf{x}_0, \mathbf{x}_1,\dots,\mathbf{x}_p\)</span> oznaczają kolumny <span class="math inline">\(\mathbf{\tilde X}\)</span>, to</p>
-<p><span class="math display">\[
-G_{ij} = \mathbf{x}_i^T \mathbf{x}_j = \langle \mathbf{x}_i, \mathbf{x}_j\rangle,
-\]</span></p>
-<p>czyli <span class="math inline">\(G\)</span> zawiera wszystkie odpowiednie <strong>iloczyny skalarne</strong> między cechami (kolumnami).</p>
+<section id="gd-vs-optuna-na-himmelblau" class="level3">
+<h3 class="anchored" data-anchor-id="gd-vs-optuna-na-himmelblau">5.2 GD vs Optuna na Himmelblau</h3>
+<p>Porównaj dwa podejścia do minimalizacji funkcji Himmelblau’a:</p>
 <ol type="1">
-<li>Oblicz macierz <span class="math inline">\(G\)</span> i obejrzyj jej wpisy. Porównaj typową skalę elementów diagonalnych <span class="math inline">\(G_{jj}\)</span> z pozadiagonalnymi <span class="math inline">\(G_{ij}\)</span> dla <span class="math inline">\(i\neq j\)</span>.</li>
-<li>Oblicz wartości własne <span class="math inline">\(G\)</span> oraz liczbę uwarunkowania <span class="math display">\[
-\kappa(G)=\frac{\lambda_{\max}(G)}{\lambda_{\min}(G)}.
-\]</span> W tym punkcie (losowe, niezależne cechy) <span class="math inline">\(\kappa(G)\)</span> powinna być umiarkowana, a <span class="math inline">\(\lambda_{\min}(G)\)</span> nie powinna być bliska zeru.</li>
-<li>Oblicz macierz odwrotną <span class="math inline">\(G^{-1}\)</span> i sprawdź, że jej wartości własne są równe <span class="math inline">\(1/\lambda_i(G)\)</span>. Co to oznacza dla stabilności obliczeń przy odwracaniu macierzy?</li>
+<li><strong>GD</strong>: 200 kroków, <span class="math inline">\(\eta = 0.01\)</span>, punkt startowy <span class="math inline">\((-4, -3)\)</span>.</li>
+<li><strong>Optuna (TPE)</strong>: 200 triali (jak w lab 6).</li>
 </ol>
-<div class="alert alert-block alert-info">
-<p><b>Intuicja: co „widzi” macierz Grama <span class="math inline">\(G=X^T X\)</span></b></p>
-<p>Macierz <span class="math inline">\(G\)</span> jest macierzą iloczynów skalarnych kolumn <span class="math inline">\(X\)</span>: <span class="math inline">\(G_{ij}=\langle x_i,x_j\rangle\)</span>. Elementy diagonalne <span class="math inline">\(G_{jj}=\|x_j\|^2\)</span> opisują skalę (energię) pojedynczej cechy, a wpisy pozadiagonalne <span class="math inline">\(G_{ij}\)</span> mówią, na ile dwie cechy niosą tę samą informację (korelacja / redundancja). Gdy pozadiagonalne wpisy są duże, cechy są współliniowe i trudniej „rozliczyć” ich wpływ osobno.</p>
-</div>
-<div class="alert alert-block alert-warning">
-<p><b>Dlaczego to ma znaczenie dla MNK (i czemu wrócimy do tego w sekcji 2)</b><br> W MNK odwracamy (jawnie lub niejawnie) macierz Grama: pojawia się <span class="math inline">\(G^{-1}\)</span>. Jeśli współliniowość sprawia, że najmniejsza wartość własna <span class="math inline">\(\lambda_{\min}(G)\)</span> staje się mała, to liczba uwarunkowania <span class="math display">\[
-\kappa(G)=\frac{\lambda_{\max}(G)}{\lambda_{\min}(G)}
-\]</span> gwałtownie rośnie, a w <span class="math inline">\(G^{-1}\)</span> pojawiają się duże wartości własne (<span class="math inline">\(1/\lambda_i(G)\)</span>) i często duże wpisy. To prowadzi do niestabilnych współczynników MNK i dużej wrażliwości na szum. W sekcji 2 skonstruujemy taki przypadek celowo.</p>
-</div>
+<p>Na jednej mapie konturowej narysuj:</p>
+<ul>
+<li>trajektorię GD,</li>
+<li>punkty ewaluacji Optuny.</li>
+</ul>
+<p>Który algorytm znalazł lepsze minimum? Który użył mniej ewaluacji funkcji? Czy GD mógłby znaleźć <strong>wszystkie</strong> cztery minima w jednym uruchomieniu?</p>
 </section>
-<section id="ocena-jakości-modelu" class="level3">
-<h3 class="anchored" data-anchor-id="ocena-jakości-modelu">1.5 Ocena jakości modelu</h3>
-<p>RSS (<em>Residual Sum of Squares</em>) to suma kwadratów reszt, czyli różnic między rzeczywistymi wartościami <span class="math inline">\(y_i\)</span> a przewidywanymi <span class="math inline">\(\hat{y}_i\)</span> (jak wygląda wzór na <span class="math inline">\(\hat{y}_i\)</span>?):</p>
-<p><span class="math display">\[\begin{equation*}
-\text{RSS} = \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
-\end{equation*}\]</span></p>
-<p>Wielkość ta jest miarą dopasowania modelu do danych. Wyliczone w poprzednich krokach parametry modelu minimalizują RSS.</p>
-<p>Współczynnik determinacji <span class="math inline">\(R^2\)</span> to stosunek wariancji wyjaśnionej przez model do całkowitej wariancji zmiennej zależnej:</p>
-<p><span class="math display">\[\begin{equation*}
-R^2 = \frac{\text{TSS} - \text{RSS}}{\text{TSS}}= 1 - \frac{\text{RSS}}{\text{TSS}}
-\end{equation*}\]</span></p>
-<ol type="1">
-<li>Oblicz przewidywane wartości <span class="math inline">\(\hat{y_i}\)</span>, <span class="math inline">\(i=1,\ldots,N\)</span>.</li>
-<li>Oblicz RSS.</li>
-<li>Oblicz współczynnik determinacji <span class="math inline">\(R^2\)</span>.</li>
-</ol>
-</section>
-<section id="pytania-dodatkowe" class="level3">
-<h3 class="anchored" data-anchor-id="pytania-dodatkowe">Pytania dodatkowe</h3>
-<p>Zobacz jak zmienia się wartość TSS, RSS i <span class="math inline">\(R^2\)</span> w zależności od:</p>
-<ol type="1">
-<li>wariancji szumu,</li>
-<li>liczby obserwacji <span class="math inline">\(N\)</span>,</li>
-<li>liczby zmiennych niezależnych <span class="math inline">\(p\)</span>.</li>
-</ol>
-</section>
-</section>
-<section id="przypadek-współliniowości-zmiennych" class="level2">
-<h2 class="anchored" data-anchor-id="przypadek-współliniowości-zmiennych">2. Przypadek współliniowości zmiennych</h2>
-<p>W zadaniu 1. zmienne <span class="math inline">\(X_1,\ldots,X_p\)</span> były wzajemnie niezależne, dzięki czemu macierz Grama <span class="math inline">\(G = \tilde{\mathbf{X}}^T\tilde{\mathbf{X}}\)</span> była dobrze uwarunkowana, a estymator <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> trafnie aproksymował prawdziwe parametry modelu. Sekcja 1.4 sygnalizowała, że sytuacja zmienia się zasadniczo, gdy cechy przestają być niezależne — duże wpisy pozadiagonalne <span class="math inline">\(G\)</span> oznaczają redundancję informacji i prowadzą do niestabilności estymatora.</p>
-<p>Teraz skonstruujemy taki przypadek celowo. Przyjmijmy, że ostatnia zmienna <span class="math inline">\(X_p\)</span> jest przybliżoną kombinacją liniową pozostałych:</p>
-<p><span class="math display">\[X_p = 2X_1 - X_2 + \varepsilon_p,\]</span></p>
-<p>gdzie <span class="math inline">\(\varepsilon_p \sim \mathcal{N}(0, \sigma_p^2)\)</span>.</p>
-<p>Parametr <span class="math inline">\(\sigma_p\)</span> kontroluje stopień współliniowości: dla <span class="math inline">\(\sigma_p \to 0\)</span> kolumny macierzy <span class="math inline">\(\tilde{\mathbf{X}}\)</span> stają się liniowo zależne i <span class="math inline">\(G\)</span> przestaje być odwracalna.</p>
-<p>Przeprowadź poniższe analizy i porównaj wyniki z zadaniem 1.:</p>
-<ol type="1">
-<li><strong>Wygeneruj dane</strong> zgodnie z powyższym modelem. Przyjmij <span class="math inline">\(p=5\)</span>, <span class="math inline">\(N=1000\)</span>, <span class="math inline">\(\sigma=2.0\)</span>. Przetestuj kilka wartości <span class="math inline">\(\sigma_p\)</span>, np. <span class="math inline">\(\sigma_p \in \{0.01,\, 0.1,\, 1.0\}\)</span>.</li>
-<li><strong>Zbadaj macierz Grama</strong>: oblicz <span class="math inline">\(G\)</span> i jej liczbę uwarunkowania <span class="math inline">\(\kappa(G)\)</span>. Jak zmienia się <span class="math inline">\(\kappa(G)\)</span> w zależności od <span class="math inline">\(\sigma_p\)</span>? Porównaj z wynikiem z sekcji 1.4.</li>
-<li><strong>Oblicz estymator <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span></strong> metodą normalną przy użyciu <code>np.linalg.inv()</code>: <span class="math display">\[\mathbf{w}_{\text{ML}} = (\tilde{\mathbf{X}}^T\tilde{\mathbf{X}})^{-1}\tilde{\mathbf{X}}^T\mathbf{y}.\]</span> Porównaj uzyskane współczynniki z wartościami rzeczywistymi — czy estymator jest nadal trafny?</li>
-<li><strong>Oceń jakość modelu</strong>: oblicz RSS i <span class="math inline">\(R^2\)</span>. Czy wysoki <span class="math inline">\(R^2\)</span> wyklucza niestabilność współczynników?</li>
-<li><strong>Rozkład SVD jako alternatywa</strong>: wyznacz <span class="math inline">\(\mathbf{w}_{\text{ML}}\)</span> za pomocą pseudoodwrotności Moore’a–Penrose’a, wykorzystując rozkład SVD zwracany przez funkcję <code>np.linalg.svd()</code>. Dla rozkładu postaci <span class="math inline">\(\tilde{\mathbf{X}} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^T\)</span> pseudoodwrotność dana jest wzorem: <span class="math display">\[\tilde{\mathbf{X}}^+ = \mathbf{V}\boldsymbol{\Sigma}^+\mathbf{U}^T,\]</span> gdzie macierz <span class="math inline">\(\boldsymbol{\Sigma}^+\)</span> powstaje poprzez zastąpienie niezerowych wartości osobliwych <span class="math inline">\(\sigma_i\)</span> ich odwrotnościami <span class="math inline">\(1/\sigma_i\)</span>. Estymator przyjmuje wówczas postać: <span class="math display">\[\mathbf{w}_{\text{ML}} = \tilde{\mathbf{X}}^+\mathbf{y} = \mathbf{V}\boldsymbol{\Sigma}^+\mathbf{U}^T\mathbf{y}.\]</span> W celu stabilizacji numerycznej zastosuj ucięcie (<em>truncation</em>), polegające na zignorowaniu pomijalnie małych wartości osobliwych <span class="math inline">\(\sigma_i\)</span> i zastąpieniu ich zerami w macierzy <span class="math inline">\(\boldsymbol{\Sigma}^+\)</span>. Porównaj stabilność wyników z metodą równań normalnych, szczególnie w przypadku złego uwarunkowania macierzy (małe <span class="math inline">\(\sigma_p\)</span>).</li>
-</ol>
-</section>
-<section id="schemat-aktywności-słońca" class="level2">
-<h2 class="anchored" data-anchor-id="schemat-aktywności-słońca">3. Schemat aktywności Słońca</h2>
-<p>Na <a href="https://sidc.be/SILSO/datafiles">Solar Influences Data Analysis Center (SIDC)</a> znajduje się baza danych dotycząca aktywności Słońca. Celem zadania jest wyznaczenie przeciętnej liczby plam słonecznych w zależności od czasu.</p>
-<section id="wczytanie-danych" class="level3">
-<h3 class="anchored" data-anchor-id="wczytanie-danych">3.1. Wczytanie danych</h3>
-<p>Pobierz <a href="https://sidc.be/SILSO/INFO/sndtotcsv.php">dane (Sunspot Number)</a> w formacie CSV. Dane te są dostępne od roku 1818. Dane możesz pobrać ręcznie, ale wygodniej będzie zrobić to wykorzystując bibliotekę <code>requests</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://sidc.be/SILSO/INFO/sndtotcsv.php'</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(url)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'sunspots.csv'</span>, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    f.write(r.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="przygotowanie-i-wizualizacja" class="level3">
-<h3 class="anchored" data-anchor-id="przygotowanie-i-wizualizacja">3.2. Przygotowanie i wizualizacja</h3>
-<ol type="1">
-<li>Dane wczytaj do obiektu DataFrame biblioteki Pandas.</li>
-<li>Sprawdź typy danych i usuń ewentualne braki (zobacz dokumentację zbioru na stronie SIDC).</li>
-<li>Wyświetl wykres rozproszenia liczby plam słonecznych w zależności od czasu.</li>
-</ol>
-</section>
-<section id="regresja-liniowa" class="level3">
-<h3 class="anchored" data-anchor-id="regresja-liniowa">3.3 Regresja liniowa</h3>
-<ol type="1">
-<li>Stwórz tablicę <code>X</code> zawierającą rok jako zmienną niezależną oraz tablicę <code>y</code> zawierającą liczbę plam słonecznych jako zmienną zależną.</li>
-<li>Zastosuj regresję liniową do wyznaczenia przeciętnej liczby plam słonecznych w zależności od roku. Wykorzystaj bazę funkcji składających się z wyrazu wolnego oraz funkcji bazowych Gaussa:</li>
-</ol>
-<p><span class="math display">\[\begin{equation*}
-\phi_i(x) = \exp\left(-\frac{(x - c_i)^2}{\sigma^2}\right),
-\end{equation*}\]</span></p>
-<p>gdzie <span class="math inline">\(c_i\)</span> to równo odległe punkty na odcinku <span class="math inline">\([X_{\text{min}},X_{\text{max}}]\)</span> oraz <span class="math inline">\(\sigma&gt;0\)</span> to parametr kontrolujący szerokość funkcji Gaussa. 3. Wyświetl wykres przeciętnej liczby plam słonecznych w zależności od roku wraz z wykresem rozproszenia danych. 4. Przetestuj inne typy funkcji bazowych, np. funkcję sigmoidalną</p>
-<p><span class="math display">\[\begin{equation*}
-\phi_i(x) = \frac{1}{1 + \exp\left(-\frac{x - c_i}{\sigma}\right)}
-\end{equation*}\]</span></p>
-<p>lub ReLU</p>
-<p><span class="math display">\[\begin{equation*}
-\phi_i(x) = \max(0, x - c_i).
-\end{equation*}\]</span></p>
+<section id="momentum-na-punkcie-siodłowym" class="level3">
+<h3 class="anchored" data-anchor-id="momentum-na-punkcie-siodłowym">5.3 Momentum na punkcie siodłowym</h3>
+<p>Wróć do funkcji <span class="math inline">\(f(x, y) = x^2 - y^2\)</span> z sekcji 2.6. Uruchom GD z momentum (<span class="math inline">\(\beta = 0.9\)</span>) z tego samego punktu startowego <span class="math inline">\((0.01, 0.01)\)</span>.</p>
+<p>Czy momentum pomogło uciec od punktu siodłowego szybciej?</p>
 
 
 </section>
