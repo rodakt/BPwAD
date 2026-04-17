@@ -426,7 +426,7 @@ window.Quarto = {
 <li><strong>Dopasuj / zaktualizuj model zastępczy</strong> na danych <span class="math inline">\(\mathcal D_t=\{(x_i,y_i)\}_{i=1}^t\)</span> <span class="math display">\[\mu_t(x), \sigma_t^2(x) \leftarrow p(f(x)\mid \mathcal D_t)\]</span></li>
 <li><strong>Zdefiniuj funkcję akwizycji</strong> (eksploracja/eksploatacja)
 <ul>
-<li><strong>UCB:</strong> <span class="math inline">\(a_t(x)=\mu_t(x)+\kappa\sigma_t(x)\)</span></li>
+<li><strong>LCB:</strong> <span class="math inline">\(a_t(x)=\mu_t(x)-\kappa\sigma_t(x)\)</span></li>
 <li><strong>EI/PI:</strong> zależne od <span class="math inline">\((\mu_t,\sigma_t)\)</span> oraz <span class="math inline">\((f_{\text{best}})\)</span></li>
 </ul></li>
 <li><strong>Wybierz następny punkt</strong> przez tanią optymalizację akwizycji <span class="math display">\[x_{t+1}=\arg\min_{x\in\mathcal X} a_t(x)\]</span></li>
@@ -439,12 +439,24 @@ window.Quarto = {
 </ul></li>
 </ol>
 </section>
+<section id="kompromis-eksploracja-eksploatacja-na-przykładzie-lcb" class="level4">
+<h4 class="anchored" data-anchor-id="kompromis-eksploracja-eksploatacja-na-przykładzie-lcb">Kompromis eksploracja-eksploatacja na przykładzie LCB</h4>
+<p>W przypadku minimalizacji funkcji celu, najczęściej stosowaną wersją tej strategii jest wspomniana wyżej <strong>LCB (Lower Confidence Bound)</strong>. Wybór kolejnego punktu opiera się na zasadzie „optymizmu w obliczu niepewności”. Wzór</p>
+<p><span class="math display">\[a_t(x) = \mu_t(x) - \kappa\sigma_t(x)\]</span></p>
+<p>manifestuje dwa kluczowe zachowania algorytmu:</p>
+<ul>
+<li><strong>Eksploatacja (składowa <span class="math inline">\(\mu_t(x)\)</span>):</strong> Algorytm dąży do minimalizacji funkcji akwizycji, więc naturalnie kieruje się tam, gdzie model zastępczy przewiduje niskie wartości średnie. Jest to „bezpieczna” gra — sprawdzamy obszary, które według naszej obecnej wiedzy są obiecujące.</li>
+<li><strong>Eksploracja (składowa <span class="math inline">\(-\kappa\sigma_t(x)\)</span>):</strong> Odjęcie odchylenia standardowego powoduje, że punkty o wysokiej niepewności (duże <span class="math inline">\(\sigma\)</span>) stają się dla algorytmu bardziej „atrakcyjne” (mają niższą wartość funkcji akwizycji). Model „premiuje” obszary słabo poznane, zakładając optymistycznie, że wysoka niepewność może skrywać wynik znacznie lepszy (niższy) niż dotychczasowe obserwacje.</li>
+</ul>
+<p>Ostateczny balans zależy od parametru <strong><span class="math inline">\(\kappa\)</span></strong>. Przy <span class="math inline">\(\kappa = 0\)</span> algorytm staje się „chciwy” i wykonuje czystą eksploatację, ignorując ryzyko i szansę wynikającą z niepewności. Wraz ze wzrostem <span class="math inline">\(\kappa\)</span>, model staje się coraz bardziej „ciekawy” świata, decydując się na badanie regionów, w których przewidywana średnia <span class="math inline">\(\mu\)</span> może być wysoka, ale potencjał wynikający z niewiedzy (<span class="math inline">\(\sigma\)</span>) jest na tyle duży, że warto podjąć ryzyko pomiaru.</p>
+<p>Dzięki temu mechanizmowi optymalizacja bayesowska nie „utyka” w pierwszym lepszym minimum lokalnym, lecz systematycznie przeczesuje przestrzeń tam, gdzie nagroda może być największa.</p>
+</section>
 <section id="tpe-tree-structured-parzen-estimator---intuicja" class="level4">
 <h4 class="anchored" data-anchor-id="tpe-tree-structured-parzen-estimator---intuicja">TPE — Tree-structured Parzen Estimator - intuicja</h4>
 <p>Domyślna metoda optymalizacji w Optunie to TPE. Zamiast modelować bezpośrednio zależność <span class="math inline">\(f(\mathbf{x})\)</span> (wynik od hiperparametrów), TPE modeluje dwa rozkłady warunkowe:</p>
 <ul>
-<li><span class="math inline">\(p(\mathbf{x} \mid y &lt; y^*)\)</span> — rozkład hiperparametrów w próbach „dobrych” (poniżej pewnego progu <span class="math inline">\(y^*\)</span>),</li>
-<li><span class="math inline">\(p(\mathbf{x} \mid y \geq y^*)\)</span> — rozkład hiperparametrów w próbach „słabych”.</li>
+<li><span class="math inline">\(p(\mathbf{x} \mid y &lt; y^*)\)</span> — rozkład hiperparametrów w próbach „dobrych” (poniżej pewnego progu <span class="math inline">\(y^*\)</span>), strefa „sukcesu”,</li>
+<li><span class="math inline">\(p(\mathbf{x} \mid y \geq y^*)\)</span> — rozkład hiperparametrów w próbach „słabych”, strefa „porażki”.</li>
 </ul>
 <p>Następny punkt do zbadania wybierany jest tak, aby zmaksymalizować stosunek <span class="math inline">\(p(\mathbf{x} \mid y &lt; y^*) / p(\mathbf{x} \mid y \geq y^*)\)</span> — preferowane są hiperparametry typowe dla dobrych prób, a nietypowe dla słabych.</p>
 <p>Kluczowa konsekwencja: każda kolejna próba jest mądrzejsza od poprzedniej, bo korzysta z akumulowanej wiedzy o przestrzeni hiperparametrów.</p>
@@ -495,7 +507,7 @@ window.Quarto = {
 </ol>
 <blockquote class="blockquote">
 <p><strong>Uwaga (różnica BO vs TPE):</strong><br>
-W klasycznym BO (np. z procesem Gaussa) model zastępczy daje wprost predykcję jakości w punkcie <span class="math inline">\(x\)</span> w postaci <span class="math inline">\((\mu(x),\sigma^2(x))\)</span>, a funkcja akwizycji <span class="math inline">\(a(x)\)</span> (np. UCB/EI) jest z nich liczona i następnie optymalizowana w <span class="math inline">\(\mathcal X\)</span>.<br>
+W klasycznym BO (np. z procesem Gaussa) model zastępczy daje wprost predykcję jakości w punkcie <span class="math inline">\(x\)</span> w postaci <span class="math inline">\((\mu(x),\sigma^2(x))\)</span>, a funkcja akwizycji <span class="math inline">\(a(x)\)</span> (np. LCB/EI) jest z nich liczona i następnie optymalizowana w <span class="math inline">\(\mathcal X\)</span>.<br>
 W TPE nie modeluje się bezpośrednio <span class="math inline">\(f(x)\)</span> jako <span class="math inline">\((\mu,\sigma^2)\)</span>; zamiast tego estymuje się dwie gęstości po hiperparametrach: <span class="math inline">\(\ell(x)=p(x\mid y&lt;y^*)\)</span> dla „dobrych” prób oraz <span class="math inline">\(g(x)=p(x\mid y\ge y^*)\)</span> dla „złych”. „Opłacalność” punktu wyraża się ilorazem <span class="math inline">\(\ell(x)/g(x)\)</span>, a wybór kolejnego <span class="math inline">\(x\)</span> jest zwykle realizowany przez sampling kandydatów z <span class="math inline">\(\ell(x)\)</span> i selekcję tego z największym <span class="math inline">\(\ell(x)/g(x)\)</span>, co jest praktyczne w przestrzeniach mieszanych (ciągłe/kategoryczne) i warunkowych (tree-structured).</p>
 </blockquote>
 </section>
