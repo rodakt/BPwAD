@@ -401,7 +401,7 @@ window.Quarto = {
 <p>Optymalizacja bayesowska to rodzina metod, które kierują przeszukiwaniem przestrzeni hiperparametrów na podstawie dotychczasowych wyników. Zamiast przeszukiwać ślepo, budują wewnętrzny model zależności między hiperparametrami a jakością modelu.</p>
 <section id="model-zastępczy" class="level4">
 <h4 class="anchored" data-anchor-id="model-zastępczy">Model zastępczy</h4>
-<p>Ewaluacja funkcji celu (np. kroswalidacja modelu z danymi hiperparametrami) jest kosztowna. Optymalizacja bayesowska buduje tani <em>model zastępczy</em> (surrogate model), który przybliża nieznaną funkcję celu na podstawie dotychczasowych obserwacji. Model zastępczy szacuje dla danego punktu przestrzeni hiperparametrów oczekiwaną wartość funkcji celu oraz niepewność tego szacunku.</p>
+<p>Ewaluacja funkcji celu (np. kroswalidacja modelu z danymi hiperparametrami) jest kosztowna. Optymalizacja bayesowska buduje tani <em>model zastępczy</em> (surrogate model), który przybliża nieznaną funkcję celu na podstawie dotychczasowych obserwacji. Model zastępczy tworzy probabilistyczne przybliżenie nieznanej funkcji celu na podstawie dotychczasowych obserwacji. Pozwala on oszacować, które obszary przestrzeni hiperparametrów są najbardziej obiecujące (wysoka oczekiwana jakość) oraz gdzie nasza wiedza o funkcji jest najmniejsza (wysoka niepewność).</p>
 </section>
 <section id="funkcja-akwizycji" class="level4">
 <h4 class="anchored" data-anchor-id="funkcja-akwizycji">Funkcja akwizycji</h4>
