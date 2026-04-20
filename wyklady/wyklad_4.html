@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 4: Metoda gradientu prostego. Tensory w PyTorch – Biblioteki Python w analizie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9eb2dcf4296333510909099cc84966dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_4.html">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: Optuna - optymalizacja hiperparametrów</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Własne estymatory scikit-learn</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Potoki i kroswalidacja</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Optuna</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 7: Metoda gradientu prostego</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#optymalizacja-metodą-gradientu-prostego" id="toc-optymalizacja-metodą-gradientu-prostego" class="nav-link active" data-scroll-target="#optymalizacja-metodą-gradientu-prostego">Optymalizacja metodą gradientu prostego</a>
+  <ul class="collapse">
+  <li><a href="#batch-gradient-descent" id="toc-batch-gradient-descent" class="nav-link" data-scroll-target="#batch-gradient-descent"><em>Batch gradient descent</em></a></li>
+  <li><a href="#stochastic-gradient-descent-sgd" id="toc-stochastic-gradient-descent-sgd" class="nav-link" data-scroll-target="#stochastic-gradient-descent-sgd"><em>Stochastic gradient descent</em> (SGD)</a></li>
+  </ul></li>
+  <li><a href="#tensory-w-pytorch" id="toc-tensory-w-pytorch" class="nav-link" data-scroll-target="#tensory-w-pytorch">Tensory w PyTorch</a>
+  <ul class="collapse">
+  <li><a href="#tworzenie-tensorów" id="toc-tworzenie-tensorów" class="nav-link" data-scroll-target="#tworzenie-tensorów">Tworzenie tensorów</a></li>
+  <li><a href="#typy-danych" id="toc-typy-danych" class="nav-link" data-scroll-target="#typy-danych">Typy danych</a></li>
+  <li><a href="#numpy-a-pytorch-podręczna-ściągawka" id="toc-numpy-a-pytorch-podręczna-ściągawka" class="nav-link" data-scroll-target="#numpy-a-pytorch-podręczna-ściągawka">NumPy a PyTorch — podręczna ściągawka</a></li>
+  <li><a href="#konwersja-między-numpy-i-pytorch" id="toc-konwersja-między-numpy-i-pytorch" class="nav-link" data-scroll-target="#konwersja-między-numpy-i-pytorch">Konwersja między NumPy i PyTorch</a></li>
+  </ul></li>
+  <li><a href="#tensordataset-i-dataloader" id="toc-tensordataset-i-dataloader" class="nav-link" data-scroll-target="#tensordataset-i-dataloader"><code>TensorDataset</code> i <code>DataLoader</code></a></li>
+  <li><a href="#przykład-regresja-liniowa-metodą-mini-batch-gradient-descent" id="toc-przykład-regresja-liniowa-metodą-mini-batch-gradient-descent" class="nav-link" data-scroll-target="#przykład-regresja-liniowa-metodą-mini-batch-gradient-descent">Przykład: regresja liniowa metodą mini-batch gradient descent</a>
+  <ul class="collapse">
+  <li><a href="#model" id="toc-model" class="nav-link" data-scroll-target="#model">Model</a></li>
+  <li><a href="#funkcja-straty" id="toc-funkcja-straty" class="nav-link" data-scroll-target="#funkcja-straty">Funkcja straty</a></li>
+  <li><a href="#gradient-wyprowadzenie" id="toc-gradient-wyprowadzenie" class="nav-link" data-scroll-target="#gradient-wyprowadzenie">Gradient — wyprowadzenie</a></li>
+  <li><a href="#implementacja" id="toc-implementacja" class="nav-link" data-scroll-target="#implementacja">Implementacja</a></li>
+  <li><a href="#wyniki" id="toc-wyniki" class="nav-link" data-scroll-target="#wyniki">Wyniki</a></li>
+  <li><a href="#dyskusja" id="toc-dyskusja" class="nav-link" data-scroll-target="#dyskusja">Dyskusja</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_4.html">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="optymalizacja-metodą-gradientu-prostego" class="level2">
+<h2 class="anchored" data-anchor-id="optymalizacja-metodą-gradientu-prostego">Optymalizacja metodą gradientu prostego</h2>
+<p>Załóżmy, że <span class="math inline">\(L(\mathbf{w})\)</span> jest funkcją straty dla modelu z parametrami <span class="math inline">\(\mathbf{w}\)</span>. Funkcja <span class="math inline">\(L\)</span> zwraca nieujemną wartość reprezentującą stopień w jakim przewidywania modelu różnią się od rzeczywistych wartości. Typowe przykłady to:</p>
+<p><strong>Błąd średniokwadratowy</strong> (MSE) dla problemów regresji:</p>
+<p><span class="math display">\[\begin{equation*}
+    L(\mathbf{w}) = \frac{1}{N} \sum_{i=1}^N (y_i - f(\mathbf{x}_i, \mathbf{w}))^2
+  \end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(y_i\)</span> to rzeczywista wartość, a <span class="math inline">\(f(\mathbf{x}_i, \mathbf{w})\)</span> to przewidywana wartość przez model dla danych wejściowych <span class="math inline">\(\mathbf{x}_i\)</span>.</p>
+<p><strong>Entropia krzyżowa</strong> (<em>cross-entropy</em>) dla problemów klasyfikacji binarnej:</p>
+<p><span class="math display">\[\begin{equation*}
+    L(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^N \left( y_i \log(f(\mathbf{x}_i, \mathbf{w})) + (1 - y_i) \log(1 - f(\mathbf{x}_i, \mathbf{w})) \right)
+  \end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(y_i\)</span> to etykieta klasy (0 lub 1), a <span class="math inline">\(f(\mathbf{x}_i, \mathbf{w})\)</span> to przewidywane prawdopodobieństwo przynależności do klasy 1.</p>
+<p><strong>Entropia krzyżowa</strong> (<em>cross-entropy</em>) dla problemów klasyfikacji wieloklasowej:</p>
+<p><span class="math display">\[\begin{equation*}
+    L(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^N \sum_{j=1}^K y_{ij} \log(f_j(\mathbf{x}_i, \mathbf{w}))
+  \end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(y_{ij}\)</span> to etykieta klasy (1 jeśli próbka <span class="math inline">\(i\)</span> należy do klasy <span class="math inline">\(j\)</span>, 0 w przeciwnym razie), a <span class="math inline">\(f_j(\mathbf{x}_i, \mathbf{w})\)</span> to przewidywane prawdopodobieństwo przynależności do klasy <span class="math inline">\(j\)</span>.</p>
+<p>Trening modelu polega na minimalizacji funkcji straty <span class="math inline">\(L(\mathbf{w})\)</span> względem parametrów <span class="math inline">\(\mathbf{w}\)</span>. Metoda wykorzystywana do znalezienia minimum lokalnego funkcji <span class="math inline">\(L(\mathbf{w})\)</span> zależy przede wszystkim od tego, czy funkcja <span class="math inline">\(L\)</span> jest różniczkowalna względem <span class="math inline">\(\mathbf{w}\)</span>, czy też nie:</p>
+<ul>
+<li><strong>Jeśli <span class="math inline">\(L(\mathbf{w})\)</span> jest różniczkowalna</strong>, to zwykle korzysta się z jakiegoś wariantu metody gradientu prostego (o czym opowiemy za chwilę).</li>
+<li><strong>Jeśli <span class="math inline">\(L(\mathbf{w})\)</span> nie jest różniczkowalna</strong>, lub informacja o gradientach nie jest dostępna, to stosuje się metody takie jak algorytmy ewolucyjne, optymalizację bayesowską, symulowane wyżarzanie, i wiele innych.</li>
+</ul>
+<p>Optymalizacja metodą gradientu prostego jest algorytmem iteracyjnym. Polega on na tym, że w pierwszym kroku wybieramy jakąś wartość początkową dla parametrów <span class="math inline">\(\mathbf{w}^{(0)}\)</span> (np. losowo), a następnie w każdym kroku <span class="math inline">\(\tau\)</span> aktualizujemy parametry <span class="math inline">\(\mathbf{w}^{(\tau)}\)</span> zgodnie z równaniem:</p>
+<p><span class="math display">\[\begin{equation*}
+  \mathbf{w}^{(\tau)} = \mathbf{w}^{(\tau - 1)} + \left(\text{krok zależny od }\mathbf{w}^{(\tau - 1)}\right)
+\end{equation*}\]</span></p>
+<p>Wybór kroku zależnego od <span class="math inline">\(\mathbf{w}^{(\tau - 1)}\)</span> jest kluczowy dla działania algorytmu i właśnie w tym miejscu wykorzystuje się informację o gradiencie funkcji <span class="math inline">\(L(\mathbf{w})\)</span> w punkcie <span class="math inline">\(\mathbf{w}^{(\tau - 1)}\)</span>.</p>
+<section id="batch-gradient-descent" class="level3">
+<h3 class="anchored" data-anchor-id="batch-gradient-descent"><em>Batch gradient descent</em></h3>
+<p>Termin <em>batch</em> oznacza, że funkcję straty <span class="math inline">\(L(\mathbf{w})\)</span> będziemy obliczali na podstawie całego zbioru danych. Matematycznie <em>batch gradient descent</em> definiuje ciąg <span class="math inline">\(\mathbf{w}^{(\tau)}\)</span> wzorem indukcyjnym:</p>
+<p><span class="math display">\[\begin{equation*}
+\begin{aligned}
+  \mathbf{w}^{(0)} &amp;= \text{losowo ustalona początkowa wartość parametrów modelu} \\
+  \mathbf{w}^{(\tau)} &amp;= \mathbf{w}^{(\tau - 1)} - \eta \nabla_{\mathbf{w}} L(\mathbf{w}^{(\tau - 1)}),\quad \tau = 1, 2, \ldots
+\end{aligned}
+\end{equation*}\]</span></p>
+<p>gdzie <strong>współczynnik uczenia</strong> (<em>learning rate</em>) <span class="math inline">\(\eta&gt;0\)</span> jest hiperparametrem algorytmu.</p>
+<p><em>Batch gradient descent</em> w pseudokodzie:</p>
+<blockquote class="blockquote">
+<p><strong>Input</strong>:</p>
+<ul>
+<li>zbiór danych <span class="math inline">\(\mathcal{D} = \{(\mathbf{x}_n, y_n)\}_{n=1}^N\)</span>,</li>
+<li>funkcja straty <span class="math inline">\(L(\mathbf{w})\)</span> obliczana na podstawie całego zbioru danych <span class="math inline">\(\mathcal{D}\)</span></li>
+<li>współczynnik uczenia <span class="math inline">\(\eta&gt;0\)</span>,</li>
+<li>losowo inicjalizowana początkowa wartość parametrów modelu <span class="math inline">\(\mathbf{w}\)</span>.</li>
+</ul>
+<p><strong>Output</strong>:</p>
+<ul>
+<li>parametry modelu <span class="math inline">\(\mathbf{w}\)</span> po zakończeniu treningu.</li>
+</ul>
+<p><strong>Algorytm</strong>:</p>
+<ol type="1">
+<li>Powtarzaj:
+<ul>
+<li><span class="math inline">\(\mathbf{w} \gets \mathbf{w} - \eta \nabla_{\mathbf{w}} L(\mathbf{w})\)</span>.</li>
+</ul></li>
+<li>aż do osiągnięcia zbieżności.</li>
+<li>Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</li>
+</ol>
+</blockquote>
+</section>
+<section id="stochastic-gradient-descent-sgd" class="level3">
+<h3 class="anchored" data-anchor-id="stochastic-gradient-descent-sgd"><em>Stochastic gradient descent</em> (SGD)</h3>
+<p>Funkcja straty <span class="math inline">\(L(\mathbf{w})\)</span> często daje się zapisać jako suma strat dla poszczególnych próbek:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(\mathbf{w}) = \frac{1}{N} \sum_{n=1}^N L_n(\mathbf{w}),
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(L_n(\mathbf{w})\)</span> to strata dla próbki <span class="math inline">\(n\)</span>. Przykładowo, dla problemu regresji z funkcją straty MSE mamy:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(\mathbf{w}) = \frac{1}{N} \sum_{n=1}^N (y_n - f(\mathbf{x}_n, \mathbf{w}))^2 = \frac{1}{N} \sum_{n=1}^N L_n(\mathbf{w}),
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(L_n(\mathbf{w}) = (y_n - f(\mathbf{x}_n, \mathbf{w}))^2\)</span>. Podobnie dla entropii krzyżowej mamy:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(\mathbf{w}) = -\frac{1}{N} \sum_{n=1}^N\sum_{j=1}^K y_{nj} \log(f_j(\mathbf{x}_n, \mathbf{w})) = \frac{1}{N} \sum_{n=1}^N L_n(\mathbf{w}),
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(L_n(\mathbf{w}) = -\sum_{j=1}^K y_{nj} \log(f_j(\mathbf{x}_n, \mathbf{w}))\)</span>.</p>
+<p>Jeśli <span class="math inline">\(L(\mathbf{w})\)</span> można zapisać jak wyżej, to gradient <span class="math inline">\(\nabla_{\mathbf{w}} L(\mathbf{w})\)</span> jest równy średniej z gradientów <span class="math inline">\(L_n(\mathbf{w})\)</span>:</p>
+<p><span class="math display">\[\begin{equation*}
+  \nabla_{\mathbf{w}} L(\mathbf{w}) = \frac{1}{N} \sum_{n=1}^N \nabla_{\mathbf{w}} L_n(\mathbf{w}).
+\end{equation*}\]</span></p>
+<p>Obserwacja ta jest wykorzystywana w algorytmie <em>stochastic gradient descent</em> (SGD), który polega na tym, że w każdym kroku aktualizujemy parametry <span class="math inline">\(\mathbf{w}^{(\tau)}\)</span> wykorzystując gradient tylko dla jednej próbki <span class="math inline">\(n\)</span> zamiast dla całego zbioru jak w przypadku <em>batch gradient descent</em>. Matematycznie SGD definiuje ciąg <span class="math inline">\(\mathbf{w}^{(\tau)}\)</span> wzorem indukcyjnym:</p>
+<p><span class="math display">\[\begin{equation*}
+\begin{aligned}
+  \mathbf{w}^{(0)} &amp;= \text{losowo ustalona początkowa wartość parametrów modelu} \\
+  \mathbf{w}^{(\tau)} &amp;= \mathbf{w}^{(\tau - 1)} - \eta \nabla_{\mathbf{w}} L_n(\mathbf{w}^{(\tau - 1)}),\quad \tau = 1, 2, \ldots
+\end{aligned}
+\end{equation*}\]</span> gdzie <span class="math inline">\(n\)</span> jest numerem próbki zależnym od kroku <span class="math inline">\(\tau\)</span>.</p>
+<p>SGD w pseudokodzie:</p>
+<blockquote class="blockquote">
+<p><strong>Input</strong>:</p>
+<ul>
+<li>zbiór danych <span class="math inline">\(\mathcal{D} = \{(\mathbf{x}_n, y_n)\}_{n=1}^N\)</span>,</li>
+<li>funkcja straty <span class="math inline">\(L_n(\mathbf{w})\)</span> obliczana na podstawie próbki <span class="math inline">\(n\)</span>,</li>
+<li>współczynnik uczenia <span class="math inline">\(\eta&gt;0\)</span>,</li>
+<li>losowo inicjalizowana początkowa wartość parametrów modelu <span class="math inline">\(\mathbf{w}\)</span>.</li>
+</ul>
+<p><strong>Output</strong>:</p>
+<ul>
+<li>parametry modelu <span class="math inline">\(\mathbf{w}\)</span> po zakończeniu treningu.</li>
+</ul>
+<p><strong>Algorytm</strong>:</p>
+<ol type="1">
+<li><span class="math inline">\(n \gets 1\)</span>.</li>
+<li>Powtarzaj:
+<ul>
+<li><span class="math inline">\(\mathbf{w} \gets \mathbf{w} - \eta \nabla_{\mathbf{w}} L_n(\mathbf{w})\)</span></li>
+<li><span class="math inline">\(n \gets n + 1\)</span></li>
+<li>jeśli <span class="math inline">\(n &gt; N\)</span>, to:
+<ul>
+<li>wymieszaj dane <span class="math inline">\(\mathcal{D}\)</span>,</li>
+<li><span class="math inline">\(n \gets 1\)</span>.</li>
+</ul></li>
+</ul></li>
+<li>aż do osiągnięcia zbieżności.</li>
+<li>Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</li>
+</ol>
+</blockquote>
+<p>Algorytm ten w ciągu <span class="math inline">\(N\)</span> kroków pętli wykona <span class="math inline">\(N\)</span> aktualizacji parametrów <span class="math inline">\(\mathbf{w}\)</span> przepuszczając przez model wszystkie próbki. Korzysta się z następującej terminologii:</p>
+<ul>
+<li><strong>iteracja</strong> (<em>iteration</em>) — pojedyncza aktualizacja parametrów <span class="math inline">\(\mathbf{w}\)</span>, czyli przetworzenie jednej próbki,</li>
+<li><strong>epoka</strong> (<em>epoch</em>) — pełne przejście przez cały zbiór danych, czyli <span class="math inline">\(N\)</span> iteracji.</li>
+</ul>
+</section>
+</section>
+<section id="tensory-w-pytorch" class="level2">
+<h2 class="anchored" data-anchor-id="tensory-w-pytorch">Tensory w PyTorch</h2>
+<p>Na wykładzie 1 poznaliśmy tablice NumPy (<code>np.ndarray</code>) — wielowymiarowe tablice liczb, na których można wykonywać zwektoryzowane operacje. <strong>Tensor</strong> w PyTorch (<code>torch.Tensor</code>) to ten sam pomysł — wielowymiarowa tablica wartości numerycznych — ale z dodatkową infrastrukturą zaprojektowaną pod trening modeli uczenia maszynowego. Na tym wykładzie interesuje nas przede wszystkim to, że tensory pozwalają nam pisać kod w stylu bardzo zbliżonym do NumPy, a jednocześnie korzystać z narzędzi PyTorch takich jak <code>DataLoader</code>. Na kolejnym wykładzie zobaczymy drugą kluczową cechę tensorów: mechanizm <em>różniczkowania automatycznego</em>, który pozwala PyTorchowi samodzielnie obliczać gradienty.</p>
+<section id="tworzenie-tensorów" class="level3">
+<h3 class="anchored" data-anchor-id="tworzenie-tensorów">Tworzenie tensorów</h3>
+<p>Tworzenie tensorów wygląda znajomo:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Z listy Pythona</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Odpowiedniki np.zeros, np.ones, np.rand</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> torch.zeros(<span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>o <span class="op">=</span> torch.ones(<span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> torch.rand(<span class="dv">2</span>, <span class="dv">3</span>)       <span class="co"># U(0,1)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>rn <span class="op">=</span> torch.randn(<span class="dv">2</span>, <span class="dv">3</span>)     <span class="co"># N(0,1)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Z tablicy NumPy</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>])</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> torch.from_numpy(arr)   <span class="co"># współdzieli pamięć z arr!</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>t2 <span class="op">=</span> torch.tensor(arr)      <span class="co"># kopia</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="typy-danych" class="level3">
+<h3 class="anchored" data-anchor-id="typy-danych">Typy danych</h3>
+<p>Domyślny typ zmiennoprzecinkowy to <code>torch.float32</code> (w NumPy: <code>np.float64</code>). Jest to różnica, do której warto się przyzwyczaić — modele uczenia maszynowego zwykle pracują w pojedynczej precyzji.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.tensor([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])       <span class="co"># torch.int64</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>]) <span class="co"># torch.float32</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">2.0</span>], dtype<span class="op">=</span>torch.float64) <span class="co"># jawnie float64</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="numpy-a-pytorch-podręczna-ściągawka" class="level3">
+<h3 class="anchored" data-anchor-id="numpy-a-pytorch-podręczna-ściągawka">NumPy a PyTorch — podręczna ściągawka</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operacja</th>
+<th>NumPy</th>
+<th>PyTorch</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tworzenie z listy</td>
+<td><code>np.array([1,2,3])</code></td>
+<td><code>torch.tensor([1,2,3])</code></td>
+</tr>
+<tr class="even">
+<td>Zera / jedynki</td>
+<td><code>np.zeros((2,3))</code></td>
+<td><code>torch.zeros(2,3)</code></td>
+</tr>
+<tr class="odd">
+<td>Kształt</td>
+<td><code>a.shape</code></td>
+<td><code>t.shape</code> (lub <code>t.size()</code>)</td>
+</tr>
+<tr class="even">
+<td>Zmiana kształtu</td>
+<td><code>a.reshape(2,3)</code></td>
+<td><code>t.reshape(2,3)</code> (lub <code>t.view(2,3)</code>)</td>
+</tr>
+<tr class="odd">
+<td>Transpozycja</td>
+<td><code>a.T</code></td>
+<td><code>t.T</code> (lub <code>t.t()</code> dla 2D)</td>
+</tr>
+<tr class="even">
+<td>Łączenie</td>
+<td><code>np.concatenate</code></td>
+<td><code>torch.cat</code></td>
+</tr>
+<tr class="odd">
+<td>Mnożenie macierzowe</td>
+<td><code>a @ b</code></td>
+<td><code>t @ u</code> (lub <code>torch.matmul</code>)</td>
+</tr>
+<tr class="even">
+<td>Suma po osi</td>
+<td><code>a.sum(axis=0)</code></td>
+<td><code>t.sum(dim=0)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Warto zapamiętać dwie różnice terminologiczne: w PyTorch oś nazywa się <code>dim</code> (nie <code>axis</code>), a zmiana kształtu bez kopiowania danych to <code>view</code> (nie ma odpowiednika w NumPy — <code>reshape</code> w NumPy <em>może</em> zwrócić widok, ale nie gwarantuje tego).</p>
+</section>
+<section id="konwersja-między-numpy-i-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="konwersja-między-numpy-i-pytorch">Konwersja między NumPy i PyTorch</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NumPy → PyTorch</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> torch.from_numpy(arr)     <span class="co"># widok — współdzieli pamięć</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> torch.tensor(arr)          <span class="co"># kopia</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># PyTorch → NumPy</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> t.numpy()                <span class="co"># widok (tylko dla tensorów na CPU)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>torch.from_numpy</code> tworzy widok na te same dane, więc zmiana w jednym obiekcie zmieni drugi. Jeśli potrzebujemy niezależnej kopii, używamy <code>torch.tensor(arr)</code>.</p>
+</section>
+</section>
+<section id="tensordataset-i-dataloader" class="level2">
+<h2 class="anchored" data-anchor-id="tensordataset-i-dataloader"><code>TensorDataset</code> i <code>DataLoader</code></h2>
+<p>W pseudokodzie mini-batch gradient descent ręcznie dzieliliśmy dane na batche i w każdej epoce na nowo je mieszaliśmy. PyTorch automatyzuje ten wzorzec za pomocą dwóch klas:</p>
+<ul>
+<li><strong><code>TensorDataset</code></strong> — owija tensory danych (cechy i etykiety) w obiekt, z którego można pobierać próbki po indeksie.</li>
+<li><strong><code>DataLoader</code></strong> — przyjmuje <code>TensorDataset</code> (lub inny zbiór) i tworzy iterator, który w każdej epoce dzieli dane na mini-batche, opcjonalnie je mieszając.</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> TensorDataset, DataLoader</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Przykładowe dane: 100 próbek, 3 cechy</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> torch.randn(<span class="dv">100</span>, <span class="dv">3</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> torch.randn(<span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> TensorDataset(X, y)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> DataLoader(dataset, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Iteracja po <code>loader</code> w naturalny sposób realizuje schemat znany z pseudokodu:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X_batch, y_batch <span class="kw">in</span> loader:    <span class="co"># mini-batche</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># X_batch.shape == (16, 3)  — dla pełnych batchy</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># y_batch.shape == (16, 1)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        ...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>DataLoader</code> automatycznie zajmuje się:</p>
+<ul>
+<li>podziałem danych na mini-batche o zadanym rozmiarze,</li>
+<li>losowym mieszaniem kolejności próbek na początku każdej epoki (gdy <code>shuffle=True</code>),</li>
+<li>obsługą ostatniego, niepełnego mini-batcha (domyślnie jest on krótszy; parametr <code>drop_last=True</code> pozwala go pominąć).</li>
+</ul>
+</section>
+<section id="przykład-regresja-liniowa-metodą-mini-batch-gradient-descent" class="level2">
+<h2 class="anchored" data-anchor-id="przykład-regresja-liniowa-metodą-mini-batch-gradient-descent">Przykład: regresja liniowa metodą mini-batch gradient descent</h2>
+<p>Połączmy wszystkie elementy wykładu: zdefiniujemy model regresji liniowej, wyprowadzimy analitycznie gradient funkcji straty MSE, a następnie zaimplementujemy pętlę treningową z użyciem tensorów PyTorch i <code>DataLoader</code>.</p>
+<section id="model" class="level3">
+<h3 class="anchored" data-anchor-id="model">Model</h3>
+<p>Rozważamy model liniowy z wyrazem wolnym:</p>
+<p><span class="math display">\[\begin{equation*}
+  f(\mathbf{x}, \mathbf{w}) = w_0 + w_1 x_1 + \ldots + w_d x_d = \mathbf{x}^T \mathbf{w},
+\end{equation*}\]</span></p>
+<p>gdzie stosujemy konwencję, że <span class="math inline">\(x_0 = 1\)</span> (kolumna jedynek dołączona do danych), więc <span class="math inline">\(\mathbf{w} = (w_0, w_1, \ldots, w_d)^T\)</span>.</p>
+</section>
+<section id="funkcja-straty" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-straty">Funkcja straty</h3>
+<p>Funkcja straty MSE dla całego zbioru <span class="math inline">\(N\)</span> próbek:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(\mathbf{w}) = \frac{1}{N} \|\mathbf{y} - X\mathbf{w}\|^2 = \frac{1}{N} (\mathbf{y} - X\mathbf{w})^T (\mathbf{y} - X\mathbf{w}),
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(X \in \mathbb{R}^{N \times (d+1)}\)</span> to macierz danych (z kolumną jedynek), a <span class="math inline">\(\mathbf{y} \in \mathbb{R}^N\)</span> to wektor etykiet.</p>
+</section>
+<section id="gradient-wyprowadzenie" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-wyprowadzenie">Gradient — wyprowadzenie</h3>
+<p>Obliczmy gradient <span class="math inline">\(\nabla_{\mathbf{w}} L(\mathbf{w})\)</span>. Zaczniemy od rozwinięcia kwadratu normy. Niech <span class="math inline">\(\mathbf{r} = \mathbf{y} - X\mathbf{w}\)</span> będzie wektorem reszt (<em>residuals</em>). Wtedy:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(\mathbf{w}) = \frac{1}{N} \mathbf{r}^T \mathbf{r} = \frac{1}{N} (\mathbf{y} - X\mathbf{w})^T (\mathbf{y} - X\mathbf{w}).
+\end{equation*}\]</span></p>
+<p>Rozwijając iloczyn:</p>
+<p><span class="math display">\[\begin{equation*}
+  L(\mathbf{w}) = \frac{1}{N} \left( \mathbf{y}^T\mathbf{y} - 2\mathbf{y}^T X\mathbf{w} + \mathbf{w}^T X^T X \mathbf{w} \right).
+\end{equation*}\]</span></p>
+<p>Różniczkując po <span class="math inline">\(\mathbf{w}\)</span>:</p>
+<p><span class="math display">\[\begin{equation*}
+  \nabla_{\mathbf{w}} L(\mathbf{w}) = \frac{1}{N} \left( -2 X^T \mathbf{y} + 2 X^T X \mathbf{w} \right) = -\frac{2}{N} X^T (\mathbf{y} - X\mathbf{w}).
+\end{equation*}\]</span></p>
+<p>Dla mini-batcha <span class="math inline">\(B\)</span> próbek o indeksach <span class="math inline">\(\{n_1, \ldots, n_B\}\)</span> wzór przyjmuje identyczną postać, ale z podmacierzami <span class="math inline">\(X_B\)</span> i <span class="math inline">\(\mathbf{y}_B\)</span>:</p>
+<p><span class="math display">\[\begin{equation*}
+  \nabla_{\mathbf{w}} L_B(\mathbf{w}) = -\frac{2}{B} X_B^T (\mathbf{y}_B - X_B \mathbf{w}).
+\end{equation*}\]</span></p>
+</section>
+<section id="implementacja" class="level3">
+<h3 class="anchored" data-anchor-id="implementacja">Implementacja</h3>
+<div id="cell-6" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> TensorDataset, DataLoader</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wygenerujmy dane syntetyczne. Prawdziwa zależność to <span class="math inline">\(y = 3 + 2x_1 - x_2 + \varepsilon\)</span>:</p>
+<div id="cell-8" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>torch.manual_seed(<span class="dv">42</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">200</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>X_raw <span class="op">=</span> torch.randn(N, d)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>w_true <span class="op">=</span> torch.tensor([<span class="fl">3.0</span>, <span class="fl">2.0</span>, <span class="op">-</span><span class="fl">1.0</span>])  <span class="co"># w0=3, w1=2, w2=-1</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Dołączamy kolumnę jedynek (wyraz wolny)</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> torch.cat([torch.ones(N, <span class="dv">1</span>), X_raw], dim<span class="op">=</span><span class="dv">1</span>)  <span class="co"># (N, d+1)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> X <span class="op">@</span> w_true <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> torch.randn(N)            <span class="co"># (N,)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Przygotujmy <code>DataLoader</code>:</p>
+<div id="cell-10" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> TensorDataset(X, y)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> DataLoader(dataset, batch_size<span class="op">=</span>batch_size, shuffle<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Inicjalizujemy wagi losowo i uruchamiamy pętlę treningową:</p>
+<div id="cell-12" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> torch.randn(d <span class="op">+</span> <span class="dv">1</span>)  <span class="co"># losowa inicjalizacja</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>eta <span class="op">=</span> <span class="fl">0.05</span>               <span class="co"># learning rate</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> []</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    epoch_loss <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    num_batches <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X_batch, y_batch <span class="kw">in</span> loader:</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Predykcja</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        y_pred <span class="op">=</span> X_batch <span class="op">@</span> w</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Strata MSE na mini-batchu</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        residuals <span class="op">=</span> y_batch <span class="op">-</span> y_pred</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> (residuals <span class="op">**</span> <span class="dv">2</span>).mean()</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Gradient — wzór analityczny</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        grad <span class="op">=</span> <span class="op">-</span><span class="fl">2.0</span> <span class="op">/</span> X_batch.shape[<span class="dv">0</span>] <span class="op">*</span> (X_batch.T <span class="op">@</span> residuals)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Aktualizacja parametrów</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        w <span class="op">=</span> w <span class="op">-</span> eta <span class="op">*</span> grad</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>        epoch_loss <span class="op">+=</span> loss.item()</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        num_batches <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    avg_loss <span class="op">=</span> epoch_loss <span class="op">/</span> num_batches</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    history.append(avg_loss)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (epoch <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Epoka </span><span class="sc">{</span>epoch<span class="op">+</span><span class="dv">1</span><span class="sc">:3d}</span><span class="ss">/</span><span class="sc">{</span>num_epochs<span class="sc">}</span><span class="ss">, MSE: </span><span class="sc">{</span>avg_loss<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoka  10/50, MSE: 0.2302
+Epoka  20/50, MSE: 0.2256
+Epoka  30/50, MSE: 0.2283
+Epoka  40/50, MSE: 0.2279
+Epoka  50/50, MSE: 0.2387</code></pre>
+</div>
+</div>
+</section>
+<section id="wyniki" class="level3">
+<h3 class="anchored" data-anchor-id="wyniki">Wyniki</h3>
+<p>Porównajmy wyuczone wagi z prawdziwymi:</p>
+<div id="cell-14" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Prawdziwe wagi:  </span><span class="sc">{</span>w_true<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Wyuczone wagi:   </span><span class="sc">{</span>[<span class="bu">round</span>(wi, <span class="dv">4</span>) <span class="cf">for</span> wi <span class="kw">in</span> w.tolist()]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Prawdziwe wagi:  [3.0, 2.0, -1.0]
+Wyuczone wagi:   [2.9541, 2.0085, -0.9647]</code></pre>
+</div>
+</div>
+<p>Wizualizacja spadku funkcji straty:</p>
+<div id="cell-16" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ax.plot(history)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Epoka"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"MSE (średnia z mini-batchy)"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Krzywa uczenia — regresja liniowa, mini-batch GD"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_4_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="dyskusja" class="level3">
+<h3 class="anchored" data-anchor-id="dyskusja">Dyskusja</h3>
+<p>Zwróćmy uwagę na kilka elementów tego przykładu.</p>
+<p><strong>Ręczne obliczanie gradientu</strong> — musieliśmy sami wyprowadzić wzór na <span class="math inline">\(\nabla_{\mathbf{w}} L\)</span> i zaprogramować go w linijce <code>grad = -2.0 / X_batch.shape[0] * (X_batch.T @ residuals)</code>. Dla regresji liniowej z MSE wzór jest prosty, ale dla bardziej złożonych modeli (sieci neuronowe, funkcje nieliniowe) wyprowadzanie gradientów ręcznie staje się niepraktyczne lub wręcz niemożliwe. Na następnym wykładzie poznamy mechanizm <em>różniczkowania automatycznego</em> (<em>autograd</em>) wbudowany w PyTorch, który zdejmie z nas ten obowiązek.</p>
+<p><strong>Rola <code>DataLoader</code></strong> — bez niego musielibyśmy ręcznie implementować mieszanie danych i podział na batche, co jest dokładnie tym, co opisywaliśmy w pseudokodzie. <code>DataLoader</code> realizuje ten wzorzec automatycznie.</p>
+<p><strong>Brak konwergencji do zera</strong> — funkcja straty nie spada do zera, ponieważ dane zawierają szum (<span class="math inline">\(\varepsilon\)</span>). Jest to zachowanie prawidłowe: model prawidłowo odzyskuje trend, ale nie może dopasować się do losowego szumu.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
