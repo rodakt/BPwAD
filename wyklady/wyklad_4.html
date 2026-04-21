@@ -485,8 +485,26 @@ window.Quarto = {
 <li>rozmiar <em>mini-batcha</em> <span class="math inline">\(B\)</span>,</li>
 <li>losowo inicjalizowana początkowa wartość parametrów modelu <span class="math inline">\(\mathbf{w}\)</span>.</li>
 </ul>
-<p><strong>Output</strong>: * parametry modelu <span class="math inline">\(\mathbf{w}\)</span> po zakończeniu treningu.</p>
-<p><strong>Algorytm</strong>: 1. <span class="math inline">\(n \gets 1\)</span>. 2. Powtarzaj: * <span class="math inline">\(\mathbf{w} \gets \mathbf{w} - \eta \nabla_{\mathbf{w}} L_{n:n+B}(\mathbf{w})\)</span> * <span class="math inline">\(n \gets n + B\)</span> * jeśli <span class="math inline">\(n &gt; N\)</span>, to: * wymieszaj dane <span class="math inline">\(\mathcal{D}\)</span>, * <span class="math inline">\(n \gets 1\)</span>. 3. aż do osiągnięcia zbieżności. 4. Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</p>
+<p><strong>Output</strong>:</p>
+<ul>
+<li>parametry modelu <span class="math inline">\(\mathbf{w}\)</span> po zakończeniu treningu.</li>
+</ul>
+<p><strong>Algorytm</strong>:</p>
+<ol type="1">
+<li><span class="math inline">\(n \gets 1\)</span>.</li>
+<li>Powtarzaj:
+<ul>
+<li><span class="math inline">\(\mathbf{w} \gets \mathbf{w} - \eta \nabla_{\mathbf{w}} L_{n:n+B}(\mathbf{w})\)</span></li>
+<li><span class="math inline">\(n \gets n + B\)</span></li>
+<li>jeśli <span class="math inline">\(n &gt; N\)</span>, to:
+<ul>
+<li>wymieszaj dane <span class="math inline">\(\mathcal{D}\)</span>,</li>
+<li><span class="math inline">\(n \gets 1\)</span>.</li>
+</ul></li>
+</ul></li>
+<li>aż do osiągnięcia zbieżności.</li>
+<li>Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</li>
+</ol>
 <p>W tym algorytmie <strong>iteracja</strong> to przetworzenie <em>mini-batcha</em> <span class="math inline">\(B\)</span> próbek, a <strong>epoka</strong> to, tak jak poprzednio, pełne przejście przez cały zbiór danych, czyli <span class="math inline">\(N/B\)</span> iteracji.</p>
 <p>Wyżej założyliśmy dla uproszczenia, że <span class="math inline">\(N\)</span> jest podzielne przez <span class="math inline">\(B\)</span>. Jeśli tak nie jest, to w ostatniej iteracji po prostu przetwarzamy wszystkie pozostałe próbki, które nie zmieściły się w pełnych <em>mini-batchach</em>.</p>
 </section>
