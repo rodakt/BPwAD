@@ -281,6 +281,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#batch-gradient-descent" id="toc-batch-gradient-descent" class="nav-link" data-scroll-target="#batch-gradient-descent"><em>Batch gradient descent</em></a></li>
   <li><a href="#stochastic-gradient-descent-sgd" id="toc-stochastic-gradient-descent-sgd" class="nav-link" data-scroll-target="#stochastic-gradient-descent-sgd"><em>Stochastic gradient descent</em> (SGD)</a></li>
+  <li><a href="#mini-batch-gradient-descent" id="toc-mini-batch-gradient-descent" class="nav-link" data-scroll-target="#mini-batch-gradient-descent"><em>Mini-batch gradient descent</em></a></li>
   </ul></li>
   <li><a href="#tensory-w-pytorch" id="toc-tensory-w-pytorch" class="nav-link" data-scroll-target="#tensory-w-pytorch">Tensory w PyTorch</a>
   <ul class="collapse">
@@ -369,20 +370,19 @@ window.Quarto = {
 \end{aligned}
 \end{equation*}\]</span></p>
 <p>gdzie <strong>współczynnik uczenia</strong> (<em>learning rate</em>) <span class="math inline">\(\eta&gt;0\)</span> jest hiperparametrem algorytmu.</p>
-<p><em>Batch gradient descent</em> w pseudokodzie:</p>
-<blockquote class="blockquote">
-<p><strong>Input</strong>:</p>
+<section id="algorytm-batch-gradient-descent" class="level4">
+<h4 class="anchored" data-anchor-id="algorytm-batch-gradient-descent">Algorytm <em>Batch gradient descent</em></h4>
+<p><strong>Wejście</strong>:</p>
 <ul>
 <li>zbiór danych <span class="math inline">\(\mathcal{D} = \{(\mathbf{x}_n, y_n)\}_{n=1}^N\)</span>,</li>
 <li>funkcja straty <span class="math inline">\(L(\mathbf{w})\)</span> obliczana na podstawie całego zbioru danych <span class="math inline">\(\mathcal{D}\)</span></li>
 <li>współczynnik uczenia <span class="math inline">\(\eta&gt;0\)</span>,</li>
 <li>losowo inicjalizowana początkowa wartość parametrów modelu <span class="math inline">\(\mathbf{w}\)</span>.</li>
 </ul>
-<p><strong>Output</strong>:</p>
+<p><strong>Wyjście</strong>:</p>
 <ul>
 <li>parametry modelu <span class="math inline">\(\mathbf{w}\)</span> po zakończeniu treningu.</li>
 </ul>
-<p><strong>Algorytm</strong>:</p>
 <ol type="1">
 <li>Powtarzaj:
 <ul>
@@ -391,7 +391,7 @@ window.Quarto = {
 <li>aż do osiągnięcia zbieżności.</li>
 <li>Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</li>
 </ol>
-</blockquote>
+</section>
 </section>
 <section id="stochastic-gradient-descent-sgd" class="level3">
 <h3 class="anchored" data-anchor-id="stochastic-gradient-descent-sgd"><em>Stochastic gradient descent</em> (SGD)</h3>
@@ -419,8 +419,8 @@ window.Quarto = {
   \mathbf{w}^{(\tau)} &amp;= \mathbf{w}^{(\tau - 1)} - \eta \nabla_{\mathbf{w}} L_n(\mathbf{w}^{(\tau - 1)}),\quad \tau = 1, 2, \ldots
 \end{aligned}
 \end{equation*}\]</span> gdzie <span class="math inline">\(n\)</span> jest numerem próbki zależnym od kroku <span class="math inline">\(\tau\)</span>.</p>
-<p>SGD w pseudokodzie:</p>
-<blockquote class="blockquote">
+<section id="algorytm-stochastic-gradient-descent-sgd" class="level4">
+<h4 class="anchored" data-anchor-id="algorytm-stochastic-gradient-descent-sgd">Algorytm <em>Stochastic gradient descent</em> (SGD)</h4>
 <p><strong>Input</strong>:</p>
 <ul>
 <li>zbiór danych <span class="math inline">\(\mathcal{D} = \{(\mathbf{x}_n, y_n)\}_{n=1}^N\)</span>,</li>
@@ -448,12 +448,48 @@ window.Quarto = {
 <li>aż do osiągnięcia zbieżności.</li>
 <li>Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</li>
 </ol>
-</blockquote>
 <p>Algorytm ten w ciągu <span class="math inline">\(N\)</span> kroków pętli wykona <span class="math inline">\(N\)</span> aktualizacji parametrów <span class="math inline">\(\mathbf{w}\)</span> przepuszczając przez model wszystkie próbki. Korzysta się z następującej terminologii:</p>
 <ul>
 <li><strong>iteracja</strong> (<em>iteration</em>) — pojedyncza aktualizacja parametrów <span class="math inline">\(\mathbf{w}\)</span>, czyli przetworzenie jednej próbki,</li>
 <li><strong>epoka</strong> (<em>epoch</em>) — pełne przejście przez cały zbiór danych, czyli <span class="math inline">\(N\)</span> iteracji.</li>
 </ul>
+</section>
+</section>
+<section id="mini-batch-gradient-descent" class="level3">
+<h3 class="anchored" data-anchor-id="mini-batch-gradient-descent"><em>Mini-batch gradient descent</em></h3>
+<p><em>Mini-batch gradient descent</em> jest kompromisem pomiędzy <em>batch gradient descent</em> a SGD: aktualizacja parametrów <span class="math inline">\(\mathbf{w}^{(\tau)}\)</span> odbywa się na podstawie gradientu funkcji straty <span class="math inline">\(L(\mathbf{w})\)</span> obliczonego na podstawie <em>mini-batcha</em> próbek - podzbioru większego niż jedna próbka, ale mniejszego (zwykle znacznie) niż cały zbiór.</p>
+<p>Niech <span class="math inline">\(B\)</span> będzie liczbą próbek w <em>mini-batchu</em>. Jest to, podobnie jak <span class="math inline">\(\eta\)</span>, hiperparametr algorytmu. Formalnie <span class="math inline">\(B\)</span> jest dowolną liczbą między 1 a <span class="math inline">\(N\)</span>, w praktyce jest zazwyczaj ustalane jako jakaś potęga 2. Możemy teraz dokonać uogólnienia wzoru z paragrafu o SGD:</p>
+<p><span class="math display">\[\begin{equation*}
+\begin{split}
+  L(\mathbf{w}) &amp;= \frac{1}{N} \sum_{n=1}^N L_n(\mathbf{w})
+  = \frac{B}{N} \sum_{k=1}^{N/B} \frac{1}{B} \sum_{j=1}^B L_{(k-1)B + j}(\mathbf{w})\\
+  &amp;= \frac{B}{N} \sum_{k=1}^{N/B} L_{(k-1)B + 1, (k-1)B + 2, \ldots, kB}(\mathbf{w}),
+\end{split}
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(L_{(k-1)B + 1, (k-1)B + 2, \ldots, kB}(\mathbf{w})\)</span> to strata dla próbek z <em>mini-batcha</em> o numerach od <span class="math inline">\((k-1)B + 1\)</span> do <span class="math inline">\(kB\)</span>. W każdym kroku aktualizujemy parametry <span class="math inline">\(\mathbf{w}^{(\tau)}\)</span> wykorzystując gradient obliczony na batchu <span class="math inline">\(B\)</span> próbek.</p>
+<p>Matematycznie:</p>
+<p><span class="math display">\[\begin{equation*}
+\begin{aligned}
+  \mathbf{w}^{(0)} &amp;= \text{losowo ustalona początkowa wartość parametrów modelu} \\
+  \mathbf{w}^{(\tau)} &amp;= \mathbf{w}^{(\tau - 1)} - \eta \nabla_{\mathbf{w}} L_{n_1, n_2, \ldots, n_B}(\mathbf{w}^{(\tau - 1)}),\quad \tau = 1, 2, \ldots
+\end{aligned}
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(n_1, n_2, \ldots, n_B\)</span> to numery próbek w <em>mini-batchu</em> zależne od kroku <span class="math inline">\(\tau\)</span>.</p>
+<section id="algorytm-mini-batch-gradient-descent" class="level4">
+<h4 class="anchored" data-anchor-id="algorytm-mini-batch-gradient-descent">Algorytm <em>Mini-batch gradient descent</em></h4>
+<p><strong>Input</strong>:</p>
+<ul>
+<li>zbiór danych <span class="math inline">\(\mathcal{D} = \{(\mathbf{x}_n, y_n)\}_{n=1}^N\)</span>,</li>
+<li>funkcja straty <span class="math inline">\(L_{n:n+B}(\mathbf{w})\)</span> obliczana na podstawie próbek <span class="math inline">\(n:n+B\)</span>,</li>
+<li>współczynnik uczenia <span class="math inline">\(\eta&gt;0\)</span>,</li>
+<li>rozmiar <em>mini-batcha</em> <span class="math inline">\(B\)</span>,</li>
+<li>losowo inicjalizowana początkowa wartość parametrów modelu <span class="math inline">\(\mathbf{w}\)</span>.</li>
+</ul>
+<p><strong>Output</strong>: * parametry modelu <span class="math inline">\(\mathbf{w}\)</span> po zakończeniu treningu.</p>
+<p><strong>Algorytm</strong>: 1. <span class="math inline">\(n \gets 1\)</span>. 2. Powtarzaj: * <span class="math inline">\(\mathbf{w} \gets \mathbf{w} - \eta \nabla_{\mathbf{w}} L_{n:n+B}(\mathbf{w})\)</span> * <span class="math inline">\(n \gets n + B\)</span> * jeśli <span class="math inline">\(n &gt; N\)</span>, to: * wymieszaj dane <span class="math inline">\(\mathcal{D}\)</span>, * <span class="math inline">\(n \gets 1\)</span>. 3. aż do osiągnięcia zbieżności. 4. Zwróć <span class="math inline">\(\mathbf{w}\)</span>.</p>
+<p>W tym algorytmie <strong>iteracja</strong> to przetworzenie <em>mini-batcha</em> <span class="math inline">\(B\)</span> próbek, a <strong>epoka</strong> to, tak jak poprzednio, pełne przejście przez cały zbiór danych, czyli <span class="math inline">\(N/B\)</span> iteracji.</p>
+<p>Wyżej założyliśmy dla uproszczenia, że <span class="math inline">\(N\)</span> jest podzielne przez <span class="math inline">\(B\)</span>. Jeśli tak nie jest, to w ostatniej iteracji po prostu przetwarzamy wszystkie pozostałe próbki, które nie zmieściły się w pełnych <em>mini-batchach</em>.</p>
+</section>
 </section>
 </section>
 <section id="tensory-w-pytorch" class="level2">
@@ -625,14 +661,14 @@ window.Quarto = {
 </section>
 <section id="implementacja" class="level3">
 <h3 class="anchored" data-anchor-id="implementacja">Implementacja</h3>
-<div id="cell-6" class="cell" data-execution_count="1">
+<div id="cell-9" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> TensorDataset, DataLoader</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Wygenerujmy dane syntetyczne. Prawdziwa zależność to <span class="math inline">\(y = 3 + 2x_1 - x_2 + \varepsilon\)</span>:</p>
-<div id="cell-8" class="cell" data-execution_count="2">
+<div id="cell-11" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>torch.manual_seed(<span class="dv">42</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">200</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">2</span></span>
@@ -645,13 +681,13 @@ window.Quarto = {
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> X <span class="op">@</span> w_true <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> torch.randn(N)            <span class="co"># (N,)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Przygotujmy <code>DataLoader</code>:</p>
-<div id="cell-10" class="cell" data-execution_count="3">
+<div id="cell-13" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> TensorDataset(X, y)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>batch_size <span class="op">=</span> <span class="dv">32</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> DataLoader(dataset, batch_size<span class="op">=</span>batch_size, shuffle<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Inicjalizujemy wagi losowo i uruchamiamy pętlę treningową:</p>
-<div id="cell-12" class="cell" data-execution_count="4">
+<div id="cell-15" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> torch.randn(d <span class="op">+</span> <span class="dv">1</span>)  <span class="co"># losowa inicjalizacja</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>eta <span class="op">=</span> <span class="fl">0.05</span>               <span class="co"># learning rate</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">50</span></span>
@@ -694,7 +730,7 @@ Epoka  50/50, MSE: 0.2387</code></pre>
 <section id="wyniki" class="level3">
 <h3 class="anchored" data-anchor-id="wyniki">Wyniki</h3>
 <p>Porównajmy wyuczone wagi z prawdziwymi:</p>
-<div id="cell-14" class="cell" data-execution_count="5">
+<div id="cell-17" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Prawdziwe wagi:  </span><span class="sc">{</span>w_true<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Wyuczone wagi:   </span><span class="sc">{</span>[<span class="bu">round</span>(wi, <span class="dv">4</span>) <span class="cf">for</span> wi <span class="kw">in</span> w.tolist()]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -703,14 +739,12 @@ Wyuczone wagi:   [2.9541, 2.0085, -0.9647]</code></pre>
 </div>
 </div>
 <p>Wizualizacja spadku funkcji straty:</p>
-<div id="cell-16" class="cell" data-execution_count="6">
+<div id="cell-19" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ax.plot(history)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Epoka"</span>)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"MSE (średnia z mini-batchy)"</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Krzywa uczenia — regresja liniowa, mini-batch GD"</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Krzywa uczenia — regresja liniowa, mini-batch GD"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
