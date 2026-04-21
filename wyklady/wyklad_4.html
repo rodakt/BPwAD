@@ -705,10 +705,10 @@ window.Quarto = {
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>loader <span class="op">=</span> DataLoader(dataset, batch_size<span class="op">=</span>batch_size, shuffle<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Inicjalizujemy wagi losowo i uruchamiamy pętlę treningową:</p>
-<div id="cell-15" class="cell" data-execution_count="4">
+<div id="cell-15" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> torch.randn(d <span class="op">+</span> <span class="dv">1</span>)  <span class="co"># losowa inicjalizacja</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>eta <span class="op">=</span> <span class="fl">0.05</span>               <span class="co"># learning rate</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">10</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> []</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
@@ -737,29 +737,25 @@ window.Quarto = {
 <span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (epoch <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>:</span>
 <span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Epoka </span><span class="sc">{</span>epoch<span class="op">+</span><span class="dv">1</span><span class="sc">:3d}</span><span class="ss">/</span><span class="sc">{</span>num_epochs<span class="sc">}</span><span class="ss">, MSE: </span><span class="sc">{</span>avg_loss<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Epoka  10/50, MSE: 0.2302
-Epoka  20/50, MSE: 0.2256
-Epoka  30/50, MSE: 0.2283
-Epoka  40/50, MSE: 0.2279
-Epoka  50/50, MSE: 0.2387</code></pre>
+<pre><code>Epoka  10/10, MSE: 0.2204</code></pre>
 </div>
 </div>
 </section>
 <section id="wyniki" class="level3">
 <h3 class="anchored" data-anchor-id="wyniki">Wyniki</h3>
 <p>Porównajmy wyuczone wagi z prawdziwymi:</p>
-<div id="cell-17" class="cell" data-execution_count="5">
+<div id="cell-17" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Prawdziwe wagi:  </span><span class="sc">{</span>w_true<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Wyuczone wagi:   </span><span class="sc">{</span>[<span class="bu">round</span>(wi, <span class="dv">4</span>) <span class="cf">for</span> wi <span class="kw">in</span> w.tolist()]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Prawdziwe wagi:  [3.0, 2.0, -1.0]
-Wyuczone wagi:   [2.9541, 2.0085, -0.9647]</code></pre>
+Wyuczone wagi:   [2.9771, 1.9661, -0.953]</code></pre>
 </div>
 </div>
 <p>Wizualizacja spadku funkcji straty:</p>
-<div id="cell-19" class="cell">
+<div id="cell-19" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ax.plot(history)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ax.plot(history, marker<span class="op">=</span><span class="st">"o"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Epoka"</span>)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"MSE (średnia z mini-batchy)"</span>)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Krzywa uczenia — regresja liniowa, mini-batch GD"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
