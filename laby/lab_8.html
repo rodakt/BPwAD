@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 8: Trening modeli gradientem prostym w PyTorch – Biblioteki Python w analizie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9eb2dcf4296333510909099cc84966dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Trening modeli gradientem prostym w PyTorch</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: Optuna - optymalizacja hiperparametrów</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Własne estymatory scikit-learn</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Potoki i kroswalidacja</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Optuna</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 7: Metoda gradientu prostego</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_8.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 8: Trening modeli gradientem prostym w PyTorch</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#rozgrzewka-tensory-pytorch" id="toc-rozgrzewka-tensory-pytorch" class="nav-link active" data-scroll-target="#rozgrzewka-tensory-pytorch">1. Rozgrzewka: tensory PyTorch</a>
+  <ul class="collapse">
+  <li><a href="#tworzenie-tensorów-i-typy-danych" id="toc-tworzenie-tensorów-i-typy-danych" class="nav-link" data-scroll-target="#tworzenie-tensorów-i-typy-danych">1.1 Tworzenie tensorów i typy danych</a></li>
+  <li><a href="#numpy-pytorch" id="toc-numpy-pytorch" class="nav-link" data-scroll-target="#numpy-pytorch">1.2 NumPy ↔︎ PyTorch</a></li>
+  <li><a href="#operacje-na-tensorach" id="toc-operacje-na-tensorach" class="nav-link" data-scroll-target="#operacje-na-tensorach">1.3 Operacje na tensorach</a></li>
+  <li><a href="#tensordataset-i-dataloader" id="toc-tensordataset-i-dataloader" class="nav-link" data-scroll-target="#tensordataset-i-dataloader">1.4 <code>TensorDataset</code> i <code>DataLoader</code></a></li>
+  <li><a href="#opcjonalnie-gpu" id="toc-opcjonalnie-gpu" class="nav-link" data-scroll-target="#opcjonalnie-gpu">1.5 (Opcjonalnie) GPU</a></li>
+  </ul></li>
+  <li><a href="#regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych" id="toc-regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych" class="nav-link" data-scroll-target="#regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych">2. Regresja liniowa z bazami gaussowskimi na plamach słonecznych</a>
+  <ul class="collapse">
+  <li><a href="#pobranie-i-przygotowanie-danych" id="toc-pobranie-i-przygotowanie-danych" class="nav-link" data-scroll-target="#pobranie-i-przygotowanie-danych">2.1 Pobranie i przygotowanie danych</a></li>
+  <li><a href="#standaryzacja-czasu" id="toc-standaryzacja-czasu" class="nav-link" data-scroll-target="#standaryzacja-czasu">2.2 Standaryzacja czasu</a></li>
+  <li><a href="#bazy-gaussowskie" id="toc-bazy-gaussowskie" class="nav-link" data-scroll-target="#bazy-gaussowskie">2.3 Bazy gaussowskie</a></li>
+  <li><a href="#model-funkcja-straty-i-gradient" id="toc-model-funkcja-straty-i-gradient" class="nav-link" data-scroll-target="#model-funkcja-straty-i-gradient">2.4 Model, funkcja straty i gradient</a></li>
+  <li><a href="#podział-trainval-i-dataloader" id="toc-podział-trainval-i-dataloader" class="nav-link" data-scroll-target="#podział-trainval-i-dataloader">2.5 Podział train/val i <code>DataLoader</code></a></li>
+  <li><a href="#pętla-treningowa" id="toc-pętla-treningowa" class="nav-link" data-scroll-target="#pętla-treningowa">2.6 Pętla treningowa</a></li>
+  <li><a href="#wizualizacja-dopasowania" id="toc-wizualizacja-dopasowania" class="nav-link" data-scroll-target="#wizualizacja-dopasowania">2.7 Wizualizacja dopasowania</a></li>
+  <li><a href="#sanity-check-z-rozwiązaniem-analitycznym-ols" id="toc-sanity-check-z-rozwiązaniem-analitycznym-ols" class="nav-link" data-scroll-target="#sanity-check-z-rozwiązaniem-analitycznym-ols">2.8 Sanity check z rozwiązaniem analitycznym (OLS)</a></li>
+  <li><a href="#eksperymenty-z-hiperparametrami" id="toc-eksperymenty-z-hiperparametrami" class="nav-link" data-scroll-target="#eksperymenty-z-hiperparametrami">2.9 Eksperymenty z hiperparametrami</a></li>
+  <li><a href="#co-model-myśli-o-przyszłości" id="toc-co-model-myśli-o-przyszłości" class="nav-link" data-scroll-target="#co-model-myśli-o-przyszłości">2.10 Co model “myśli” o przyszłości?</a></li>
+  </ul></li>
+  <li><a href="#regresja-logistyczna-klasyfikacja-binarna" id="toc-regresja-logistyczna-klasyfikacja-binarna" class="nav-link" data-scroll-target="#regresja-logistyczna-klasyfikacja-binarna">3. Regresja logistyczna — klasyfikacja binarna</a>
+  <ul class="collapse">
+  <li><a href="#dane" id="toc-dane" class="nav-link" data-scroll-target="#dane">3.1 Dane</a></li>
+  <li><a href="#implementacja-sigmoid-i-bce" id="toc-implementacja-sigmoid-i-bce" class="nav-link" data-scroll-target="#implementacja-sigmoid-i-bce">3.2 Implementacja sigmoid i BCE</a></li>
+  <li><a href="#pętla-treningowa-1" id="toc-pętla-treningowa-1" class="nav-link" data-scroll-target="#pętla-treningowa-1">3.3 Pętla treningowa</a></li>
+  <li><a href="#krzywe-uczenia-i-ewaluacja" id="toc-krzywe-uczenia-i-ewaluacja" class="nav-link" data-scroll-target="#krzywe-uczenia-i-ewaluacja">3.4 Krzywe uczenia i ewaluacja</a></li>
+  <li><a href="#sanity-check-ze-scikit-learn" id="toc-sanity-check-ze-scikit-learn" class="nav-link" data-scroll-target="#sanity-check-ze-scikit-learn">3.5 Sanity check ze scikit-learn</a></li>
+  </ul></li>
+  <li><a href="#podsumowanie-i-zapowiedź-wykładu-5" id="toc-podsumowanie-i-zapowiedź-wykładu-5" class="nav-link" data-scroll-target="#podsumowanie-i-zapowiedź-wykładu-5">4. Podsumowanie i zapowiedź wykładu 5</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Trening modeli gradientem prostym w PyTorch</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 8: Trening modeli gradientem prostym w PyTorch</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_8.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<p>Na lab 7 stosowaliśmy metodę gradientu prostego do minimalizacji funkcji matematycznych — bez danych, bez modeli. Na wykładzie 4 zobaczyliśmy, że trening modeli uczenia maszynowego to w istocie <strong>minimalizacja funkcji straty</strong> i że w tej roli można wykorzystać dokładnie ten sam algorytm, tyle że zastosowany do funkcji zależnej od zbioru danych.</p>
+<p>W tym arkuszu połączymy oba wątki: zastosujemy mini-batch gradient descent w PyTorch do treningu dwóch klasycznych modeli parametrycznych — regresji liniowej z nieliniowymi cechami (sekcja 2) oraz regresji logistycznej (sekcja 3). Gradienty będziemy nadal wyprowadzać i programować ręcznie; mechanizm różniczkowania automatycznego (<em>autograd</em>), który zdejmie z nas ten obowiązek, poznamy na wykładzie 5.</p>
+<div id="cell-1" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> TensorDataset, DataLoader</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="rozgrzewka-tensory-pytorch" class="level2">
+<h2 class="anchored" data-anchor-id="rozgrzewka-tensory-pytorch">1. Rozgrzewka: tensory PyTorch</h2>
+<p>Na wykładzie 4 poznaliśmy tensory jako “numpy’owe tablice z dodatkową infrastrukturą”. Zanim przejdziemy do treningu modeli, wykonajmy kilka krótkich zadań rozgrzewkowych, żeby nabrać wprawy w składni.</p>
+<section id="tworzenie-tensorów-i-typy-danych" class="level3">
+<h3 class="anchored" data-anchor-id="tworzenie-tensorów-i-typy-danych">1.1 Tworzenie tensorów i typy danych</h3>
+<ol type="1">
+<li>Utwórz tensor <code>a</code> z listy <code>[1.0, 2.0, 3.0, 4.0]</code>. Wypisz <code>a.shape</code>, <code>a.dtype</code> i <code>a.ndim</code>.</li>
+<li>Utwórz tensor <code>b</code> z listy <code>[1, 2, 3, 4]</code> (bez kropek). Jaki jest jego <code>dtype</code>? Porównaj z poprzednim.</li>
+<li>Utwórz tensor <code>z</code> wypełniony zerami o kształcie <code>(3, 4)</code> oraz tensor <code>r</code> o tym samym kształcie wypełniony liczbami z rozkładu <span class="math inline">\(\mathcal{N}(0, 1)\)</span>.</li>
+<li>Jakiego typu zmiennoprzecinkowego używa domyślnie PyTorch? Jakiego NumPy? Sprawdź eksperymentalnie.</li>
+</ol>
+</section>
+<section id="numpy-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="numpy-pytorch">1.2 NumPy ↔︎ PyTorch</h3>
+<ol type="1">
+<li>Utwórz tablicę NumPy <code>arr = np.array([[1.0, 2.0], [3.0, 4.0]])</code>.</li>
+<li>Przekształć ją na tensor dwoma sposobami: przez <code>torch.from_numpy(arr)</code> oraz przez <code>torch.tensor(arr)</code>.</li>
+<li>Zmień jeden element oryginalnej tablicy NumPy: <code>arr[0, 0] = 99.0</code>. Który z dwóch tensorów “widzi” tę zmianę, a który nie? Wyjaśnij.</li>
+</ol>
+</section>
+<section id="operacje-na-tensorach" class="level3">
+<h3 class="anchored" data-anchor-id="operacje-na-tensorach">1.3 Operacje na tensorach</h3>
+<p>Niech <span class="math inline">\(X \in \mathbb{R}^{5 \times 3}\)</span> będzie losowym tensorem, a <span class="math inline">\(w \in \mathbb{R}^3\)</span> wektorem wag. Zaimplementuj następujące operacje (każdą jedną linijką):</p>
+<ol type="1">
+<li>Mnożenie macierzowe <span class="math inline">\(Xw\)</span> — wynik powinien być tensorem o kształcie <code>(5,)</code>.</li>
+<li>Transpozycja: utwórz <span class="math inline">\(X^T\)</span> i sprawdź jej kształt.</li>
+<li>Broadcasting: utwórz wektor <span class="math inline">\(b \in \mathbb{R}^3\)</span> i oblicz <span class="math inline">\(X + b\)</span> (każda kolumna <span class="math inline">\(X\)</span> zostaje przesunięta o odpowiadający element <span class="math inline">\(b\)</span>).</li>
+<li>Suma po osi: oblicz średnią <span class="math inline">\(X\)</span> po osi 0 (wynik kształtu <code>(3,)</code>) i po osi 1 (wynik kształtu <code>(5,)</code>)</li>
+</ol>
+</section>
+<section id="tensordataset-i-dataloader" class="level3">
+<h3 class="anchored" data-anchor-id="tensordataset-i-dataloader">1.4 <code>TensorDataset</code> i <code>DataLoader</code></h3>
+<p>Wygeneruj sztuczny zbiór 50 próbek: <span class="math inline">\(X \in \mathbb{R}^{50 \times 2}\)</span> z rozkładu <span class="math inline">\(\mathcal{N}(0, 1)\)</span> oraz <span class="math inline">\(y \in \mathbb{R}^{50}\)</span> z rozkładu <span class="math inline">\(\mathcal{N}(0, 1)\)</span>.</p>
+<ol type="1">
+<li>Opakuj dane w <code>TensorDataset</code>.</li>
+<li>Utwórz <code>DataLoader</code> z <code>batch_size=8</code> i <code>shuffle=True</code>.</li>
+<li>Przeiteruj po <code>DataLoader</code> <strong>jedną</strong> epokę. Dla każdego batcha wypisz jego numer i kształt <code>X_batch</code>, <code>y_batch</code>.</li>
+<li>Ile batchy zostało zwróconych? Dlaczego właśnie tyle? Jakiego kształtu jest ostatni batch?</li>
+</ol>
+</section>
+<section id="opcjonalnie-gpu" class="level3">
+<h3 class="anchored" data-anchor-id="opcjonalnie-gpu">1.5 (Opcjonalnie) GPU</h3>
+<p>Sprawdź, czy w środowisku jest dostępny GPU:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> <span class="st">"cuda"</span> <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">"cpu"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Jeśli tak, utwórz tensor <code>t = torch.randn(1000, 1000)</code> i przenieś go na GPU: <code>t = t.to(device)</code>. W Colab można włączyć GPU w <code>Środowisko wykonawcze → Zmień typ środowiska</code>.</p>
+</section>
+</section>
+<section id="regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych" class="level2">
+<h2 class="anchored" data-anchor-id="regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych">2. Regresja liniowa z bazami gaussowskimi na plamach słonecznych</h2>
+<p>Zbiór danych <strong>plam słonecznych</strong> (SILSO, Królewskie Obserwatorium Belgii) jest klasycznym zbiorem szeregów czasowych: dzienna liczba plam na powierzchni Słońca mierzona od 1818 roku. Dane wykazują charakterystyczną cykliczność ~11-letnią, ale też zmienność amplitudy między cyklami (tzw. <em>cykl Gleissberga</em>).</p>
+<p>Zbudujemy model, który odtworzy tę zależność za pomocą <strong>regresji liniowej w bazie cech gaussowskich</strong>. Model pozostaje liniowy w parametrach (co jest kluczowe — gradient ma prostą postać), ale dzięki nieliniowym cechom potrafi przybliżać zależności nieliniowe. To ten sam pomysł, który stoi za jądrowymi maszynami wektorów nośnych i, w pewnym sensie, za sieciami neuronowymi (warstwa ukryta to wyuczone, nieliniowe cechy).</p>
+<section id="pobranie-i-przygotowanie-danych" class="level3">
+<h3 class="anchored" data-anchor-id="pobranie-i-przygotowanie-danych">2.1 Pobranie i przygotowanie danych</h3>
+<p>Plik CSV z SILSO jest dostępny pod adresem:</p>
+<p><code>https://www.sidc.be/SILSO/INFO/sndtotcsv.php</code></p>
+<p>Ma 8 kolumn rozdzielonych <strong>średnikiem</strong>, bez nagłówka. Znaczenie kolumn (po kolei):</p>
+<ol type="1">
+<li>rok,</li>
+<li>miesiąc,</li>
+<li>dzień,</li>
+<li>rok dziesiętny (ułamek roku),</li>
+<li><strong>dzienna liczba plam słonecznych</strong> (SN) — zmienna zależna,</li>
+<li>odchylenie standardowe,</li>
+<li>liczba obserwacji,</li>
+<li>flaga definitywności (1 = dane ostateczne, 0 = prowizoryczne).</li>
+</ol>
+<p><strong>Uwaga:</strong> dni bez obserwacji są oznaczone wartością <span class="math inline">\(-1\)</span> w kolumnie SN — musimy je odfiltrować.</p>
+<ol type="1">
+<li>Załaduj dane funkcją <code>pd.read_csv</code> z parametrami <code>sep=';'</code>, <code>header=None</code>, własnymi <code>names</code> i <code>na_values=[-1]</code> dla kolumny SN.</li>
+<li>Odfiltruj wiersze z brakującą wartością SN.</li>
+<li>Zostaw dane od <strong>1 stycznia 1874</strong> (od tej daty obserwacje są praktycznie kompletne).</li>
+<li>Wypisz: ile zostało rekordów, jaki jest zakres czasu (pierwsza i ostatnia data), minimum/maksimum/średnia SN.</li>
+<li>Narysuj surowy wykres SN w funkcji roku dziesiętnego (pełen zakres). Seria jest mocno zaszumiona — to normalne. Opcjonalnie: nałóż wygładzoną ruchomą średnią z okna np. 365 dni, żeby wyraźniej zobaczyć cykle.</li>
+</ol>
+</section>
+<section id="standaryzacja-czasu" class="level3">
+<h3 class="anchored" data-anchor-id="standaryzacja-czasu">2.2 Standaryzacja czasu</h3>
+<p>Dla stabilności numerycznej przeskalujemy czas do przedziału <span class="math inline">\([0, 1]\)</span>:</p>
+<p><span class="math display">\[\tau = \frac{t - t_{\min}}{t_{\max} - t_{\min}}\]</span></p>
+<p>gdzie <span class="math inline">\(t\)</span> to rok dziesiętny (kolumna 4 z pliku).</p>
+<ol type="1">
+<li>Oblicz <span class="math inline">\(\tau\)</span> dla wszystkich punktów. Sprawdź, że <span class="math inline">\(\tau \in [0, 1]\)</span>.</li>
+<li>Wypisz <span class="math inline">\(t_{\min}\)</span> i <span class="math inline">\(t_{\max}\)</span> — przydadzą się w sekcji 2.10 do ekstrapolacji.</li>
+</ol>
+</section>
+<section id="bazy-gaussowskie" class="level3">
+<h3 class="anchored" data-anchor-id="bazy-gaussowskie">2.3 Bazy gaussowskie</h3>
+<p>Dla ustalonej liczby baz <span class="math inline">\(K\)</span> i szerokości <span class="math inline">\(s &gt; 0\)</span> definiujemy <span class="math inline">\(K\)</span> funkcji bazowych:</p>
+<p><span class="math display">\[\varphi_k(\tau) = \exp\!\left(-\frac{(\tau - \mu_k)^2}{2 s^2}\right), \qquad k = 1, 2, \ldots, K,\]</span></p>
+<p>gdzie centra <span class="math inline">\(\mu_k\)</span> są równomiernie rozmieszczone na przedziale <span class="math inline">\([0, 1]\)</span>, np. <span class="math inline">\(\mu_k = \frac{k - 1}{K - 1}\)</span>.</p>
+<p>Każda baza jest “kapeluszem” Gaussa o maksimum w <span class="math inline">\(\mu_k\)</span> i szerokości kontrolowanej przez <span class="math inline">\(s\)</span>. Model ma postać:</p>
+<p><span class="math display">\[\hat{y}(\tau) = w_0 + \sum_{k=1}^K w_k \, \varphi_k(\tau),\]</span></p>
+<p>czyli kombinację liniową baz plus wyraz wolny <span class="math inline">\(w_0\)</span>. Dodanie kolumny jedynek do macierzy cech pozwala potraktować <span class="math inline">\(w_0\)</span> tak samo jak pozostałe wagi.</p>
+<ol type="1">
+<li><p>Napisz funkcję <code>gaussian_features(tau, K, s)</code> przyjmującą:</p>
+<ul>
+<li><code>tau</code> — tablicę NumPy lub tensor 1D kształtu <code>(N,)</code>,</li>
+<li><code>K</code> — liczbę baz,</li>
+<li><code>s</code> — szerokość bazy,</li>
+</ul>
+<p>i zwracającą tensor <span class="math inline">\(\Phi \in \mathbb{R}^{N \times (K+1)}\)</span>, gdzie pierwsza kolumna to jedynki (<em>bias</em>), a kolumny <span class="math inline">\(2, \ldots, K+1\)</span> to wartości funkcji <span class="math inline">\(\varphi_1, \ldots, \varphi_K\)</span>.</p>
+<p><em>Wskazówka:</em> można użyć broadcastingu. Jeśli <code>tau</code> ma kształt <code>(N,)</code> i zmienisz go na <code>(N, 1)</code>, a centra <code>mu</code> na <code>(K,)</code>, to różnica <code>tau[:, None] - mu[None, :]</code> będzie kształtu <code>(N, K)</code>.</p></li>
+<li><p>Dla <span class="math inline">\(K = 10\)</span> i <span class="math inline">\(s = 0.05\)</span> narysuj <strong>wszystkie 10 baz</strong> na jednym wykresie (oś <span class="math inline">\(x\)</span>: <span class="math inline">\(\tau \in [0, 1]\)</span>, oś <span class="math inline">\(y\)</span>: <span class="math inline">\(\varphi_k(\tau)\)</span>). Powinno powstać 10 “dzwonów” rozmieszczonych równomiernie.</p></li>
+</ol>
+</section>
+<section id="model-funkcja-straty-i-gradient" class="level3">
+<h3 class="anchored" data-anchor-id="model-funkcja-straty-i-gradient">2.4 Model, funkcja straty i gradient</h3>
+<p>Model: <span class="math inline">\(\hat{\mathbf{y}} = \Phi \mathbf{w}\)</span>, gdzie <span class="math inline">\(\Phi \in \mathbb{R}^{N \times (K+1)}\)</span>, <span class="math inline">\(\mathbf{w} \in \mathbb{R}^{K+1}\)</span>.</p>
+<p>Funkcja straty MSE:</p>
+<p><span class="math display">\[L(\mathbf{w}) = \frac{1}{N} \|\mathbf{y} - \Phi \mathbf{w}\|^2.\]</span></p>
+<p>Gradient (znany z wykładu 4, wyprowadzenie identyczne):</p>
+<p><span class="math display">\[\nabla_{\mathbf{w}} L = -\frac{2}{N} \Phi^T (\mathbf{y} - \Phi \mathbf{w}).\]</span></p>
+<p>Dla mini-batcha <span class="math inline">\(B\)</span> próbek wzór ma identyczną postać, z podmacierzami <span class="math inline">\(\Phi_B\)</span> i <span class="math inline">\(\mathbf{y}_B\)</span>:</p>
+<p><span class="math display">\[\nabla_{\mathbf{w}} L_B = -\frac{2}{B} \Phi_B^T (\mathbf{y}_B - \Phi_B \mathbf{w}).\]</span></p>
+</section>
+<section id="podział-trainval-i-dataloader" class="level3">
+<h3 class="anchored" data-anchor-id="podział-trainval-i-dataloader">2.5 Podział train/val i <code>DataLoader</code></h3>
+<ol type="1">
+<li>Ustal <span class="math inline">\(K\)</span> i <span class="math inline">\(s\)</span> — zacznij od <span class="math inline">\(K = 200\)</span>, <span class="math inline">\(s = 0.005\)</span> (centra co <span class="math inline">\(\approx 0.005\)</span>, szerokość porównywalna z odstępem).</li>
+<li>Oblicz <span class="math inline">\(\Phi\)</span> dla wszystkich danych (kształt <code>(N, K+1)</code>) i tensor <span class="math inline">\(\mathbf{y}\)</span> (wartości SN jako <code>torch.float32</code>).</li>
+<li>Dokonaj <strong>losowego</strong> podziału train/val 80/20. Możesz użyć <code>torch.randperm(N)</code> albo <code>sklearn.model_selection.train_test_split</code> na indeksach.</li>
+<li>Utwórz <code>TensorDataset</code> i <code>DataLoader</code> dla zbioru treningowego z <code>batch_size=256</code>, <code>shuffle=True</code>. Zbiór walidacyjny trzymaj jako surowe tensory <span class="math inline">\(\Phi_\text{val}\)</span>, <span class="math inline">\(\mathbf{y}_\text{val}\)</span> — nie iterujemy po nim w batchach, tylko liczymy stratę od razu na całości.</li>
+</ol>
+<p><strong>Uwaga.</strong> Skalowanie czasu do <span class="math inline">\([0, 1]\)</span> wykonujemy na wszystkich danych jednocześnie, przed podziałem na train/val w sekcji 2.5. W odróżnieniu od <code>StandardScaler</code> w sekcji 3, gdzie statystyki (średnia, odchylenie standardowe) <strong>uczymy się</strong> ze zbioru treningowego, tutaj traktujemy <span class="math inline">\(t_{\min}\)</span> i <span class="math inline">\(t_{\max}\)</span> jako <strong>zmianę jednostek</strong>, a nie parametry modelu — zmieniamy oś czasu z lat na ułamki przedziału, analogicznie do zamiany stopni Celsjusza na Kelwiny.</p>
+</section>
+<section id="pętla-treningowa" class="level3">
+<h3 class="anchored" data-anchor-id="pętla-treningowa">2.6 Pętla treningowa</h3>
+<p>Zaimplementuj mini-batch GD:</p>
+<ol type="1">
+<li>Zainicjalizuj wagi <span class="math inline">\(\mathbf{w}\)</span> losowo: np. <code>torch.randn(K+1) * 0.01</code> (małe losowe wartości).</li>
+<li>Ustal learning rate <code>lr</code> (np. 0.01) i liczbę epok (np. 30).</li>
+<li>W każdej epoce:
+<ul>
+<li>iteruj po <code>DataLoader</code>ze;</li>
+<li>dla każdego batcha oblicz <span class="math inline">\(\hat{\mathbf{y}}_B = \Phi_B \mathbf{w}\)</span>, residua <span class="math inline">\(\mathbf{r}_B = \mathbf{y}_B - \hat{\mathbf{y}}_B\)</span>, gradient według wzoru z 2.4;</li>
+<li>aktualizuj wagi: <span class="math inline">\(\mathbf{w} \gets \mathbf{w} - \eta \nabla L_B\)</span>.</li>
+</ul></li>
+<li>Po każdej epoce oblicz <strong>pełne</strong> MSE na train i val (jednym mnożeniem macierzowym, bez iteracji po batchach) i dopisz do historii.</li>
+<li>Wypisz co kilka epok aktualny train/val MSE.</li>
+</ol>
+<p><em>Wskazówka dot. <code>lr</code>:</em> jeśli MSE rośnie lub wybucha do NaN, learning rate jest za duży. Jeśli po 30 epokach train MSE prawie się nie zmienił, za mały. Eksperymentuj na zasadzie ×10 / ÷10.</p>
+</section>
+<section id="wizualizacja-dopasowania" class="level3">
+<h3 class="anchored" data-anchor-id="wizualizacja-dopasowania">2.7 Wizualizacja dopasowania</h3>
+<ol type="1">
+<li>Po zakończeniu treningu oblicz predykcję modelu <span class="math inline">\(\hat{\mathbf{y}} = \Phi \mathbf{w}\)</span> na <strong>całym</strong> zakresie danych.</li>
+<li>Narysuj na jednym wykresie:
+<ul>
+<li>surowe dane (punkty, alpha mały — np. 0.2, żeby zagęszczenie było widoczne);</li>
+<li>predykcję modelu (linia, np. czerwona, o grubszej szerokości).</li>
+</ul></li>
+<li>Czy model odtwarza cykliczność? Czy amplituda jest realistyczna?</li>
+</ol>
+<p>Narysuj też krzywe uczenia: train MSE i val MSE w funkcji epoki na jednym wykresie (oś <span class="math inline">\(y\)</span> w skali logarytmicznej).</p>
+</section>
+<section id="sanity-check-z-rozwiązaniem-analitycznym-ols" class="level3">
+<h3 class="anchored" data-anchor-id="sanity-check-z-rozwiązaniem-analitycznym-ols">2.8 Sanity check z rozwiązaniem analitycznym (OLS)</h3>
+<p>Regresja liniowa ma rozwiązanie w postaci zamkniętej:</p>
+<p><span class="math display">\[\mathbf{w}_{\text{OLS}} = (\Phi^T \Phi)^{-1} \Phi^T \mathbf{y}.\]</span></p>
+<p>W praktyce używamy stabilniejszego numerycznie <code>np.linalg.lstsq</code> lub <code>torch.linalg.lstsq</code>.</p>
+<ol type="1">
+<li>Oblicz <span class="math inline">\(\mathbf{w}_{\text{OLS}}\)</span> na zbiorze treningowym.</li>
+<li>Oblicz MSE modelu OLS na train i val.</li>
+<li>Porównaj z wynikami GD po 30 epokach: wagi powinny być zbliżone, MSE też. Jeśli GD daje zauważalnie gorszy wynik, potrzeba więcej epok lub lepszego <code>lr</code>.</li>
+</ol>
+<p>To ważny moment: <strong>GD odtwarza rozwiązanie analityczne</strong>. Dla regresji liniowej GD jest niepotrzebny (rozwiązanie zamknięte jest tańsze), ale ten sam algorytm będzie działał tam, gdzie zamkniętej formy już nie ma.</p>
+</section>
+<section id="eksperymenty-z-hiperparametrami" class="level3">
+<h3 class="anchored" data-anchor-id="eksperymenty-z-hiperparametrami">2.9 Eksperymenty z hiperparametrami</h3>
+<p>Najważniejsza część sekcji 2. Tu badamy, jak konstrukcja modelu i hiperparametry GD wpływają na wynik.</p>
+<section id="wpływ-liczby-baz-k" class="level4">
+<h4 class="anchored" data-anchor-id="wpływ-liczby-baz-k">2.9.1 Wpływ liczby baz <span class="math inline">\(K\)</span></h4>
+<p>Uruchom trening dla <span class="math inline">\(K \in \{20, 200, 800\}\)</span> przy stałym <span class="math inline">\(s = 0.005\)</span>, <code>lr</code> i liczbie epok dobranych w 2.6.</p>
+<p>Dla każdego <span class="math inline">\(K\)</span>:</p>
+<ol type="1">
+<li>Narysuj dopasowanie modelu na tle danych (trzy osobne wykresy).</li>
+<li>Zapisz końcowe wartości train MSE i val MSE.</li>
+</ol>
+<p>Zbierz wyniki w tabeli. Od którego <span class="math inline">\(K\)</span> val MSE zaczyna rosnąć przy spadającym train MSE? Jak nazywamy to zjawisko?</p>
+</section>
+<section id="wpływ-szerokości-bazy-s" class="level4">
+<h4 class="anchored" data-anchor-id="wpływ-szerokości-bazy-s">2.9.2 Wpływ szerokości bazy <span class="math inline">\(s\)</span></h4>
+<p>Ustaw <span class="math inline">\(K = 200\)</span>. Uruchom trening dla trzech wartości <span class="math inline">\(s\)</span>:</p>
+<ul>
+<li><span class="math inline">\(s = 0.001\)</span> — bardzo wąskie bazy (bazy prawie nie nakładają się),</li>
+<li><span class="math inline">\(s = 0.005\)</span> — standardowe (porównywalne z odstępem między centrami),</li>
+<li><span class="math inline">\(s = 0.05\)</span> — szerokie (duże nakładanie).</li>
+</ul>
+<p>Porównaj dopasowania na trzech wykresach. Który model za bardzo “dopasowuje się do szumu”? Który jest zbyt gładki?</p>
+</section>
+<section id="wpływ-lr-i-batch_size" class="level4">
+<h4 class="anchored" data-anchor-id="wpływ-lr-i-batch_size">2.9.3 Wpływ <code>lr</code> i <code>batch_size</code></h4>
+<p>Ustaw <span class="math inline">\(K = 200\)</span>, <span class="math inline">\(s = 0.005\)</span>. Uruchom trening dla siatki:</p>
+<ul>
+<li><code>lr</code> <span class="math inline">\(\in \{0.001, 0.01, 0.1\}\)</span>,</li>
+<li><code>batch_size</code> <span class="math inline">\(\in \{32, 256, 2048\}\)</span>.</li>
+</ul>
+<p>Daje to 9 treningów. Dla każdego zapisz val MSE po 30 epokach. Zestaw wyniki w tabeli 3 × 3 (<code>lr</code> jako wiersze, <code>batch_size</code> jako kolumny).</p>
+<p>Obserwacje do komentarza:</p>
+<ul>
+<li>Czy większy <code>batch_size</code> przyspiesza czy spowalnia zbieżność (w jednostkach epok)?</li>
+<li>Który <code>lr</code> jest najlepszy? Czy ten sam dla każdego <code>batch_size</code>?</li>
+<li>Czy dla jakiejś kombinacji trening się rozbiega (NaN-y)?</li>
+</ul>
+</section>
+</section>
+<section id="co-model-myśli-o-przyszłości" class="level3">
+<h3 class="anchored" data-anchor-id="co-model-myśli-o-przyszłości">2.10 Co model “myśli” o przyszłości?</h3>
+<p>Model został wytrenowany na przedziale <span class="math inline">\(\tau \in [0, 1]\)</span>, który w oryginalnej skali odpowiada zakresowi lat <code>t_min</code> do <code>t_max</code>. Co stanie się, jeśli zastosujemy go do czasów <strong>poza</strong> tym zakresem?</p>
+<ol type="1">
+<li>Wygeneruj siatkę lat od <code>t_max</code> do <code>t_max + 10</code> (gęsto, np. co 10 dni).</li>
+<li>Przeskaluj do <span class="math inline">\(\tau\)</span> tym samym wzorem co w 2.2 (wartości <span class="math inline">\(\tau\)</span> będą <span class="math inline">\(&gt; 1\)</span>).</li>
+<li>Oblicz <span class="math inline">\(\Phi\)</span> i predykcję modelu.</li>
+<li>Narysuj razem: dane treningowe + predykcja na pełnym zakresie (wliczając ekstrapolację), zaznacz linią pionową punkt <code>t_max</code>.</li>
+</ol>
+<p>Co widzisz? Dlaczego model tak się zachowuje poza zakresem? (<em>Wskazówka:</em> zerknij na wykres baz z 2.3 — wszystkie centra <span class="math inline">\(\mu_k \in [0, 1]\)</span>, więc dla <span class="math inline">\(\tau \gg 1\)</span> wartości <span class="math inline">\(\varphi_k\)</span> są…)</p>
+<p>To ważna obserwacja: modele regresji z lokalnymi bazami <strong>nie ekstrapolują</strong> w sensowny sposób. Przewidują dobrze tam, gdzie widziały dane, i “wygasają” poza zakresem.</p>
+</section>
+</section>
+<section id="regresja-logistyczna-klasyfikacja-binarna" class="level2">
+<h2 class="anchored" data-anchor-id="regresja-logistyczna-klasyfikacja-binarna">3. Regresja logistyczna — klasyfikacja binarna</h2>
+<p>W tej sekcji zmieniamy zarówno model, jak i funkcję straty. Model to:</p>
+<p><span class="math display">\[\hat{y}(\mathbf{x}, \mathbf{w}) = \sigma(\mathbf{x}^T \mathbf{w}), \qquad \sigma(z) = \frac{1}{1 + e^{-z}},\]</span></p>
+<p>gdzie <span class="math inline">\(\sigma\)</span> to <strong>funkcja sigmoidalna</strong>, a <span class="math inline">\(\hat{y}\)</span> interpretujemy jako prawdopodobieństwo klasy 1. Funkcja straty to <strong>entropia krzyżowa binarna</strong> (BCE) z wykładu 4:</p>
+<p><span class="math display">\[L(\mathbf{w}) = -\frac{1}{N} \sum_{n=1}^N \left[ y_n \log \hat{y}_n + (1 - y_n) \log (1 - \hat{y}_n) \right].\]</span></p>
+<p><strong>Gradient — podajemy wprost</strong> (szkic wyprowadzenia w podręcznikach ML; kluczowy fakt to uproszczenie dzięki strukturze <span class="math inline">\(\sigma\)</span> i BCE):</p>
+<p><span class="math display">\[\nabla_{\mathbf{w}} L = \frac{1}{N} X^T (\sigma(X\mathbf{w}) - \mathbf{y}).\]</span></p>
+<p>Dla mini-batcha <span class="math inline">\(B\)</span>:</p>
+<p><span class="math display">\[\nabla_{\mathbf{w}} L_B = \frac{1}{B} X_B^T (\sigma(X_B \mathbf{w}) - \mathbf{y}_B).\]</span></p>
+<p>Zauważ, że to <strong>ta sama postać</strong> co gradient MSE: <span class="math inline">\(X^T \cdot (\text{predykcja} - \text{etykieta})\)</span>. To nie przypadek — dla tej konkretnej pary (funkcja aktywacji, funkcja straty) człony się skracają. Dla innych kombinacji wzór byłby bardziej skomplikowany.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Uwaga metodologiczna.</strong> Dla regresji logistycznej na tak małym zbiorze (kilkaset próbek) <strong>nikt w praktyce nie używa GD</strong>. Scikit-learnowy <code>LogisticRegression</code> domyślnie używa metody L-BFGS, która zbiega w kilkudziesięciu iteracjach bez konieczności dobierania <code>lr</code>. Wybieramy tu GD z powodów dydaktycznych — to ten sam algorytm, który za chwilę będzie napędzał trening sieci neuronowych, gdzie metody drugiego rzędu przestają być praktyczne.</p>
+</div>
+</div>
+<section id="dane" class="level3">
+<h3 class="anchored" data-anchor-id="dane">3.1 Dane</h3>
+<p>Użyjemy zbioru <strong>Breast Cancer Wisconsin</strong> (znanego z lab 4 i 5): 569 próbek, 30 cech, 2 klasy (łagodny/złośliwy).</p>
+<ol type="1">
+<li>Załaduj dane: <code>from sklearn.datasets import load_breast_cancer</code>, <code>data = load_breast_cancer()</code>.</li>
+<li>Podziel na train/test 80/20 z <code>random_state=42</code> (<code>sklearn.model_selection.train_test_split</code>).</li>
+<li>Znormalizuj cechy używając <code>StandardScaler</code> — <strong>dopasuj scaler tylko na train</strong>, transformuj train i test. (GD bez standaryzacji cech zbiega wolno lub wcale — cechy w zbiorze mają rzędy wielkości różne skale.)</li>
+<li>Do macierzy cech dodaj kolumnę jedynek (bias). Konwertuj na tensory <code>float32</code> (cechy) i <code>float32</code> (etykiety).</li>
+<li>Zbuduj <code>TensorDataset</code> i <code>DataLoader</code> dla zbioru treningowego, <code>batch_size=32</code>, <code>shuffle=True</code>. Zbiór testowy zostaw jako surowe tensory.</li>
+</ol>
+</section>
+<section id="implementacja-sigmoid-i-bce" class="level3">
+<h3 class="anchored" data-anchor-id="implementacja-sigmoid-i-bce">3.2 Implementacja sigmoid i BCE</h3>
+<ol type="1">
+<li><p>Zaimplementuj <code>sigmoid(z)</code> ręcznie przez <code>1 / (1 + torch.exp(-z))</code> (nie używaj <code>torch.sigmoid</code>).</p></li>
+<li><p>Zaimplementuj <code>bce_loss(y_true, y_pred)</code>: <span class="math display">\[\text{BCE} = -\frac{1}{N} \sum_n [y_n \log \hat{y}_n + (1 - y_n) \log(1 - \hat{y}_n)].\]</span></p>
+<p><em>Wskazówka dot. stabilności numerycznej:</em> dla <span class="math inline">\(\hat{y}\)</span> bliskich 0 lub 1, <span class="math inline">\(\log \hat{y}\)</span> dąży do <span class="math inline">\(-\infty\)</span>. Zastosuj <code>torch.clamp(y_pred, eps, 1 - eps)</code> z małym <code>eps</code> (np. <span class="math inline">\(10^{-7}\)</span>) przed obliczeniem logarytmu.</p></li>
+</ol>
+</section>
+<section id="pętla-treningowa-1" class="level3">
+<h3 class="anchored" data-anchor-id="pętla-treningowa-1">3.3 Pętla treningowa</h3>
+<p>Zaimplementuj mini-batch GD analogicznie do sekcji 2.6:</p>
+<ol type="1">
+<li>Inicjalizuj wagi losowo, np. <code>torch.randn(n_features + 1) * 0.01</code>.</li>
+<li>W każdej epoce iteruj po <code>DataLoader</code>ze, licz predykcję, gradient, aktualizuj wagi.</li>
+<li>Po każdej epoce zapisuj do historii: BCE na train (uśrednione po batchach lub obliczone od razu na całości), BCE na test, accuracy train i test.</li>
+</ol>
+<p>Proponowane hiperparametry na start: <code>lr=0.1</code>, 100 epok.</p>
+<p><em>Wskazówka dot. accuracy:</em> predykcja klasy to <code>y_pred &gt; 0.5</code>.</p>
+</section>
+<section id="krzywe-uczenia-i-ewaluacja" class="level3">
+<h3 class="anchored" data-anchor-id="krzywe-uczenia-i-ewaluacja">3.4 Krzywe uczenia i ewaluacja</h3>
+<ol type="1">
+<li>Narysuj krzywe uczenia:
+<ul>
+<li>BCE train i test vs epoka (jeden wykres),</li>
+<li>accuracy train i test vs epoka (drugi wykres).</li>
+</ul></li>
+<li>Wypisz końcową accuracy na zbiorze testowym.</li>
+<li>Opcjonalnie: narysuj macierz pomyłek na zbiorze testowym (<code>sklearn.metrics.confusion_matrix</code>).</li>
+</ol>
+</section>
+<section id="sanity-check-ze-scikit-learn" class="level3">
+<h3 class="anchored" data-anchor-id="sanity-check-ze-scikit-learn">3.5 Sanity check ze scikit-learn</h3>
+<p>Uruchom <code>sklearn.linear_model.LogisticRegression</code> na tych samych przetworzonych danych:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>clf.fit(X_train_scaled, y_train)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>(Pamiętaj, żeby sklearnowi podać dane <strong>bez</strong> ręcznie doklejonej kolumny jedynek — sklearn dokłada bias sam.)</p>
+<p>Porównaj:</p>
+<ol type="1">
+<li>Accuracy na teście. Powinna być bardzo zbliżona do Twojej implementacji.</li>
+<li>Wagi (<code>clf.coef_</code> i <code>clf.intercept_</code>) z wyuczonymi <span class="math inline">\(\mathbf{w}\)</span>. Uwaga: sklearn domyślnie stosuje regularyzację L2 z <span class="math inline">\(C=1.0\)</span>, więc wagi będą lekko “skurczone” względem Twoich. Porównuj znaki, rzędy wielkości i względne wielkości, a nie dokładne wartości.</li>
+</ol>
+</section>
+</section>
+<section id="podsumowanie-i-zapowiedź-wykładu-5" class="level2">
+<h2 class="anchored" data-anchor-id="podsumowanie-i-zapowiedź-wykładu-5">4. Podsumowanie i zapowiedź wykładu 5</h2>
+<p>W tym arkuszu wytrenowaliśmy dwa modele za pomocą tego samego algorytmu (mini-batch gradient descent), ale z dwiema różnymi funkcjami straty (MSE, BCE) i dwoma różnymi modelami (liniowy w bazach gaussowskich, regresja logistyczna). Za każdym razem musieliśmy:</p>
+<ol type="1">
+<li>wyprowadzić analitycznie gradient funkcji straty względem wag,</li>
+<li>zaprogramować go w postaci wyrażenia macierzowego,</li>
+<li>wpleść w pętlę treningową.</li>
+</ol>
+<p>Dla tych dwóch modeli wzór na gradient miał ładną, wspólną postać <span class="math inline">\(X^T (\text{predykcja} - \text{etykieta})\)</span>. Dla bardziej złożonych modeli — a takimi są sieci neuronowe — wyprowadzanie gradientu ręcznie staje się żmudne i łatwe o pomyłkę. Rozważmy na przykład model:</p>
+<p><span class="math display">\[\hat{y} = \sigma\!\left(\text{ReLU}(X W_1 + \mathbf{b}_1) W_2 + \mathbf{b}_2\right).\]</span></p>
+<p>Wyprowadzenie <span class="math inline">\(\partial L / \partial W_1\)</span> wymaga kilkukrotnego zastosowania reguły łańcuchowej i sumy iloczynów Hadamarda z pochodnymi funkcji aktywacji. Dla sieci z 10 warstwami i niestandardowymi funkcjami aktywacji — praktycznie niewykonalne.</p>
+<p>Na wykładzie 5 poznamy mechanizm <strong>różniczkowania automatycznego</strong> (<em>autograd</em>) wbudowany w PyTorch, który sam konstruuje graf obliczeniowy i liczy wszystkie gradienty za nas. Otworzy nam to drogę do trenowania sieci neuronowych praktycznie dowolnej architektury.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
