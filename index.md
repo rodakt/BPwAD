@@ -34,7 +34,8 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 | 4. Własne estymatory w scikit-learn | [🔗 HTML](laby/lab_4.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_4.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_4.ipynb) |
 | 5. Potoki i kroswalidacja | [🔗 HTML](laby/lab_5.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_5.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_5.ipynb) |
 | 6. Optuna | [🔗 HTML](laby/lab_6.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_6.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_6.ipynb) |
-| 7. Gradient descent od podstaw | [🔗 HTML](laby/lab_7.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_7.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_7.ipynb) |
+| 7. Metoda gradientu prostego | [🔗 HTML](laby/lab_7.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_7.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_7.ipynb) |
+| 8. Trening modeli gradientem prostym w PyTorch | [🔗 HTML](laby/lab_8.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_8.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_8.ipynb) |
 
 ## Zaliczenie
 
