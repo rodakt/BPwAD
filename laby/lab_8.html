@@ -294,7 +294,7 @@ window.Quarto = {
   <li><a href="#regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych" id="toc-regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych" class="nav-link" data-scroll-target="#regresja-liniowa-z-bazami-gaussowskimi-na-plamach-słonecznych">2. Regresja liniowa z bazami gaussowskimi na plamach słonecznych</a>
   <ul class="collapse">
   <li><a href="#pobranie-i-przygotowanie-danych" id="toc-pobranie-i-przygotowanie-danych" class="nav-link" data-scroll-target="#pobranie-i-przygotowanie-danych">2.1 Pobranie i przygotowanie danych</a></li>
-  <li><a href="#standaryzacja-czasu" id="toc-standaryzacja-czasu" class="nav-link" data-scroll-target="#standaryzacja-czasu">2.2 Standaryzacja czasu</a></li>
+  <li><a href="#zmiana-jednostek-czasu" id="toc-zmiana-jednostek-czasu" class="nav-link" data-scroll-target="#zmiana-jednostek-czasu">2.2 Zmiana jednostek czasu</a></li>
   <li><a href="#bazy-gaussowskie" id="toc-bazy-gaussowskie" class="nav-link" data-scroll-target="#bazy-gaussowskie">2.3 Bazy gaussowskie</a></li>
   <li><a href="#model-funkcja-straty-i-gradient" id="toc-model-funkcja-straty-i-gradient" class="nav-link" data-scroll-target="#model-funkcja-straty-i-gradient">2.4 Model, funkcja straty i gradient</a></li>
   <li><a href="#podział-trainval-i-dataloader" id="toc-podział-trainval-i-dataloader" class="nav-link" data-scroll-target="#podział-trainval-i-dataloader">2.5 Podział train/val i <code>DataLoader</code></a></li>
@@ -431,14 +431,21 @@ window.Quarto = {
 <li>Narysuj surowy wykres SN w funkcji roku dziesiętnego (pełen zakres). Seria jest mocno zaszumiona — to normalne. Opcjonalnie: nałóż wygładzoną ruchomą średnią z okna np. 365 dni, żeby wyraźniej zobaczyć cykle.</li>
 </ol>
 </section>
-<section id="standaryzacja-czasu" class="level3">
-<h3 class="anchored" data-anchor-id="standaryzacja-czasu">2.2 Standaryzacja czasu</h3>
+<section id="zmiana-jednostek-czasu" class="level3">
+<h3 class="anchored" data-anchor-id="zmiana-jednostek-czasu">2.2 Zmiana jednostek czasu</h3>
 <p>Dla stabilności numerycznej przeskalujemy czas do przedziału <span class="math inline">\([0, 1]\)</span>:</p>
 <p><span class="math display">\[\tau = \frac{t - t_{\min}}{t_{\max} - t_{\min}}\]</span></p>
-<p>gdzie <span class="math inline">\(t\)</span> to rok dziesiętny (kolumna 4 z pliku).</p>
+<p>gdzie <span class="math inline">\(t\)</span> to rok dziesiętny (kolumna 4 z pliku). <strong>Kluczowe:</strong> granice <span class="math inline">\(t_{\min}\)</span> i <span class="math inline">\(t_{\max}\)</span> traktujemy jako <strong>arbitralnie ustalone stałe</strong>, a nie statystyki wyliczone z danych. Dzięki temu skalowanie jest zwykłą zmianą jednostek (analogicznie do zamiany stopni Celsjusza na Kelwiny), a nie operacją uczoną ze zbioru — nie ma więc ryzyka wycieku danych przy późniejszym podziale train/val.</p>
+<p>Ustalamy:</p>
+<ul>
+<li><span class="math inline">\(t_{\min} = 1874.0\)</span> (początek modelowanego okresu),</li>
+<li>$t_{} = $ koniec bieżącego roku kalendarzowego, czyli <code>datetime.date.today().year + 1.0</code>.</li>
+</ul>
+<p>Zadania:</p>
 <ol type="1">
-<li>Oblicz <span class="math inline">\(\tau\)</span> dla wszystkich punktów. Sprawdź, że <span class="math inline">\(\tau \in [0, 1]\)</span>.</li>
-<li>Wypisz <span class="math inline">\(t_{\min}\)</span> i <span class="math inline">\(t_{\max}\)</span> — przydadzą się w sekcji 2.10 do ekstrapolacji.</li>
+<li>Wyznacz <span class="math inline">\(t_{\max}\)</span> jak wyżej.</li>
+<li>Oblicz <span class="math inline">\(\tau\)</span> dla wszystkich punktów danych. Sprawdź, że wszystkie wartości leżą w <span class="math inline">\([0, 1)\)</span> (ostatni rekord jest sprzed końca bieżącego roku).</li>
+<li>Zapamiętaj <span class="math inline">\(t_{\min}\)</span> i <span class="math inline">\(t_{\max}\)</span> jako stałe — przydadzą się w sekcji 2.10 do ekstrapolacji.</li>
 </ol>
 </section>
 <section id="bazy-gaussowskie" class="level3">
@@ -479,7 +486,6 @@ window.Quarto = {
 <li>Dokonaj <strong>losowego</strong> podziału train/val 80/20. Możesz użyć <code>torch.randperm(N)</code> albo <code>sklearn.model_selection.train_test_split</code> na indeksach.</li>
 <li>Utwórz <code>TensorDataset</code> i <code>DataLoader</code> dla zbioru treningowego z <code>batch_size=256</code>, <code>shuffle=True</code>. Zbiór walidacyjny trzymaj jako surowe tensory <span class="math inline">\(\Phi_\text{val}\)</span>, <span class="math inline">\(\mathbf{y}_\text{val}\)</span> — nie iterujemy po nim w batchach, tylko liczymy stratę od razu na całości.</li>
 </ol>
-<p><strong>Uwaga.</strong> Skalowanie czasu do <span class="math inline">\([0, 1]\)</span> wykonujemy na wszystkich danych jednocześnie, przed podziałem na train/val w sekcji 2.5. W odróżnieniu od <code>StandardScaler</code> w sekcji 3, gdzie statystyki (średnia, odchylenie standardowe) <strong>uczymy się</strong> ze zbioru treningowego, tutaj traktujemy <span class="math inline">\(t_{\min}\)</span> i <span class="math inline">\(t_{\max}\)</span> jako <strong>zmianę jednostek</strong>, a nie parametry modelu — zmieniamy oś czasu z lat na ułamki przedziału, analogicznie do zamiany stopni Celsjusza na Kelwiny.</p>
 </section>
 <section id="pętla-treningowa" class="level3">
 <h3 class="anchored" data-anchor-id="pętla-treningowa">2.6 Pętla treningowa</h3>
