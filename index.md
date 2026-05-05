@@ -23,6 +23,7 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 | 2. scikit-learn - estymatory, transformatory, potoki | [🔗 HTML](wyklady/wyklad_2.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_2.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_2.ipynb) |
 | 3. Optuna - optymalizacja hiperparametrów | [🔗 HTML](wyklady/wyklad_3.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_3.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_3.ipynb) |
 | 4. PyTorch - metoda gradientu prostego, tensory w PyTorch | [🔗 HTML](wyklady/wyklad_4.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_4.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_4.ipynb) |
+| 5. Różniczkowanie automatyczne i wsteczna propagacja | [🔗 HTML](wyklady/wyklad_5.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_5.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_5.ipynb) |
 
 ## Laboratoria
 
