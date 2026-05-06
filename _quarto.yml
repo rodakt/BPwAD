@@ -16,6 +16,7 @@ project:
     - "laby/lab_6.ipynb"
     - "laby/lab_7.ipynb"
     - "laby/lab_8.ipynb"
+    - "laby/lab_9.ipynb"
 
 website:
   title: "Biblioteki Python w analizie danych"
@@ -39,7 +40,8 @@ website:
           - "laby/lab_6.ipynb"
           - "laby/lab_7.ipynb"
           - "laby/lab_8.ipynb"
-          
+          - "laby/lab_9.ipynb"
+
 format:
   html:
     theme: sandstone
