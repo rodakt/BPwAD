@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 9: Autograd, nn.Module i pierwsze sieci neuronowe – Biblioteki Python w analizie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9eb2dcf4296333510909099cc84966dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_9.html">Lab 9: Autograd, <code>nn.Module</code> i pierwsze sieci neuronowe</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: Optuna - optymalizacja hiperparametrów</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 5: Różniczkowanie automatyczne i wsteczna propagacja</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Własne estymatory scikit-learn</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Potoki i kroswalidacja</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Optuna</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 7: Metoda gradientu prostego</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 8: Trening modeli gradientem prostym w PyTorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_9.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 9: Autograd, <code>nn.Module</code> i pierwsze sieci neuronowe</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#rozgrzewka-graf-obliczeniowy-i-autograd" id="toc-rozgrzewka-graf-obliczeniowy-i-autograd" class="nav-link active" data-scroll-target="#rozgrzewka-graf-obliczeniowy-i-autograd">1. Rozgrzewka: graf obliczeniowy i autograd</a>
+  <ul class="collapse">
+  <li><a href="#funkcja-i-jej-graf-obliczeniowy" id="toc-funkcja-i-jej-graf-obliczeniowy" class="nav-link" data-scroll-target="#funkcja-i-jej-graf-obliczeniowy">1.1 Funkcja i jej graf obliczeniowy</a></li>
+  <li><a href="#forward-pass-z-konkretnymi-wartościami" id="toc-forward-pass-z-konkretnymi-wartościami" class="nav-link" data-scroll-target="#forward-pass-z-konkretnymi-wartościami">1.2 Forward pass z konkretnymi wartościami</a></li>
+  <li><a href="#backward-pass-definicje-i-reguła" id="toc-backward-pass-definicje-i-reguła" class="nav-link" data-scroll-target="#backward-pass-definicje-i-reguła">1.3 Backward pass — definicje i reguła</a></li>
+  <li><a href="#backward-pass-ręczne-wyprowadzenie" id="toc-backward-pass-ręczne-wyprowadzenie" class="nav-link" data-scroll-target="#backward-pass-ręczne-wyprowadzenie">1.4 Backward pass — ręczne wyprowadzenie</a></li>
+  <li><a href="#weryfikacja-symboliczna-z-bezpośredniego-różniczkowania" id="toc-weryfikacja-symboliczna-z-bezpośredniego-różniczkowania" class="nav-link" data-scroll-target="#weryfikacja-symboliczna-z-bezpośredniego-różniczkowania">1.5 Weryfikacja symboliczna z bezpośredniego różniczkowania</a></li>
+  <li><a href="#weryfikacja-numeryczna-w-pytorch" id="toc-weryfikacja-numeryczna-w-pytorch" class="nav-link" data-scroll-target="#weryfikacja-numeryczna-w-pytorch">1.6 Weryfikacja numeryczna w PyTorch</a></li>
+  <li><a href="#akumulacja-gradientów" id="toc-akumulacja-gradientów" class="nav-link" data-scroll-target="#akumulacja-gradientów">1.7 Akumulacja gradientów</a></li>
+  <li><a href="#torch.no_grad-i-.detach" id="toc-torch.no_grad-i-.detach" class="nav-link" data-scroll-target="#torch.no_grad-i-.detach">1.8 <code>torch.no_grad()</code> i <code>.detach()</code></a></li>
+  </ul></li>
+  <li><a href="#regresja-logistyczna-z-autograd-breast-cancer" id="toc-regresja-logistyczna-z-autograd-breast-cancer" class="nav-link" data-scroll-target="#regresja-logistyczna-z-autograd-breast-cancer">2. Regresja logistyczna z autograd — breast cancer</a>
+  <ul class="collapse">
+  <li><a href="#dane" id="toc-dane" class="nav-link" data-scroll-target="#dane">2.1 Dane</a></li>
+  <li><a href="#pętla-treningowa-z-autograd" id="toc-pętla-treningowa-z-autograd" class="nav-link" data-scroll-target="#pętla-treningowa-z-autograd">2.2 Pętla treningowa z autograd</a></li>
+  <li><a href="#krzywe-uczenia-i-porównanie-z-lab-8" id="toc-krzywe-uczenia-i-porównanie-z-lab-8" class="nav-link" data-scroll-target="#krzywe-uczenia-i-porównanie-z-lab-8">2.3 Krzywe uczenia i porównanie z lab 8</a></li>
+  </ul></li>
+  <li><a href="#nn.module-i-optim-kanoniczna-pętla-treningowa" id="toc-nn.module-i-optim-kanoniczna-pętla-treningowa" class="nav-link" data-scroll-target="#nn.module-i-optim-kanoniczna-pętla-treningowa">3. <code>nn.Module</code> i <code>optim</code> — kanoniczna pętla treningowa</a>
+  <ul class="collapse">
+  <li><a href="#model-jako-klasa-nn.module" id="toc-model-jako-klasa-nn.module" class="nav-link" data-scroll-target="#model-jako-klasa-nn.module">3.1 Model jako klasa <code>nn.Module</code></a></li>
+  <li><a href="#funkcja-straty-i-optymalizator" id="toc-funkcja-straty-i-optymalizator" class="nav-link" data-scroll-target="#funkcja-straty-i-optymalizator">3.2 Funkcja straty i optymalizator</a></li>
+  <li><a href="#kanoniczna-pętla-treningowa" id="toc-kanoniczna-pętla-treningowa" class="nav-link" data-scroll-target="#kanoniczna-pętla-treningowa">3.3 Kanoniczna pętla treningowa</a></li>
+  <li><a href="#trening-i-porównanie" id="toc-trening-i-porównanie" class="nav-link" data-scroll-target="#trening-i-porównanie">3.4 Trening i porównanie</a></li>
+  </ul></li>
+  <li><a href="#mlp-na-regresji-nieliniowej-sunspoty" id="toc-mlp-na-regresji-nieliniowej-sunspoty" class="nav-link" data-scroll-target="#mlp-na-regresji-nieliniowej-sunspoty">4. MLP na regresji nieliniowej — sunspoty</a>
+  <ul class="collapse">
+  <li><a href="#dane-1" id="toc-dane-1" class="nav-link" data-scroll-target="#dane-1">4.1 Dane</a></li>
+  <li><a href="#model" id="toc-model" class="nav-link" data-scroll-target="#model">4.2 Model</a></li>
+  <li><a href="#strata-optymalizator-i-pętla-treningowa" id="toc-strata-optymalizator-i-pętla-treningowa" class="nav-link" data-scroll-target="#strata-optymalizator-i-pętla-treningowa">4.3 Strata, optymalizator i pętla treningowa</a></li>
+  <li><a href="#wynik-i-porównanie-z-bazą-gaussa" id="toc-wynik-i-porównanie-z-bazą-gaussa" class="nav-link" data-scroll-target="#wynik-i-porównanie-z-bazą-gaussa">4.4 Wynik i porównanie z bazą Gaussa</a></li>
+  </ul></li>
+  <li><a href="#klasyfikacja-wieloklasowa-zbiór-2d-z-czterema-klasami" id="toc-klasyfikacja-wieloklasowa-zbiór-2d-z-czterema-klasami" class="nav-link" data-scroll-target="#klasyfikacja-wieloklasowa-zbiór-2d-z-czterema-klasami">5. Klasyfikacja wieloklasowa — zbiór 2D z czterema klasami</a>
+  <ul class="collapse">
+  <li><a href="#dane-2" id="toc-dane-2" class="nav-link" data-scroll-target="#dane-2">5.1 Dane</a></li>
+  <li><a href="#przygotowanie-tensorów" id="toc-przygotowanie-tensorów" class="nav-link" data-scroll-target="#przygotowanie-tensorów">5.2 Przygotowanie tensorów</a></li>
+  <li><a href="#baseline-regresja-softmax" id="toc-baseline-regresja-softmax" class="nav-link" data-scroll-target="#baseline-regresja-softmax">5.3 Baseline: regresja softmax</a></li>
+  <li><a href="#wizualizacja-granic-decyzyjnych" id="toc-wizualizacja-granic-decyzyjnych" class="nav-link" data-scroll-target="#wizualizacja-granic-decyzyjnych">5.4 Wizualizacja granic decyzyjnych</a></li>
+  <li><a href="#mlp" id="toc-mlp" class="nav-link" data-scroll-target="#mlp">5.5 MLP</a></li>
+  <li><a href="#porównanie-side-by-side" id="toc-porównanie-side-by-side" class="nav-link" data-scroll-target="#porównanie-side-by-side">5.6 Porównanie side-by-side</a></li>
+  <li><a href="#macierz-pomyłek" id="toc-macierz-pomyłek" class="nav-link" data-scroll-target="#macierz-pomyłek">5.7 Macierz pomyłek</a></li>
+  </ul></li>
+  <li><a href="#zadania-dodatkowe" id="toc-zadania-dodatkowe" class="nav-link" data-scroll-target="#zadania-dodatkowe">6. Zadania dodatkowe</a>
+  <ul class="collapse">
+  <li><a href="#wpływ-szerokości-warstwy-ukrytej-na-granice-decyzyjne" id="toc-wpływ-szerokości-warstwy-ukrytej-na-granice-decyzyjne" class="nav-link" data-scroll-target="#wpływ-szerokości-warstwy-ukrytej-na-granice-decyzyjne">6.1 Wpływ szerokości warstwy ukrytej na granice decyzyjne</a></li>
+  <li><a href="#adam-vs-sgd-na-sunspot-ach" id="toc-adam-vs-sgd-na-sunspot-ach" class="nav-link" data-scroll-target="#adam-vs-sgd-na-sunspot-ach">6.2 Adam vs SGD na sunspot-ach</a></li>
+  <li><a href="#regresja-logistyczna-ze-scikit-learn-kontrola" id="toc-regresja-logistyczna-ze-scikit-learn-kontrola" class="nav-link" data-scroll-target="#regresja-logistyczna-ze-scikit-learn-kontrola">6.3 Regresja logistyczna ze scikit-learn — kontrola</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_1.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_9.html">Lab 9: Autograd, <code>nn.Module</code> i pierwsze sieci neuronowe</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 9: Autograd, <code>nn.Module</code> i pierwsze sieci neuronowe</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_9.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<p>Na lab 8 trenowaliśmy regresję liniową i logistyczną w PyTorch, ale gradient funkcji straty wyprowadzaliśmy ręcznie i programowali jako wyrażenie macierzowe. Wykład 5 pokazał, że to już niepotrzebne: mechanizm różniczkowania automatycznego (<em>autograd</em>) buduje graf obliczeniowy w trakcie forward passu i sam liczy wszystkie gradienty po wywołaniu <code>loss.backward()</code>.</p>
+<p>W tym arkuszu wykorzystamy autograd w trzech narastających kontekstach. Najpierw na małej funkcji matematycznej — przejdziemy backpropagację ręcznie, węzeł po węźle, i porównamy z wynikiem PyTorcha. Potem przepiszemy regresję logistyczną z lab 8 tak, by gradient liczył się sam. Następnie zrefaktoryzujemy ten sam model używając <code>nn.Module</code> i <code>optim</code> — wprowadzając kanoniczną pętlę treningową, którą będziemy już zawsze wykorzystywać. Wreszcie wytrenujemy pierwsze sieci neuronowe z prawdziwego zdarzenia: MLP na regresji (sunspoty z lab 8) i MLP na klasyfikacji wieloklasowej (zbiór 2D z czterema klasami), na którym zobaczymy, jak warstwa ukryta zmienia kształt granic decyzyjnych.</p>
+<div id="cell-1" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> TensorDataset, DataLoader</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="rozgrzewka-graf-obliczeniowy-i-autograd" class="level2">
+<h2 class="anchored" data-anchor-id="rozgrzewka-graf-obliczeniowy-i-autograd">1. Rozgrzewka: graf obliczeniowy i autograd</h2>
+<p>Na wykładzie 5 widzieliśmy, że każda funkcja zapisana jako sekwencja operacji elementarnych daje się przedstawić jako skierowany graf acykliczny i że algorytm wstecznej propagacji to systematyczne stosowanie reguły łańcuchowej w odwrotnej kolejności topologicznej tego grafu. W tej sekcji przejdziemy ten algorytm ręcznie na małym przykładzie, a następnie zweryfikujemy wynik autograd-em.</p>
+<section id="funkcja-i-jej-graf-obliczeniowy" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-i-jej-graf-obliczeniowy">1.1 Funkcja i jej graf obliczeniowy</h3>
+<p>Rozważmy funkcję trzech zmiennych:</p>
+<p><span class="math display">\[L(x_1, x_2, x_3) = (x_1 + x_2) \sin(x_2 x_3).\]</span></p>
+<p>Rozłóżmy ją na operacje elementarne, wprowadzając węzły pośrednie <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>:</p>
+<p><span class="math display">\[
+a = x_1 + x_2, \qquad
+b = x_2 \, x_3, \qquad
+c = \sin(b), \qquad
+L = a \cdot c.
+\]</span></p>
+<p>Korzeniem grafu jest <span class="math inline">\(L\)</span>, liśćmi — zmienne <span class="math inline">\(x_1, x_2, x_3\)</span>. Krawędzie kierowane “w dół”, od korzenia do liści, opisują <strong>relację rodzic → dziecko</strong> w grafie obliczeniowym: jeśli wartość węzła <span class="math inline">\(u\)</span> jest obliczana na podstawie wartości węzła <span class="math inline">\(v\)</span>, to <span class="math inline">\(u\)</span> jest <strong>rodzicem</strong> <span class="math inline">\(v\)</span>, a <span class="math inline">\(v\)</span> jego <strong>dzieckiem</strong>. (Forward pass biegnie w odwrotnym kierunku — od dzieci do rodziców.)</p>
+<p>Krawędzie naszego grafu:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>dziecko</th>
+<th>rodzic</th>
+<th>operacja przy rodzicu</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(a\)</span></td>
+<td><span class="math inline">\(L\)</span></td>
+<td><span class="math inline">\(L = a \cdot c\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(c\)</span></td>
+<td><span class="math inline">\(L\)</span></td>
+<td><span class="math inline">\(L = a \cdot c\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(b\)</span></td>
+<td><span class="math inline">\(c\)</span></td>
+<td><span class="math inline">\(c = \sin(b)\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x_1\)</span></td>
+<td><span class="math inline">\(a\)</span></td>
+<td><span class="math inline">\(a = x_1 + x_2\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x_2\)</span></td>
+<td><span class="math inline">\(a\)</span></td>
+<td><span class="math inline">\(a = x_1 + x_2\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(x_2\)</span></td>
+<td><span class="math inline">\(b\)</span></td>
+<td><span class="math inline">\(b = x_2 \, x_3\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(x_3\)</span></td>
+<td><span class="math inline">\(b\)</span></td>
+<td><span class="math inline">\(b = x_2 \, x_3\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Zauważ, że <strong><span class="math inline">\(x_2\)</span> ma dwóch rodziców</strong> (<span class="math inline">\(a\)</span> oraz <span class="math inline">\(b\)</span>) — pojawia się w dwóch ścieżkach prowadzących od liścia do korzenia. To kluczowy szczegół, do którego za chwilę wrócimy.</p>
+</section>
+<section id="forward-pass-z-konkretnymi-wartościami" class="level3">
+<h3 class="anchored" data-anchor-id="forward-pass-z-konkretnymi-wartościami">1.2 Forward pass z konkretnymi wartościami</h3>
+<p>Ustalmy punkt <span class="math inline">\((x_1, x_2, x_3) = (1, 2, 3)\)</span> i policzmy wartości wszystkich węzłów:</p>
+<ol type="1">
+<li><span class="math inline">\(a = 1 + 2 = 3\)</span>.</li>
+<li><span class="math inline">\(b = 2 \cdot 3 = 6\)</span>.</li>
+<li><span class="math inline">\(c = \sin(6) \approx -0.2794\)</span>.</li>
+<li><span class="math inline">\(L = a \cdot c = 3 \sin(6) \approx -0.8382\)</span>.</li>
+</ol>
+<p>Te liczby przydadzą się w 1.5 do weryfikacji numerycznej.</p>
+</section>
+<section id="backward-pass-definicje-i-reguła" class="level3">
+<h3 class="anchored" data-anchor-id="backward-pass-definicje-i-reguła">1.3 Backward pass — definicje i reguła</h3>
+<p>Dla każdego węzła <span class="math inline">\(v\)</span> w grafie wprowadzamy oznaczenie</p>
+<p><span class="math display">\[\bar v \;:=\; \frac{\partial L}{\partial v}.\]</span></p>
+<p>Reguła wstecznej propagacji mówi, że dla każdego węzła <span class="math inline">\(v\)</span> różnego od korzenia</p>
+<p><span class="math display">\[\bar v \;=\; \sum_{u \in \text{rodzice}(v)} \bar u \cdot \frac{\partial u}{\partial v},\]</span></p>
+<p>gdzie suma przebiega po wszystkich rodzicach <span class="math inline">\(v\)</span> w grafie, a pochodne <span class="math inline">\(\partial u / \partial v\)</span> to <strong>lokalne pochodne</strong> — zależne tylko od operacji wykonywanej przy węźle <span class="math inline">\(u\)</span>. Dla korzenia kładziemy <span class="math inline">\(\bar L = \partial L / \partial L = 1\)</span>.</p>
+<p>Algorytm: idziemy w <strong>odwrotnej kolejności topologicznej</strong>, od korzenia do liści. W każdym węźle używamy już policzonych <span class="math inline">\(\bar u\)</span> rodziców i mnożymy przez lokalną pochodną.</p>
+</section>
+<section id="backward-pass-ręczne-wyprowadzenie" class="level3">
+<h3 class="anchored" data-anchor-id="backward-pass-ręczne-wyprowadzenie">1.4 Backward pass — ręczne wyprowadzenie</h3>
+<p>Wykonaj algorytm krok po kroku. Dla każdego węzła zapisz najpierw wzór symboliczny (w którym wykorzystujesz <span class="math inline">\(\bar u\)</span> rodziców i pochodne lokalne), a następnie podstaw wartości <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span> z 1.2.</p>
+<ol type="1">
+<li><span class="math inline">\(\bar L = 1\)</span>.</li>
+<li><span class="math inline">\(\bar a\)</span>: jedyny rodzic <span class="math inline">\(a\)</span> to <span class="math inline">\(L = a \cdot c\)</span>, czyli <span class="math inline">\(\partial L / \partial a = c\)</span>. Stąd <span class="math display">\[\bar a = \bar L \cdot c = c.\]</span></li>
+<li><span class="math inline">\(\bar c\)</span>: jedyny rodzic <span class="math inline">\(c\)</span> to <span class="math inline">\(L = a \cdot c\)</span>, czyli <span class="math inline">\(\partial L / \partial c = a\)</span>. Stąd <span class="math display">\[\bar c = \bar L \cdot a = a.\]</span></li>
+<li><span class="math inline">\(\bar b\)</span>: jedyny rodzic <span class="math inline">\(b\)</span> to <span class="math inline">\(c = \sin(b)\)</span>, czyli <span class="math inline">\(\partial c / \partial b = \cos(b)\)</span>. Stąd <span class="math display">\[\bar b = \bar c \cdot \cos(b) = a \cos(b).\]</span></li>
+<li><span class="math inline">\(\bar{x_1}\)</span>: jedyny rodzic to <span class="math inline">\(a = x_1 + x_2\)</span>, <span class="math inline">\(\partial a / \partial x_1 = 1\)</span>. Stąd <span class="math display">\[\bar{x_1} = \bar a \cdot 1 = c.\]</span></li>
+<li><span class="math inline">\(\bar{x_3}\)</span>: jedyny rodzic to <span class="math inline">\(b = x_2 x_3\)</span>, <span class="math inline">\(\partial b / \partial x_3 = x_2\)</span>. Stąd <span class="math display">\[\bar{x_3} = \bar b \cdot x_2 = a \, x_2 \cos(b).\]</span></li>
+<li><span class="math inline">\(\bar{x_2}\)</span> — przypadek z dwoma rodzicami. Sumujemy wkład z gałęzi przez <span class="math inline">\(a\)</span> i z gałęzi przez <span class="math inline">\(b\)</span>:
+<ul>
+<li>przez <span class="math inline">\(a\)</span>: <span class="math inline">\(\partial a / \partial x_2 = 1\)</span>, wkład <span class="math inline">\(\bar a \cdot 1 = c\)</span>,</li>
+<li>przez <span class="math inline">\(b\)</span>: <span class="math inline">\(\partial b / \partial x_2 = x_3\)</span>, wkład <span class="math inline">\(\bar b \cdot x_3 = a \, x_3 \cos(b)\)</span>.</li>
+</ul>
+Stąd <span class="math display">\[\bar{x_2} = c + a \, x_3 \cos(b).\]</span></li>
+</ol>
+<p>Sumowanie po węzłach nadrzędnych nie jest modyfikacją reguły łańcuchowej, lecz jej naturalną konsekwencją w przypadku funkcji wielu zmiennych. Jeśli zmienna <span class="math inline">\(x\)</span> ma wielu odbiorców, jej łączny gradient jest sumą wpływów przekazywanych przez każdą z tych ścieżek. Backpropagacja po prostu porządkuje to sumowanie, zapewniając efektywność obliczeniową.</p>
+<p>Podstawiając wartości z 1.2 (<span class="math inline">\(a = 3\)</span>, <span class="math inline">\(b = 6\)</span>):</p>
+<p><span class="math display">\[
+\bar{x_1} = \sin(6), \quad
+\bar{x_2} = \sin(6) + 9\cos(6), \quad
+\bar{x_3} = 6\cos(6).
+\]</span></p>
+<p>Oblicz te wartości liczbowo (np. przez <code>math.sin</code>, <code>math.cos</code>).</p>
+</section>
+<section id="weryfikacja-symboliczna-z-bezpośredniego-różniczkowania" class="level3">
+<h3 class="anchored" data-anchor-id="weryfikacja-symboliczna-z-bezpośredniego-różniczkowania">1.5 Weryfikacja symboliczna z bezpośredniego różniczkowania</h3>
+<p>Bez korzystania z grafu, policz <span class="math inline">\(\partial L / \partial x_j\)</span> dla <span class="math inline">\(j = 1, 2, 3\)</span> bezpośrednio z definicji <span class="math inline">\(L = (x_1 + x_2)\sin(x_2 x_3)\)</span> (reguła iloczynu i reguła łańcuchowa). Sprawdź, że dostajesz dokładnie te same wyrażenia, co w 1.4. To wewnętrzny kontrol algorytmu — backpropagacja musi dać identyczny wynik z tym, co dostalibyśmy “klasycznie”.</p>
+</section>
+<section id="weryfikacja-numeryczna-w-pytorch" class="level3">
+<h3 class="anchored" data-anchor-id="weryfikacja-numeryczna-w-pytorch">1.6 Weryfikacja numeryczna w PyTorch</h3>
+<p>Zaimplementuj forward pass jako sekwencję operacji tensorowych z <code>requires_grad=True</code> na liściach, wywołaj <code>backward()</code> i porównaj <code>.grad</code> liści z liczbami z 1.4.</p>
+<div id="cell-9" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> torch.tensor(<span class="fl">1.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x2 <span class="op">=</span> torch.tensor(<span class="fl">2.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x3 <span class="op">=</span> torch.tensor(<span class="fl">3.0</span>, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x1 <span class="op">+</span> x2</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> x2 <span class="op">*</span> x3</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> torch.sin(b)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> a <span class="op">*</span> c</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>L.backward()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x1.grad, x2.grad, x3.grad)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Sprawdź, że wartości zgadzają się z ręcznymi do precyzji float32 — użyj <code>torch.allclose</code> z tolerancją rzędu <span class="math inline">\(10^{-6}\)</span>, np.:</p>
+<div id="cell-11" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>expected <span class="op">=</span> torch.tensor([</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    math.sin(<span class="dv">6</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    math.sin(<span class="dv">6</span>) <span class="op">+</span> <span class="dv">9</span> <span class="op">*</span> math.cos(<span class="dv">6</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">6</span> <span class="op">*</span> math.cos(<span class="dv">6</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> torch.tensor([x1.grad, x2.grad, x3.grad])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> torch.allclose(actual, expected, atol<span class="op">=</span><span class="fl">1e-6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>To, co przed chwilą zrobiłeś ręcznie dla 4 węzłów wewnętrznych, PyTorch zrobił automatycznie — dla tego samego grafu, ale używając tej samej reguły. W realnych modelach graf ma miliony węzłów; algorytm jest ten sam.</p>
+</section>
+<section id="akumulacja-gradientów" class="level3">
+<h3 class="anchored" data-anchor-id="akumulacja-gradientów">1.7 Akumulacja gradientów</h3>
+<p>Wywołaj <code>backward()</code> po raz drugi (zbuduj graf jeszcze raz, bo PyTorch zwalnia go po pierwszym backward) i obejrzyj <code>x1.grad</code>, <code>x2.grad</code>, <code>x3.grad</code>. Co się stało?</p>
+<div id="cell-13" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> x1 <span class="op">+</span> x2</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> x2 <span class="op">*</span> x3</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> torch.sin(b)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> a <span class="op">*</span> c</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>L.backward()</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x1.grad, x2.grad, x3.grad)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wartości się <strong>podwoiły</strong>. PyTorch nie zastępuje zawartości <code>.grad</code>, tylko ją dodaje — celowo, bo czasem chcemy zsumować gradienty z wielu wywołań backward przed aktualizacją. W typowej pętli treningowej musimy więc pamiętać, żeby wyzerować gradienty:</p>
+<div id="cell-15" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x1.grad.zero_()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>x2.grad.zero_()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>x3.grad.zero_()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>W sekcji 3 zobaczysz, że <code>optim.SGD</code> (i każdy inny optymalizator) dostarcza metody <code>zero_grad()</code>, która robi to dla wszystkich parametrów modelu na raz.</p>
+</section>
+<section id="torch.no_grad-i-.detach" class="level3">
+<h3 class="anchored" data-anchor-id="torch.no_grad-i-.detach">1.8 <code>torch.no_grad()</code> i <code>.detach()</code></h3>
+<p>Wykonaj jedną i tę samą operację — np. predykcję <code>y = a * c</code> — w trzech kontekstach i zaobserwuj <code>y.requires_grad</code> oraz <code>y.grad_fn</code>:</p>
+<ol type="1">
+<li>Zwykły kontekst: <code>y = a * c</code>.</li>
+<li>W bloku <code>with torch.no_grad(): y = a * c</code>.</li>
+<li>Po odpięciu od grafu: <code>y = (a * c).detach()</code>.</li>
+</ol>
+<p>Pierwszy przypadek śledzi operację (graf się buduje), pozostałe dwa nie. <code>no_grad()</code> używamy, gdy w danym fragmencie kodu nie planujemy liczyć gradientu (walidacja, predykcja na nowych danych) — pozwala to PyTorchowi <strong>nie zapamiętywać wartości pośrednich</strong> potrzebnych do backward, oszczędzając pamięć. <code>.detach()</code> odpina pojedynczy tensor — przydaje się np. przy konwersji do NumPy do wizualizacji.</p>
+</section>
+</section>
+<section id="regresja-logistyczna-z-autograd-breast-cancer" class="level2">
+<h2 class="anchored" data-anchor-id="regresja-logistyczna-z-autograd-breast-cancer">2. Regresja logistyczna z autograd — breast cancer</h2>
+<p>Wracamy do zbioru Breast Cancer Wisconsin z lab 8 (sekcja 3). Powtarzamy trening regresji logistycznej, ale tym razem gradientu nie liczymy ręcznie ze wzoru <span class="math inline">\(\nabla_{\mathbf{w}} L = X^T(\sigma(X\mathbf{w}) - \mathbf{y})/N\)</span> — odda nam tę pracę autograd.</p>
+<section id="dane" class="level3">
+<h3 class="anchored" data-anchor-id="dane">2.1 Dane</h3>
+<p>Powtórz przygotowanie danych z lab 8 (sekcja 3.1). W skrócie:</p>
+<ol type="1">
+<li><code>data = load_breast_cancer()</code> (z <code>sklearn.datasets</code>).</li>
+<li>Podział train/test 80/20, <code>random_state=42</code>.</li>
+<li><code>StandardScaler</code> dopasowany na train, transformacja train i test.</li>
+<li>Doklej kolumnę jedynek (bias) do macierzy cech.</li>
+<li>Konwersja na tensory <code>float32</code>.</li>
+<li><code>TensorDataset</code> + <code>DataLoader</code> z <code>batch_size=32</code>, <code>shuffle=True</code> na zbiorze treningowym. Zbiór testowy zostaw jako surowe tensory.</li>
+</ol>
+</section>
+<section id="pętla-treningowa-z-autograd" class="level3">
+<h3 class="anchored" data-anchor-id="pętla-treningowa-z-autograd">2.2 Pętla treningowa z autograd</h3>
+<p>Wagi modelu to teraz tensor z <code>requires_grad=True</code>:</p>
+<div id="cell-21" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n_features_with_bias <span class="op">=</span> X_train_t.shape[<span class="dv">1</span>]  <span class="co"># 30 + 1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> (torch.randn(n_features_with_bias)<span class="op">*</span> <span class="fl">0.01</span>).requires_grad_(<span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><em>Uwaga:</em> mnożenie przez 0.01 daje lekko pomniejszoną inicjalizację. Niestety, nie można wykonać tej operacji bezpośrednio na tensorze z <code>requires_grad=True</code>, bo to odpina tensor od grafu.</p>
+<p>Funkcje pomocnicze (zgodnie z lab 8 sekcja 3.2):</p>
+<ul>
+<li><code>sigmoid(z)</code> zaimplementowana jako <code>1 / (1 + torch.exp(-z))</code>,</li>
+<li><code>bce_loss(y_true, y_pred)</code> z <code>torch.clamp</code> na <span class="math inline">\([\varepsilon, 1-\varepsilon]\)</span> przed logarytmem.</li>
+</ul>
+<p>Pętla treningowa z automatycznym różniczkowaniem:</p>
+<div id="cell-26" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> {<span class="st">"train_loss"</span>: [], <span class="st">"test_loss"</span>: [], <span class="st">"train_acc"</span>: [], <span class="st">"test_acc"</span>: []}</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X_batch, y_batch <span class="kw">in</span> train_loader:</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># forward</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        logits <span class="op">=</span> X_batch <span class="op">@</span> w</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        y_pred <span class="op">=</span> sigmoid(logits)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> bce_loss(y_batch, y_pred)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># backward — tu autograd robi za nas to, co w lab 8</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># liczyliśmy ręcznie wzorem X^T (y_pred - y) / B</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># aktualizacja wag w torch.no_grad() — nie chcemy, żeby aktualizacja</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># trafiła do grafu obliczeniowego</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            w <span class="op">-=</span> lr <span class="op">*</span> w.grad</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            w.grad.zero_()</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ewaluacja po epoce — bez śledzenia grafu</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ... policz BCE i accuracy na train i test</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Dwie nowe rzeczy w stosunku do lab 8:</p>
+<ul>
+<li><code>loss.backward()</code> zastępuje ręczne wyprowadzenie i implementację gradientu — jedna linijka działa dla <strong>dowolnej</strong> funkcji straty, nie tylko BCE.</li>
+<li><code>with torch.no_grad():</code> wokół aktualizacji wag jest konieczne. Bez tego operacja <code>w -= lr * w.grad</code> zostałaby wpisana do grafu, który PyTorch chce różniczkować przy następnym <code>backward()</code> — i rzuciłby błędem. Wewnątrz <code>no_grad</code> graf nie jest budowany, więc aktualizacja “in-place” jest bezpieczna.</li>
+</ul>
+</section>
+<section id="krzywe-uczenia-i-porównanie-z-lab-8" class="level3">
+<h3 class="anchored" data-anchor-id="krzywe-uczenia-i-porównanie-z-lab-8">2.3 Krzywe uczenia i porównanie z lab 8</h3>
+<p>Narysuj BCE train/test i accuracy train/test w funkcji epoki. Wypisz końcową accuracy na zbiorze testowym. Wynik powinien być <strong>bardzo zbliżony</strong> do tego z lab 8 sekcja 3.4 — to ten sam algorytm, ten sam zbiór, ta sama strata. Różnica polega tylko na tym, kto liczy gradient.</p>
+</section>
+</section>
+<section id="nn.module-i-optim-kanoniczna-pętla-treningowa" class="level2">
+<h2 class="anchored" data-anchor-id="nn.module-i-optim-kanoniczna-pętla-treningowa">3. <code>nn.Module</code> i <code>optim</code> — kanoniczna pętla treningowa</h2>
+<p>W sekcji 2 nadal trzymaliśmy parametry modelu jako “luźny” tensor <code>w</code>, sami inicjalizowaliśmy go, sami zerowaliśmy gradient i sami pisaliśmy aktualizację. PyTorch oferuje dwa abstrakty, które porządkują ten kod: <strong><code>nn.Module</code></strong> opakowuje parametry modelu i forward pass, a <strong><code>optim</code></strong> opakowuje aktualizację wag.</p>
+<section id="model-jako-klasa-nn.module" class="level3">
+<h3 class="anchored" data-anchor-id="model-jako-klasa-nn.module">3.1 Model jako klasa <code>nn.Module</code></h3>
+<p>Zdefiniuj klasę <code>LogReg</code> dziedziczącą po <code>nn.Module</code>. W <code>__init__</code> utwórz pojedynczą warstwę <code>nn.Linear(n_features, 1)</code> (bias jest w <code>nn.Linear</code>, więc do macierzy danych nie doklejamy już kolumny jedynek). W <code>forward</code> zwróć <strong>logity</strong> (czyli <code>self.linear(x)</code>), bez sigmoid — funkcja straty zrobi sigmoid sama.</p>
+<div id="cell-31" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LogReg(nn.Module):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_features):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.linear <span class="op">=</span> nn.Linear(n_features, <span class="dv">1</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.linear(x).squeeze(<span class="op">-</span><span class="dv">1</span>)  <span class="co"># kształt (B,) zamiast (B, 1)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Stwórz instancję modelu i wypisz <code>list(model.parameters())</code> — zobaczysz dwa tensory parametrów (waga i bias), oba z <code>requires_grad=True</code>, oba zainicjalizowane wariantem inicjalizacji Kaiminga.</p>
+</section>
+<section id="funkcja-straty-i-optymalizator" class="level3">
+<h3 class="anchored" data-anchor-id="funkcja-straty-i-optymalizator">3.2 Funkcja straty i optymalizator</h3>
+<p>Użyj <code>nn.BCEWithLogitsLoss</code> zamiast pisanej własnoręcznie BCE z sigmoidą. Jak omawialiśmy na wykładzie 5, łączy ona sigmoidę z log-em w sposób stabilny numerycznie — dlatego model zwraca logity, nie prawdopodobieństwa.</p>
+<div id="cell-33" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.BCEWithLogitsLoss()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.SGD(model.parameters(), lr<span class="op">=</span><span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="kanoniczna-pętla-treningowa" class="level3">
+<h3 class="anchored" data-anchor-id="kanoniczna-pętla-treningowa">3.3 Kanoniczna pętla treningowa</h3>
+<div id="cell-35" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> {<span class="st">"train_loss"</span>: [], <span class="st">"test_loss"</span>: [], <span class="st">"train_acc"</span>: [], <span class="st">"test_acc"</span>: []}</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X_batch, y_batch <span class="kw">in</span> train_loader:</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        logits <span class="op">=</span> model(X_batch)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> criterion(logits, y_batch)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ewaluacja</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ... policz BCE i accuracy na train i test</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Ten szkielet — <code>zero_grad → forward → loss → backward → step</code> — będziemy odtwarzać w każdym kolejnym treningu w tym kursie. Warto go zapamiętać.</p>
+<p>Trzy nowe wywołania, które w sekcji 2 załatwialiśmy ręcznie:</p>
+<ul>
+<li><code>optimizer.zero_grad()</code> zeruje gradienty wszystkich parametrów (<code>w.grad.zero_()</code> × liczba parametrów),</li>
+<li><code>optimizer.step()</code> wykonuje aktualizację — dla <code>optim.SGD(lr=0.1)</code> to dokładnie <code>p -= 0.1 * p.grad</code> dla każdego parametru <code>p</code>, opakowane w <code>torch.no_grad()</code>,</li>
+<li><code>model.train()</code> / <code>model.eval()</code> przełączają tryb modelu. Dla <code>nn.Linear</code> nie zmieniają nic, ale w sieciach z dropoutem (jeszcze poznamy) lub batch norm robią różnicę. Dobry zwyczaj — zawsze deklarować tryb explicite.</li>
+</ul>
+</section>
+<section id="trening-i-porównanie" class="level3">
+<h3 class="anchored" data-anchor-id="trening-i-porównanie">3.4 Trening i porównanie</h3>
+<p>Wytrenuj model i porównaj końcową accuracy z sekcją 2 — powinna być praktycznie taka sama. Ale <strong>sekcja 3 jest krótsza w kodzie</strong>: nie ma ręcznej inicjalizacji wag, nie ma własnej sigmoidy, nie ma własnej BCE, nie ma <code>with torch.no_grad()</code> wokół aktualizacji. Wszystko, co powtarzalne, schowaliśmy w abstrakcjach.</p>
+<p>Od tej chwili będziemy używać <code>nn.Module</code> + <code>optim</code> w każdym treningu.</p>
+</section>
+</section>
+<section id="mlp-na-regresji-nieliniowej-sunspoty" class="level2">
+<h2 class="anchored" data-anchor-id="mlp-na-regresji-nieliniowej-sunspoty">4. MLP na regresji nieliniowej — sunspoty</h2>
+<p>Wracamy do zbioru SILSO z lab 8 (sekcja 2), ale tym razem zamiast regresji liniowej z ręcznie skonstruowaną bazą Gaussa wytrenujemy <strong>wielowarstwowy perceptron</strong> (MLP), który nauczy się reprezentacji sam.</p>
+<section id="dane-1" class="level3">
+<h3 class="anchored" data-anchor-id="dane-1">4.1 Dane</h3>
+<p>Powtórz wczytanie i przygotowanie danych z lab 8 (sekcja 2.1–2.2). W skrócie:</p>
+<ol type="1">
+<li><code>pd.read_csv</code> z URL SILSO <code>https://www.sidc.be/SILSO/INFO/sndtotcsv.php</code>, parametry jak w lab 8.</li>
+<li>Wyrzuć rekordy z brakującą wartością SN.</li>
+<li>Skala czasu: <span class="math inline">\(\tau = (t - t_{\min}) / (t_{\max} - t_{\min})\)</span> z <span class="math inline">\(t_{\min}, t_{\max}\)</span> ustawionymi na ten sam zakres co w lab 8.</li>
+<li>Podział na zbiór treningowy (<span class="math inline">\(\tau &lt; 0.8\)</span>) i walidacyjny (<span class="math inline">\(\tau \geq 0.8\)</span>).</li>
+<li>Konwersja na tensory <code>float32</code>. Cechy mają kształt <code>(N, 1)</code>, etykiety <code>(N,)</code>.</li>
+<li><code>TensorDataset</code> + <code>DataLoader</code> z <code>batch_size=256</code>, <code>shuffle=True</code>.</li>
+</ol>
+</section>
+<section id="model" class="level3">
+<h3 class="anchored" data-anchor-id="model">4.2 Model</h3>
+<p>Sieć z dwiema warstwami ukrytymi po 32 neurony, aktywacja ReLU. Najprościej — przez <code>nn.Sequential</code>:</p>
+<div id="cell-40" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> nn.Sequential(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">1</span>, <span class="dv">32</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">32</span>, <span class="dv">32</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">32</span>, <span class="dv">1</span>),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>nn.Sequential</code> to skrót dla prostych modeli, w których forward pass to po prostu kompozycja warstw — nie trzeba pisać własnej klasy z <code>forward</code>. Wypisz <code>list(model.parameters())</code> — zobaczysz 6 tensorów (3 warstwy × waga i bias).</p>
+</section>
+<section id="strata-optymalizator-i-pętla-treningowa" class="level3">
+<h3 class="anchored" data-anchor-id="strata-optymalizator-i-pętla-treningowa">4.3 Strata, optymalizator i pętla treningowa</h3>
+<p><code>nn.MSELoss</code> jako strata. Jako optymalizatora użyj <code>torch.optim.Adam(model.parameters(), lr=1e-3)</code>. Adam w odróżnieniu od SGD utrzymuje per-parametr średnie ruchome gradientu i jego kwadratu, dzięki czemu jest mniej wrażliwy na dobór <code>lr</code> niż SGD (na wykładzie 5 widzieliśmy go jako naturalny wybór “domyślny” dla sieci neuronowych).</p>
+<p>Zastosuj kanoniczną pętlę treningową z sekcji 3.3. Liczba epok: 200. Pamiętaj o <code>model.eval()</code> + <code>torch.no_grad()</code> przy ewaluacji na zbiorze walidacyjnym.</p>
+<p><em>Uwaga o kształtach.</em> Wyjście <code>model(x)</code> ma kształt <code>(B, 1)</code>, a etykiety <code>(B,)</code>. <code>nn.MSELoss</code> nie zgłosi błędu, ale zacznie broadcastować do <code>(B, B)</code>, co da bezsensowny wynik. Spłaszcz wyjście: <code>model(x).squeeze(-1)</code>.</p>
+</section>
+<section id="wynik-i-porównanie-z-bazą-gaussa" class="level3">
+<h3 class="anchored" data-anchor-id="wynik-i-porównanie-z-bazą-gaussa">4.4 Wynik i porównanie z bazą Gaussa</h3>
+<ol type="1">
+<li>Krzywa uczenia: train MSE i val MSE w funkcji epoki, oś <span class="math inline">\(y\)</span> w skali logarytmicznej.</li>
+<li>Wykres dopasowania: na osi <span class="math inline">\(x\)</span> pełny zakres <span class="math inline">\(\tau\)</span>, na osi <span class="math inline">\(y\)</span> predykcja modelu nałożona na dane (jak w lab 8 sekcja 2.7).</li>
+</ol>
+<p>Porównaj z modelem z bazą Gaussa z lab 8 (sekcja 2.9.1 dla <span class="math inline">\(K = 200\)</span>). Co możesz zaobserwować:</p>
+<ul>
+<li>W lab 8 musieliśmy ręcznie zaprojektować bazę: wybrać <span class="math inline">\(K\)</span>, dobrać szerokość <span class="math inline">\(s\)</span>, rozmieścić centra. MLP nie wymaga niczego z tej listy — sieć <strong>uczy się reprezentacji</strong> z surowego <span class="math inline">\(\tau \in [0, 1]\)</span>.</li>
+<li>Dopasowanie powinno być wizualnie podobnej jakości lub lepsze.</li>
+<li>Liczba parametrów modelu: policz ją z <code>sum(p.numel() for p in model.parameters())</code> i porównaj z <span class="math inline">\(K = 200\)</span> z lab 8.</li>
+</ul>
+<p>To pierwszy lab, w którym sieć “ma sens” — pokazuje swoją przewagę nad modelem ręcznie zaprojektowanym przez nas.</p>
+</section>
+</section>
+<section id="klasyfikacja-wieloklasowa-zbiór-2d-z-czterema-klasami" class="level2">
+<h2 class="anchored" data-anchor-id="klasyfikacja-wieloklasowa-zbiór-2d-z-czterema-klasami">5. Klasyfikacja wieloklasowa — zbiór 2D z czterema klasami</h2>
+<p>W ostatniej sekcji zobaczymy klasyfikację wieloklasową w wykonaniu MLP. Użyjemy dwuwymiarowego, syntetycznego zbioru z czterema klasami, dla którego — dzięki tej dwuwymiarowości — możemy narysować <strong>granice decyzyjne</strong> modelu i naocznie porównać model liniowy z MLP.</p>
+<section id="dane-2" class="level3">
+<h3 class="anchored" data-anchor-id="dane-2">5.1 Dane</h3>
+<p>Wczytaj zbiór z dwóch plików CSV. Każdy plik ma kolumny <code>x1</code>, <code>x2</code>, <code>y</code>, gdzie <code>y</code> przyjmuje wartości <span class="math inline">\(0, 1, 2, 3\)</span>.</p>
+<div id="cell-42" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>URL_TRAIN <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/rodakt/BPwAD/refs/heads/v2/data/D2_class/train.csv"</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>URL_TEST  <span class="op">=</span> <span class="st">"https://raw.githubusercontent.com/rodakt/BPwAD/refs/heads/v2/data/D2_class/test.csv"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.read_csv(URL_TRAIN)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>df_test  <span class="op">=</span> pd.read_csv(URL_TEST)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Narysuj scatter plot zbioru treningowego pokolorowany po klasach (np. <code>plt.scatter(..., c=y, cmap='tab10')</code>). Zobaczysz cztery struktury: pierścień, dwa skupiska o rozkładach Gaussa i półokrąg.</p>
+<p>Zwróć uwagę, że pierścień (klasa 0) i półokrąg (klasa 3) <strong>częściowo na siebie nachodzą</strong> w dolnej połowie obrazka. Idealne accuracy nie jest tu osiągalne — to nie wada modelu, tylko właściwość zbioru. Zobaczymy ją w macierzy pomyłek w 5.7.</p>
+</section>
+<section id="przygotowanie-tensorów" class="level3">
+<h3 class="anchored" data-anchor-id="przygotowanie-tensorów">5.2 Przygotowanie tensorów</h3>
+<ol type="1">
+<li><code>StandardScaler</code> dopasowany na train, transformacja train i test.</li>
+<li>Cechy jako <code>float32</code>, etykiety jako <strong><code>torch.long</code></strong> — <code>nn.CrossEntropyLoss</code> wymaga indeksów klas typu całkowitego.</li>
+<li><code>TensorDataset</code> + <code>DataLoader</code> z <code>batch_size=64</code>, <code>shuffle=True</code> na zbiorze treningowym. Zbiór testowy zostaw jako surowe tensory.</li>
+</ol>
+</section>
+<section id="baseline-regresja-softmax" class="level3">
+<h3 class="anchored" data-anchor-id="baseline-regresja-softmax">5.3 Baseline: regresja softmax</h3>
+<p>Zacznij od najprostszego możliwego modelu — pojedynczej warstwy liniowej z 4 wyjściami:</p>
+<div id="cell-45" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>model_lin <span class="op">=</span> nn.Linear(<span class="dv">2</span>, <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>To <strong>regresja softmax</strong> (wieloklasowy odpowiednik regresji logistycznej): logity przechodzą przez softmax, dając rozkład prawdopodobieństwa nad 4 klasami. Tak jak <code>nn.BCEWithLogitsLoss</code> w sekcji 3, <code>nn.CrossEntropyLoss</code> łączy softmax z entropią krzyżową w jednej operacji stabilnej numerycznie — model zwraca logity, nie prawdopodobieństwa.</p>
+<div id="cell-47" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model_lin.parameters(), lr<span class="op">=</span><span class="fl">1e-2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wytrenuj model przez 100 epok w kanonicznej pętli (sekcja 3.3). Wypisz końcową accuracy na zbiorze testowym (predykcja klasy: <code>logits.argmax(dim=1)</code>).</p>
+</section>
+<section id="wizualizacja-granic-decyzyjnych" class="level3">
+<h3 class="anchored" data-anchor-id="wizualizacja-granic-decyzyjnych">5.4 Wizualizacja granic decyzyjnych</h3>
+<p>Napisz funkcję <code>plot_decision_boundary(model, X, y, ax)</code>, która:</p>
+<ol type="1">
+<li>Tworzy gęstą siatkę punktów na obszarze obejmującym cały zbiór (np. <code>np.meshgrid</code> na zakresie <code>[X.min - 0.5, X.max + 0.5]</code> z krokiem 0.02).</li>
+<li>Konwertuje siatkę na tensor <code>float32</code>.</li>
+<li>W trybie <code>model.eval()</code> + <code>torch.no_grad()</code> liczy <code>logits = model(grid)</code> i <code>Z = logits.argmax(dim=1)</code>.</li>
+<li>Rysuje <code>ax.contourf(xx, yy, Z, alpha=0.3, cmap='tab10', levels=...)</code> — kolorowane regiony to obszary, gdzie model przewiduje daną klasę.</li>
+<li>Nakłada <code>ax.scatter</code> z punktami zbioru.</li>
+</ol>
+<p><em>Wskazówka dot. siatki.</em> Pamiętaj, że model był trenowany na danych po standaryzacji — siatkę i punkty rysujemy w <strong>przestrzeni po standaryzacji</strong> (tak, by model widział je tak samo jak dane treningowe). Albo rysujesz w oryginalnej skali, ale wtedy przed predykcją musisz przepuścić siatkę przez ten sam <code>StandardScaler</code>.</p>
+<p>Narysuj granice dla <code>model_lin</code>. Co widzisz?</p>
+<p>Granice modelu liniowego to kawałki płaszczyzn — w 2D to <strong>linie proste</strong>. Cztery klasy → cztery regiony oddzielone liniami. Pierścień (klasa 0) jest niemożliwy do oddzielenia liniami od klas wewnątrz/na zewnątrz — model musi wybrać jakieś “kompromisowe” cięcia, które nie odzwierciedlają struktury danych.</p>
+</section>
+<section id="mlp" class="level3">
+<h3 class="anchored" data-anchor-id="mlp">5.5 MLP</h3>
+<p>Wprowadź dwie warstwy ukryte:</p>
+<div id="cell-49" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>model_mlp <span class="op">=</span> nn.Sequential(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">2</span>, <span class="dv">32</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">32</span>, <span class="dv">32</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    nn.ReLU(),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    nn.Linear(<span class="dv">32</span>, <span class="dv">4</span>),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wytrenuj go w <strong>identycznej</strong> pętli co w 5.3 (z osobnym optymalizatorem dla nowego modelu). Wypisz końcową accuracy.</p>
+</section>
+<section id="porównanie-side-by-side" class="level3">
+<h3 class="anchored" data-anchor-id="porównanie-side-by-side">5.6 Porównanie side-by-side</h3>
+<p>Narysuj dwa wykresy obok siebie (<code>fig, (ax1, ax2) = plt.subplots(1, 2)</code>):</p>
+<ul>
+<li>po lewej granice <code>model_lin</code>,</li>
+<li>po prawej granice <code>model_mlp</code>.</li>
+</ul>
+<p>Granice MLP powinny być <strong>zakrzywione</strong> — pierścień zostaje znaleziony jako oddzielny region, a granice między klasami dopasowują się do faktycznej struktury danych. To naoczna ilustracja tego, co warstwa ukryta z nieliniowością wnosi do modelu: zdolność wyrażania <strong>funkcji nieliniowych</strong>, których model liniowy nie umie wyrazić w żaden sposób.</p>
+</section>
+<section id="macierz-pomyłek" class="level3">
+<h3 class="anchored" data-anchor-id="macierz-pomyłek">5.7 Macierz pomyłek</h3>
+<p>Dla obu modeli policz macierz pomyłek na zbiorze testowym (<code>sklearn.metrics.confusion_matrix</code>). Porównaj:</p>
+<ul>
+<li>W modelu liniowym błędy są rozsiane po wielu klasach.</li>
+<li>W MLP błędy są <strong>skoncentrowane na granicy klas 0 i 3</strong> (pierścień i półokrąg) — tam, gdzie zbiór faktycznie zawiera próbki nie do rozróżnienia. Reszta klas powinna być rozdzielana niemal bezbłędnie.</li>
+</ul>
+<p>To dobra okazja, żeby zauważyć: jakość modelu nie sprowadza się do jednej liczby. Macierz pomyłek pokazuje, <strong>gdzie</strong> model się myli i czy te miejsca mają sens.</p>
+</section>
+</section>
+<section id="zadania-dodatkowe" class="level2">
+<h2 class="anchored" data-anchor-id="zadania-dodatkowe">6. Zadania dodatkowe</h2>
+<section id="wpływ-szerokości-warstwy-ukrytej-na-granice-decyzyjne" class="level3">
+<h3 class="anchored" data-anchor-id="wpływ-szerokości-warstwy-ukrytej-na-granice-decyzyjne">6.1 Wpływ szerokości warstwy ukrytej na granice decyzyjne</h3>
+<p>Wytrenuj kilka MLP-ów z jedną warstwą ukrytą o różnej szerokości — <code>hidden_size ∈ {2, 4, 8, 32, 128}</code>. Dla każdego narysuj granice decyzyjne na zbiorze 2D z sekcji 5. Ułóż wykresy w siatce subplotów (np. 1×5 lub 2×3).</p>
+<p>Co obserwujesz, gdy szerokość rośnie? W którym momencie pierścień zostaje “znaleziony”? Czy przy <code>hidden_size = 128</code> granice nie stają się nadmiernie pofalowane (przeuczenie)?</p>
+</section>
+<section id="adam-vs-sgd-na-sunspot-ach" class="level3">
+<h3 class="anchored" data-anchor-id="adam-vs-sgd-na-sunspot-ach">6.2 Adam vs SGD na sunspot-ach</h3>
+<p>Wytrenuj sieć z sekcji 4 dwoma optymalizatorami: <code>optim.SGD(lr=0.01)</code> i <code>optim.Adam(lr=1e-3)</code>. Pozostałe hiperparametry takie same. Narysuj krzywe zbieżności (val MSE w funkcji epoki) na jednym wykresie.</p>
+<p>Spróbuj też <code>optim.SGD</code> z różnymi <code>lr</code> (<span class="math inline">\(10^{-1}, 10^{-2}, 10^{-3}\)</span>). Czy któreś <code>lr</code> daje SGD wynik porównywalny z Adamem? Czy strojenie <code>lr</code> jest pracochłonne?</p>
+</section>
+<section id="regresja-logistyczna-ze-scikit-learn-kontrola" class="level3">
+<h3 class="anchored" data-anchor-id="regresja-logistyczna-ze-scikit-learn-kontrola">6.3 Regresja logistyczna ze scikit-learn — kontrola</h3>
+<p>Wytrenuj <code>sklearn.linear_model.LogisticRegression</code> na danych z sekcji 2/3 i porównaj accuracy z modelem z sekcji 3. Dla regresji logistycznej na małym zbiorze sklearn używa metody L-BFGS, więc nie strojąc niczego dostaniesz wynik referencyjny. Twój PyTorch-owy model po 100 epokach SGD powinien osiągnąć podobną accuracy — różnica rzędu 1 punktu procentowego jest normalna.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
