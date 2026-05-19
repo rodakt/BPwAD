@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 6: Sieci konwolucyjne – Biblioteki Python w analizie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-2269d3ea1d12f6324cc9284dfa77e372.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_6.html">Wykład 6: Sieci konwolucyjne</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Biblioteki Python w analizie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Biblioteki Python w analizie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: NumPy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: scikit-learn - estymatory, transformatory, potoki.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: Optuna - optymalizacja hiperparametrów</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Metoda gradientu prostego. Tensory w PyTorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 5: Różniczkowanie automatyczne i wsteczna propagacja</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_6.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 6: Sieci konwolucyjne</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - regresja liniowa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: NumPy - obrazy rastrowe</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: NumPy - algorytm k-średnich</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Własne estymatory scikit-learn</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Potoki i kroswalidacja</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Optuna</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 7: Metoda gradientu prostego</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 8: Trening modeli gradientem prostym w PyTorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 9: Autograd, <code>nn.Module</code> i pierwsze sieci neuronowe</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#motywacja" id="toc-motywacja" class="nav-link active" data-scroll-target="#motywacja">Motywacja</a>
+  <ul class="collapse">
+  <li><a href="#liczba-parametrów" id="toc-liczba-parametrów" class="nav-link" data-scroll-target="#liczba-parametrów">Liczba parametrów</a></li>
+  <li><a href="#brak-niezmienniczości-translacyjnej" id="toc-brak-niezmienniczości-translacyjnej" class="nav-link" data-scroll-target="#brak-niezmienniczości-translacyjnej">Brak niezmienniczości translacyjnej</a></li>
+  </ul></li>
+  <li><a href="#filtry-konwolucyjne" id="toc-filtry-konwolucyjne" class="nav-link" data-scroll-target="#filtry-konwolucyjne">Filtry konwolucyjne</a>
+  <ul class="collapse">
+  <li><a href="#przykład-rachunkowy" id="toc-przykład-rachunkowy" class="nav-link" data-scroll-target="#przykład-rachunkowy">Przykład rachunkowy</a></li>
+  <li><a href="#filtr-to-detektor-cechy-lokalnej" id="toc-filtr-to-detektor-cechy-lokalnej" class="nav-link" data-scroll-target="#filtr-to-detektor-cechy-lokalnej">Filtr to detektor cechy lokalnej</a></li>
+  </ul></li>
+  <li><a href="#padding" id="toc-padding" class="nav-link" data-scroll-target="#padding">Padding</a></li>
+  <li><a href="#stride" id="toc-stride" class="nav-link" data-scroll-target="#stride">Stride</a></li>
+  <li><a href="#konwolucje-z-wieloma-kanałami-i-filtrami" id="toc-konwolucje-z-wieloma-kanałami-i-filtrami" class="nav-link" data-scroll-target="#konwolucje-z-wieloma-kanałami-i-filtrami">Konwolucje z wieloma kanałami i filtrami</a></li>
+  <li><a href="#pooling" id="toc-pooling" class="nav-link" data-scroll-target="#pooling">Pooling</a></li>
+  <li><a href="#equiwariantność-i-niezmienniczość" id="toc-equiwariantność-i-niezmienniczość" class="nav-link" data-scroll-target="#equiwariantność-i-niezmienniczość">Equiwariantność i niezmienniczość</a></li>
+  <li><a href="#pole-recepcyjne" id="toc-pole-recepcyjne" class="nav-link" data-scroll-target="#pole-recepcyjne">Pole recepcyjne</a>
+  <ul class="collapse">
+  <li><a href="#wzór-rekurencyjny" id="toc-wzór-rekurencyjny" class="nav-link" data-scroll-target="#wzór-rekurencyjny">Wzór rekurencyjny</a></li>
+  <li><a href="#tabela-dla-lenet-5" id="toc-tabela-dla-lenet-5" class="nav-link" data-scroll-target="#tabela-dla-lenet-5">Tabela dla LeNet-5</a></li>
+  </ul></li>
+  <li><a href="#architektura-sieci-konwolucyjnej" id="toc-architektura-sieci-konwolucyjnej" class="nav-link" data-scroll-target="#architektura-sieci-konwolucyjnej">Architektura sieci konwolucyjnej</a></li>
+  <li><a href="#lenet-5" id="toc-lenet-5" class="nav-link" data-scroll-target="#lenet-5">LeNet-5</a>
+  <ul class="collapse">
+  <li><a href="#architektura" id="toc-architektura" class="nav-link" data-scroll-target="#architektura">Architektura</a></li>
+  <li><a href="#wczytanie-danych" id="toc-wczytanie-danych" class="nav-link" data-scroll-target="#wczytanie-danych">Wczytanie danych</a></li>
+  <li><a href="#implementacja" id="toc-implementacja" class="nav-link" data-scroll-target="#implementacja">Implementacja</a></li>
+  <li><a href="#gpu-jako-naturalne-środowisko-cnn-ów" id="toc-gpu-jako-naturalne-środowisko-cnn-ów" class="nav-link" data-scroll-target="#gpu-jako-naturalne-środowisko-cnn-ów">GPU jako naturalne środowisko CNN-ów</a></li>
+  <li><a href="#pętla-treningowa-z-ewaluacją-per-epoka" id="toc-pętla-treningowa-z-ewaluacją-per-epoka" class="nav-link" data-scroll-target="#pętla-treningowa-z-ewaluacją-per-epoka">Pętla treningowa z ewaluacją per epoka</a></li>
+  <li><a href="#diagnostyka" id="toc-diagnostyka" class="nav-link" data-scroll-target="#diagnostyka">Diagnostyka</a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie">Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_6.html">Wykład 6: Sieci konwolucyjne</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 6: Sieci konwolucyjne</h1>
+<p class="subtitle lead">Biblioteki Python w analizie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="motywacja" class="level2">
+<h2 class="anchored" data-anchor-id="motywacja">Motywacja</h2>
+<p>Sieci konwolucyjne (CNN — <em>convolutional neural networks</em>) rozwiązują dwa problemy, które pojawiają się, gdy próbujemy przetwarzać obrazy za pomocą klasycznej sieci MLP z wykładu 5:</p>
+<ol type="1">
+<li>liczba parametrów eksploduje wraz z rozmiarem obrazu,</li>
+<li>brak niezmienniczości ze względu na przesunięcia.</li>
+</ol>
+<section id="liczba-parametrów" class="level3">
+<h3 class="anchored" data-anchor-id="liczba-parametrów">Liczba parametrów</h3>
+<p>Pojedynczy neuron w pierwszej warstwie ukrytej MLP ma postać</p>
+<p><span class="math display">\[\begin{equation*}
+z = f(\mathbf{w}^T \mathbf{x} + b),
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(\mathbf{w}\)</span> to wektor wag o tej samej długości co wejście <span class="math inline">\(\mathbf{x}\)</span>, <span class="math inline">\(b\)</span> to bias, a <span class="math inline">\(f\)</span> to funkcja aktywacji. Dla obrazu o rozmiarze <span class="math inline">\(1000 \times 1000\)</span> pikseli w trzech kanałach kolorów wejście ma długość <span class="math inline">\(3 \cdot 10^6\)</span>, więc pojedynczy neuron ma <span class="math inline">\(3\cdot 10^6 + 1\)</span> parametrów. Warstwa z tysiącem neuronów ma już rzędu <span class="math inline">\(3 \cdot 10^9\)</span> parametrów — zanim w ogóle dotkniemy kolejnych warstw.</p>
+<p>Dla obrazu MNIST <span class="math inline">\(28 \times 28\)</span> liczby są skromniejsze, ale logika ta sama: każdy neuron pierwszej warstwy musi mieć wagę dla każdego piksela. Każda waga jest niezależna od innych.</p>
+</section>
+<section id="brak-niezmienniczości-translacyjnej" class="level3">
+<h3 class="anchored" data-anchor-id="brak-niezmienniczości-translacyjnej">Brak niezmienniczości translacyjnej</h3>
+<p>MLP patrzy na obraz globalnie. Każdy piksel ma swoją osobną wagę, więc obraz z czarną cyfrą „1” w lewym górnym rogu i ten sam obraz po przesunięciu cyfry w prawy dolny róg są dla sieci dwoma zupełnie różnymi wejściami. Aby nauczyć ją, że obie wersje reprezentują tę samą klasę, musimy pokazać przykłady „1” we wszystkich możliwych położeniach. Tymczasem nasz mózg radzi sobie z tym bez najmniejszego problemu: cyfra to cyfra niezależnie od tego, gdzie się znajduje.</p>
+<p>Sieci konwolucyjne adresują oba problemy jedną ideą: <strong>filtra przesuwającego się po obrazie z dzielonymi wagami</strong>.</p>
+</section>
+</section>
+<section id="filtry-konwolucyjne" class="level2">
+<h2 class="anchored" data-anchor-id="filtry-konwolucyjne">Filtry konwolucyjne</h2>
+<p>Wyobraźmy sobie prostokątne <strong>okno</strong> (<em>receptive field</em>) — najczęściej kwadrat <span class="math inline">\(3 \times 3\)</span> lub <span class="math inline">\(5 \times 5\)</span> — które przesuwa się po obrazie, w każdym położeniu obejmując mały fragment pikseli. W obrębie okna stosujemy operację</p>
+<p><span class="math display">\[\begin{equation*}
+z = \mathbf{w}^T \mathbf{x} + b,
+\end{equation*}\]</span></p>
+<p>gdzie <span class="math inline">\(\mathbf{x}\)</span> to spłaszczony wektor pikseli wewnątrz okna, a <span class="math inline">\(\mathbf{w}\)</span> i <span class="math inline">\(b\)</span> to <strong>wagi filtra</strong> (kernela) — wspólne dla wszystkich położeń okna. Tablicę uzyskaną przez zastosowanie filtra <span class="math inline">\(\mathbf{K}\)</span> do wszystkich położeń w obrazie <span class="math inline">\(\mathbf{I}\)</span> nazywamy <strong>konwolucją</strong> i oznaczamy <span class="math inline">\(\mathbf{I} \ast \mathbf{K}\)</span>.</p>
+<p>Dla filtra o rozmiarze <span class="math inline">\(h \times w\)</span> formalnie:</p>
+<p><span class="math display">\[\begin{equation*}
+[\mathbf{I} \ast \mathbf{K}](i, j) = \sum_{m=0}^{h-1} \sum_{n=0}^{w-1} \mathbf{I}(i + m, j + n) \cdot \mathbf{K}(m, n).
+\end{equation*}\]</span></p>
+<p><strong>Uwaga terminologiczna.</strong> W ścisłej matematyce konwolucja zawiera odwrócenie jądra (sumujemy <span class="math inline">\(\mathbf{I}(i - m, j - n) \cdot \mathbf{K}(m, n)\)</span>). Operacja zdefiniowana powyżej to formalnie <em>korelacja krzyżowa</em>. W deep learningu konsekwentnie używa się korelacji krzyżowej, a nazywa się ją konwolucją — wagi filtra i tak są uczone, więc operacyjnie nie ma różnicy.</p>
+<section id="przykład-rachunkowy" class="level3">
+<h3 class="anchored" data-anchor-id="przykład-rachunkowy">Przykład rachunkowy</h3>
+<p>Niech</p>
+<p><span class="math display">\[\begin{equation*}
+\mathbf{I} = \begin{bmatrix} 1 &amp; 2 &amp; 3 \\ 4 &amp; 5 &amp; 6 \\ 7 &amp; 8 &amp; 9 \end{bmatrix}, \quad
+\mathbf{K} = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \end{bmatrix}.
+\end{equation*}\]</span></p>
+<p>Filtr <span class="math inline">\(2 \times 2\)</span> mieści się w obrazie <span class="math inline">\(3 \times 3\)</span> na cztery sposoby, więc wynik konwolucji ma rozmiar <span class="math inline">\(2 \times 2\)</span>:</p>
+<p><span class="math display">\[\begin{equation*}
+\mathbf{I} \ast \mathbf{K} = \begin{bmatrix}
+1\cdot 1 + 2\cdot 2 + 4\cdot 3 + 5\cdot 4 &amp; 2\cdot 1 + 3\cdot 2 + 5\cdot 3 + 6\cdot 4 \\
+4\cdot 1 + 5\cdot 2 + 7\cdot 3 + 8\cdot 4 &amp; 5\cdot 1 + 6\cdot 2 + 8\cdot 3 + 9\cdot 4
+\end{bmatrix} = \begin{bmatrix} 37 &amp; 47 \\ 67 &amp; 77 \end{bmatrix}.
+\end{equation*}\]</span></p>
+</section>
+<section id="filtr-to-detektor-cechy-lokalnej" class="level3">
+<h3 class="anchored" data-anchor-id="filtr-to-detektor-cechy-lokalnej">Filtr to detektor cechy lokalnej</h3>
+<p>Na wyjściu z warstwy konwolucyjnej znajduje się funkcja aktywacji, najczęściej ReLU, stosowana elementwise:</p>
+<p><span class="math display">\[\begin{equation*}
+z = \text{ReLU}(\mathbf{w}^T \mathbf{x} + b).
+\end{equation*}\]</span></p>
+<p>Pojedyncza aktywacja <span class="math inline">\(z\)</span> „widzi” tylko tę część obrazu, która znajduje się w jej oknie. Wagi filtra są jednak współdzielone między wszystkimi położeniami okna, więc w każdym z nich liczona jest ta sama operacja. Ponieważ <span class="math inline">\(\mathbf{w}^T \mathbf{x}\)</span> to iloczyn skalarny, przyjmuje największe wartości tam, gdzie wektor pikseli <span class="math inline">\(\mathbf{x}\)</span> jest „kierunkowo zgodny” z wagami filtra. ReLU wygasza wszystkie aktywacje mniejsze od <span class="math inline">\(-b\)</span> i przepuszcza pozostałe. W efekcie filtr działa jak <strong>detektor lokalnej cechy</strong> — wzorca, który najlepiej dopasowuje się do jego wag.</p>
+<p>Filtr <span class="math inline">\(3 \times 3\)</span> ma tylko 10 parametrów (9 wag + bias), niezależnie od rozmiaru obrazu, do którego go stosujemy. To kluczowa zmiana w stosunku do MLP.</p>
+<section id="przykład-detekcja-krawędzi" class="level4">
+<h4 class="anchored" data-anchor-id="przykład-detekcja-krawędzi">Przykład: detekcja krawędzi</h4>
+<p>Pokażmy działanie konwolucji na konkretnym obrazie. Skorzystamy z wbudowanego zdjęcia <code>camera</code> z biblioteki <code>scikit-image</code> (512×512, skala szarości).</p>
+<div id="cell-3" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.data <span class="im">import</span> camera</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> camera()                              <span class="co"># tablica numpy uint8, kształt (512, 512)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> arr.astype(np.float32) <span class="op">/</span> <span class="fl">255.0</span>        <span class="co"># normalizacja do [0, 1]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>img_tensor <span class="op">=</span> torch.tensor(arr).unsqueeze(<span class="dv">0</span>).unsqueeze(<span class="dv">0</span>)  <span class="co"># kształt (1, 1, 512, 512)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>img_tensor.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>torch.Size([1, 1, 512, 512])</code></pre>
+</div>
+</div>
+<p>PyTorch oczekuje tensorów obrazowych w kształcie <code>(batch, channels, height, width)</code>. Dla pojedynczego obrazu w skali szarości dodajemy więc dwa wymiary jednostkowe: kanał i batch. Dla obrazów RGB wymiar <code>channels</code> byłby równy 3.</p>
+<p>Definiujemy dwa filtry — pionowy i poziomy — odpowiadające detektorom krawędzi:</p>
+<p><span class="math display">\[\begin{equation*}
+\mathbf{K}_{\text{v}} = \begin{bmatrix} 1 &amp; 0 &amp; -1 \\ 1 &amp; 0 &amp; -1 \\ 1 &amp; 0 &amp; -1 \end{bmatrix}, \quad
+\mathbf{K}_{\text{h}} = \begin{bmatrix} 1 &amp; 1 &amp; 1 \\ 0 &amp; 0 &amp; 0 \\ -1 &amp; -1 &amp; -1 \end{bmatrix}.
+\end{equation*}\]</span></p>
+<div id="cell-5" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>vertical_filter <span class="op">=</span> torch.tensor(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    [[<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>]], dtype<span class="op">=</span>torch.float32</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>).unsqueeze(<span class="dv">0</span>).unsqueeze(<span class="dv">0</span>)              <span class="co"># kształt (1, 1, 3, 3) dla conv2d</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>horizontal_filter <span class="op">=</span> torch.transpose(vertical_filter, <span class="dv">2</span>, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Wykonujemy konwolucję obrazu z każdym z filtrów. Argument <code>padding=1</code> dodaje warstwę zer wokół obrazu, dzięki czemu wynik zachowuje oryginalny rozmiar <span class="math inline">\(512 \times 512\)</span> (do paddingu wrócimy w następnej sekcji).</p>
+<div id="cell-7" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_filter(img, kernel):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Konwolucja + normalizacja wyniku do [0, 1] dla wizualizacji."""</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> nn.functional.conv2d(img, kernel, padding<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> out.squeeze().numpy()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> (out <span class="op">-</span> out.<span class="bu">min</span>()) <span class="op">/</span> (out.<span class="bu">max</span>() <span class="op">-</span> out.<span class="bu">min</span>())</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>img_vertical <span class="op">=</span> apply_filter(img_tensor, vertical_filter)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>img_horizontal <span class="op">=</span> apply_filter(img_tensor, horizontal_filter)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">0</span>].imshow(arr, cmap<span class="op">=</span><span class="st">"gray"</span>)<span class="op">;</span>          axs[<span class="dv">0</span>].set_title(<span class="st">"Oryginał"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>].imshow(img_vertical, cmap<span class="op">=</span><span class="st">"gray"</span>)<span class="op">;</span> axs[<span class="dv">1</span>].set_title(<span class="st">"Filtr pionowy"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">2</span>].imshow(img_horizontal, cmap<span class="op">=</span><span class="st">"gray"</span>)<span class="op">;</span> axs[<span class="dv">2</span>].set_title(<span class="st">"Filtr poziomy"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axs: ax.axis(<span class="st">"off"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_6_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Filtr pionowy daje silne odpowiedzi tam, gdzie obraz ma pionowe krawędzie (przejścia jasność-ciemność wzdłuż osi poziomej), a filtr poziomy — tam, gdzie krawędzie są poziome. W obu przypadkach jeden filtr o dziewięciu wagach wyłapał konkretną cechę geometryczną <em>w całym obrazie</em> — bez konieczności uczenia osobnych wag dla każdego położenia. To jest właśnie współdzielenie wag w praktyce.</p>
+</section>
+</section>
+</section>
+<section id="padding" class="level2">
+<h2 class="anchored" data-anchor-id="padding">Padding</h2>
+<p>Konwolucja obrazu o wymiarach <span class="math inline">\(H \times W\)</span> filtrem o wymiarach <span class="math inline">\(h \times w\)</span> daje wyjście o rozmiarze</p>
+<p><span class="math display">\[\begin{equation*}
+H_{\text{out}} = H - h + 1, \quad W_{\text{out}} = W - w + 1,
+\end{equation*}\]</span></p>
+<p>czyli obraz nieznacznie się kurczy. Przy wielu kolejnych warstwach konwolucyjnych obraz mógłby zniknąć — i tracilibyśmy informację o pikselach przy brzegach (które trafiają tylko do nielicznych okien).</p>
+<p><strong>Padding</strong> (dopełnianie) polega na otoczeniu obrazu warstwą sztucznych pikseli przed konwolucją. Dodanie <span class="math inline">\(p\)</span> pikseli z każdej strony daje obraz o wymiarach <span class="math inline">\((H + 2p) \times (W + 2p)\)</span>, a po konwolucji:</p>
+<p><span class="math display">\[\begin{equation*}
+H_{\text{out}} = H + 2p - h + 1, \quad W_{\text{out}} = W + 2p - w + 1.
+\end{equation*}\]</span></p>
+<p>Dla filtra <span class="math inline">\(3 \times 3\)</span> wystarczy <span class="math inline">\(p = 1\)</span>, żeby zachować oryginalny rozmiar; dla filtra <span class="math inline">\(5 \times 5\)</span> — <span class="math inline">\(p = 2\)</span>. Dodatkowe piksele zazwyczaj wypełnia się zerami (<em>zero-padding</em>); jeśli wcześniej od obrazu odjęto średnią, to zero jest wartością neutralną.</p>
+</section>
+<section id="stride" class="level2">
+<h2 class="anchored" data-anchor-id="stride">Stride</h2>
+<p><strong>Stride</strong> <span class="math inline">\(s\)</span> to krok, o jaki przesuwamy okno filtra. Wartość domyślna <span class="math inline">\(s = 1\)</span> oznacza, że filtr przesuwa się o jeden piksel; większy stride redukuje rozmiar wyjścia i jest jedną z technik downsamplingu. Ogólny wzór na rozmiar wyjścia:</p>
+<p><span class="math display">\[\begin{equation*}
+H_{\text{out}} = \left\lfloor \frac{H + 2p - h}{s} \right\rfloor + 1, \quad
+W_{\text{out}} = \left\lfloor \frac{W + 2p - w}{s} \right\rfloor + 1.
+\end{equation*}\]</span></p>
+</section>
+<section id="konwolucje-z-wieloma-kanałami-i-filtrami" class="level2">
+<h2 class="anchored" data-anchor-id="konwolucje-z-wieloma-kanałami-i-filtrami">Konwolucje z wieloma kanałami i filtrami</h2>
+<p>Do tej pory rozważaliśmy obraz w skali szarości — jeden kanał. Dla obrazów kolorowych mamy <span class="math inline">\(C\)</span> kanałów wejściowych (np. RGB ma <span class="math inline">\(C = 3\)</span>). Filtr konwolucyjny dla <span class="math inline">\(C\)</span> kanałów ma wymiary <span class="math inline">\(h \times w \times C\)</span> i <span class="math inline">\(hwC\)</span> wag plus jeden bias — wszystkie kanały są przetwarzane razem przez jeden filtr.</p>
+<p>Aby sieć mogła wykrywać różnorodne cechy lokalne, filtry organizuje się w <strong>tensor filtrów</strong> o wymiarach <span class="math inline">\(h \times w \times C \times C_{\text{out}}\)</span>, gdzie <span class="math inline">\(C_{\text{out}}\)</span> to liczba filtrów w danej warstwie. Każdy filtr produkuje jedną <strong>mapę aktywacji</strong>, więc wyjście warstwy konwolucyjnej ma <span class="math inline">\(C_{\text{out}}\)</span> kanałów.</p>
+<p>Łączna liczba parametrów warstwy konwolucyjnej wynosi <span class="math inline">\((hwC + 1) \cdot C_{\text{out}}\)</span>. Dla typowych wartości (<span class="math inline">\(h = w = 3\)</span>, <span class="math inline">\(C = 3\)</span>, <span class="math inline">\(C_{\text{out}} = 64\)</span>) daje to <span class="math inline">\((28) \cdot 64 = 1792\)</span> parametry — w porównaniu do milionów, których wymagałaby gęsto połączona warstwa o tej samej funkcjonalności.</p>
+<p><strong>Kluczowa zaleta</strong>: liczba parametrów warstwy konwolucyjnej nie zależy od rozmiaru obrazu <span class="math inline">\(H \times W\)</span>. Tę samą warstwę można zastosować do obrazu MNIST (<span class="math inline">\(28 \times 28\)</span>) i do zdjęcia w wysokiej rozdzielczości.</p>
+</section>
+<section id="pooling" class="level2">
+<h2 class="anchored" data-anchor-id="pooling">Pooling</h2>
+<p>Pooling to operacja redukcji rozmiaru obrazu <em>bez parametrów do uczenia</em>. Podobnie jak w konwolucji, przesuwamy po obrazie prostokątne okno, ale zamiast obliczać iloczyn skalarny z wagami, agregujemy piksele okna prostą funkcją — najczęściej maksimum (<strong>max pooling</strong>) lub średnią (<strong>average pooling</strong>). Krok przesuwania okna zwykle równa się jego rozmiarowi, więc okna nie nakładają się.</p>
+<p>Pooling stosowany jest do każdego kanału z osobna — zmniejsza wysokość i szerokość, ale zachowuje liczbę kanałów. Typowy max pooling <span class="math inline">\(2 \times 2\)</span> ze stride <span class="math inline">\(2\)</span> zmniejsza obraz dwukrotnie w każdym wymiarze, a wymiar kanałowy pozostaje bez zmian.</p>
+</section>
+<section id="equiwariantność-i-niezmienniczość" class="level2">
+<h2 class="anchored" data-anchor-id="equiwariantność-i-niezmienniczość">Equiwariantność i niezmienniczość</h2>
+<p>Sieci konwolucyjne są lokalnie <strong>ekwiwariantne względem przesunięcia</strong>: jeśli przesuniemy obraz wejściowy, to odpowiadające mu mapy aktywacji również przesuną się w przybliżeniu o tę samą wartość. Wynika to ze współdzielenia wag — ten sam filtr jest stosowany w różnych położeniach obrazu, więc ta sama cecha może zostać wykryta niezależnie od miejsca wystąpienia. W praktyce dokładna ekwiwariantność może być zaburzona przez padding, brzegi obrazu, stride i pooling.</p>
+<p>Pooling wprowadza natomiast <strong>lokalną, przybliżoną niezmienniczość</strong> względem małych przesunięć. Na przykład max-pooling może dać tę samą odpowiedź, jeśli cecha przesunie się wewnątrz tego samego okna poolingowego i nadal pozostanie wartością maksymalną. Po kilku warstwach receptywne pola neuronów rosną, a reprezentacja staje się mniej wrażliwa na dokładne położenie lokalnych cech.</p>
+</section>
+<section id="pole-recepcyjne" class="level2">
+<h2 class="anchored" data-anchor-id="pole-recepcyjne">Pole recepcyjne</h2>
+<p>W jednowarstwowej konwolucji pojedyncza aktywacja zależy od kwadratu <span class="math inline">\(h \times w\)</span> pikseli wejścia. Co się dzieje, gdy ułożymy kilka warstw konwolucyjnych jedna na drugiej?</p>
+<p><strong>Pole recepcyjne</strong> (<em>receptive field</em>, RF) aktywacji w warstwie <span class="math inline">\(l\)</span> to zbiór pikseli <em>oryginalnego wejścia</em>, od których ta aktywacja zależy. Im głębsza warstwa, tym większe pole recepcyjne — i tym większy fragment obrazu „widzi” pojedynczy neuron.</p>
+<section id="wzór-rekurencyjny" class="level3">
+<h3 class="anchored" data-anchor-id="wzór-rekurencyjny">Wzór rekurencyjny</h3>
+<p>Niech <span class="math inline">\(r_l\)</span> oznacza rozmiar pola recepcyjnego po warstwie <span class="math inline">\(l\)</span> (liczony w pikselach wejścia), a <span class="math inline">\(j_l\)</span> — <strong>skok</strong> (<em>jump</em>), czyli odległość między sąsiednimi pikselami wejścia, na które „patrzą” sąsiednie aktywacje w warstwie <span class="math inline">\(l\)</span>. Dla warstwy o rozmiarze jądra <span class="math inline">\(k_l\)</span> i stride <span class="math inline">\(s_l\)</span>:</p>
+<p><span class="math display">\[\begin{equation*}
+r_l = r_{l-1} + (k_l - 1) \cdot j_{l-1}, \qquad j_l = j_{l-1} \cdot s_l,
+\end{equation*}\]</span></p>
+<p>z warunkami początkowymi <span class="math inline">\(r_0 = 1\)</span>, <span class="math inline">\(j_0 = 1\)</span> (pojedynczy piksel wejścia, sąsiednie piksele odległe o 1).</p>
+<p><strong>Intuicja.</strong> Sąsiednie aktywacje warstwy <span class="math inline">\(l\)</span> widzą fragmenty wejścia odległe o <span class="math inline">\(j_{l-1}\)</span> pikseli. Filtr o rozmiarze <span class="math inline">\(k_l\)</span> obejmuje <span class="math inline">\(k_l\)</span> takich aktywacji, więc rozciągnięcie pola recepcyjnego rośnie o <span class="math inline">\((k_l - 1) \cdot j_{l-1}\)</span>. Każdy stride &gt; 1 (najczęściej pochodzący z poolingu) zwiększa skok, więc każda kolejna konwolucja „widzi” dwukrotnie szerszy fragment wejścia.</p>
+</section>
+<section id="tabela-dla-lenet-5" class="level3">
+<h3 class="anchored" data-anchor-id="tabela-dla-lenet-5">Tabela dla LeNet-5</h3>
+<p>Backbone konwolucyjny LeNet-5 (do której wrócimy za chwilę) składa się z czterech warstw: dwie pary konwolucja–pooling. Policzmy pole recepcyjne na końcu części konwolucyjnej:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Warstwa</th>
+<th><span class="math inline">\(k\)</span></th>
+<th><span class="math inline">\(s\)</span></th>
+<th><span class="math inline">\(r\)</span> przed</th>
+<th><span class="math inline">\(j\)</span> przed</th>
+<th><span class="math inline">\(r\)</span> po</th>
+<th><span class="math inline">\(j\)</span> po</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>wejście</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>conv1</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>pool1</td>
+<td>2</td>
+<td>2</td>
+<td>5</td>
+<td>1</td>
+<td>6</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>conv2</td>
+<td>5</td>
+<td>1</td>
+<td>6</td>
+<td>2</td>
+<td>14</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>pool2</td>
+<td>2</td>
+<td>2</td>
+<td>14</td>
+<td>2</td>
+<td>16</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Pojedyncza aktywacja na wyjściu części konwolucyjnej LeNet-5 widzi okno <span class="math inline">\(16 \times 16\)</span> na wejściu <span class="math inline">\(28 \times 28\)</span> — czyli <em>nieco ponad połowę</em> obrazu w każdym wymiarze. Pojedyncza aktywacja nie widzi całej cyfry; pełną integrację cech zapewniają dopiero warstwy w pełni połączone, które są nad częścią konwolucyjną.</p>
+<p>Dla większych obrazów (ImageNet <span class="math inline">\(224 \times 224\)</span>) potrzeba znacznie głębszych sieci, żeby pole recepcyjne pokryło sensowny fragment wejścia. To jeden z argumentów za architekturami takimi jak ResNet, które omówimy w wykładzie 7.</p>
+</section>
+</section>
+<section id="architektura-sieci-konwolucyjnej" class="level2">
+<h2 class="anchored" data-anchor-id="architektura-sieci-konwolucyjnej">Architektura sieci konwolucyjnej</h2>
+<p>Typowy „klocek” prostej sieci konwolucyjnej składa się z trzech warstw:</p>
+<ol type="1">
+<li>konwolucja,</li>
+<li>aktywacja (zwykle ReLU),</li>
+<li>pooling (zwykle max pooling).</li>
+</ol>
+<p>Sieć składa kilka takich klocków jeden na drugim — z każdą kolejną parą konwolucja-pooling rozmiar przestrzenny obrazu maleje, liczba kanałów rośnie, a pole recepcyjne się powiększa.</p>
+<p>Na końcu części konwolucyjnej stosuje się <strong>warstwę spłaszczającą</strong> (<em>flatten</em>), która przekształca mapy aktywacji o kształcie <span class="math inline">\(C_{\text{out}} \times H' \times W'\)</span> w wektor o długości <span class="math inline">\(C_{\text{out}} \cdot H' \cdot W'\)</span>. Wektor ten trafia do klasycznej sieci MLP, która produkuje finalne wyjście (logity klas w przypadku klasyfikacji).</p>
+</section>
+<section id="lenet-5" class="level2">
+<h2 class="anchored" data-anchor-id="lenet-5">LeNet-5</h2>
+<p><a href="http://en.wikipedia.org/wiki/LeNet-5">LeNet-5</a> to jedna z pierwszych sieci konwolucyjnych — zaprojektowana przez Yanna LeCuna i jego współpracowników w 1998 roku do rozpoznawania cyfr w obrazach <span class="math inline">\(28 \times 28\)</span> pikseli. Mimo że ma już ponad ćwierć wieku, pozostaje doskonałym przykładem podstawowej architektury CNN — wystarczająco prostym, by zmieścić ją w głowie w całości, i wystarczająco silnym, by osiągnąć przyzwoity wynik na MNIST.</p>
+<section id="architektura" class="level3">
+<h3 class="anchored" data-anchor-id="architektura">Architektura</h3>
+<p>LeNet-5 składa się z dwóch par konwolucja–pooling, po których następuje trójwarstwowy MLP:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Warstwa</th>
+<th>Wejście</th>
+<th>Operacja</th>
+<th>Wyjście</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>conv1</code></td>
+<td><span class="math inline">\(1 \times 28 \times 28\)</span></td>
+<td>Conv 5×5, pad=2</td>
+<td><span class="math inline">\(6 \times 28 \times 28\)</span></td>
+</tr>
+<tr class="even">
+<td><code>pool</code></td>
+<td><span class="math inline">\(6 \times 28 \times 28\)</span></td>
+<td>MaxPool 2×2, stride=2</td>
+<td><span class="math inline">\(6 \times 14 \times 14\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>conv2</code></td>
+<td><span class="math inline">\(6 \times 14 \times 14\)</span></td>
+<td>Conv 5×5, pad=0</td>
+<td><span class="math inline">\(16 \times 10 \times 10\)</span></td>
+</tr>
+<tr class="even">
+<td><code>pool</code></td>
+<td><span class="math inline">\(16 \times 10 \times 10\)</span></td>
+<td>MaxPool 2×2, stride=2</td>
+<td><span class="math inline">\(16 \times 5 \times 5\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>flatten</code></td>
+<td><span class="math inline">\(16 \times 5 \times 5\)</span></td>
+<td>—</td>
+<td><span class="math inline">\(400\)</span></td>
+</tr>
+<tr class="even">
+<td><code>fc1</code></td>
+<td><span class="math inline">\(400\)</span></td>
+<td>Linear</td>
+<td><span class="math inline">\(120\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>fc2</code></td>
+<td><span class="math inline">\(120\)</span></td>
+<td>Linear</td>
+<td><span class="math inline">\(84\)</span></td>
+</tr>
+<tr class="even">
+<td><code>fc3</code></td>
+<td><span class="math inline">\(84\)</span></td>
+<td>Linear</td>
+<td><span class="math inline">\(10\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Liczba <span class="math inline">\(16 \cdot 5 \cdot 5 = 400\)</span> wejść do <code>fc1</code> bierze się wprost z arytmetyki kształtów: po dwóch parach konwolucja–pooling z mapy o rozmiarze przestrzennym <span class="math inline">\(28 \times 28\)</span> zostaje <span class="math inline">\(5 \times 5\)</span>, ale liczba kanałów wzrasta z 1 do 16.</p>
+<p>Pole recepcyjne na końcu części konwolucyjnej (po <code>pool2</code>) wynosi <span class="math inline">\(16 \times 16\)</span> — jak policzyliśmy w poprzedniej sekcji.</p>
+</section>
+<section id="wczytanie-danych" class="level3">
+<h3 class="anchored" data-anchor-id="wczytanie-danych">Wczytanie danych</h3>
+<div id="cell-16" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> DataLoader</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision <span class="im">import</span> datasets</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision.transforms <span class="im">import</span> ToTensor</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>training_data <span class="op">=</span> datasets.MNIST(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span><span class="st">"data"</span>, train<span class="op">=</span><span class="va">True</span>, download<span class="op">=</span><span class="va">True</span>, transform<span class="op">=</span>ToTensor(),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>test_data <span class="op">=</span> datasets.MNIST(</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    root<span class="op">=</span><span class="st">"data"</span>, train<span class="op">=</span><span class="va">False</span>, download<span class="op">=</span><span class="va">True</span>, transform<span class="op">=</span>ToTensor(),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(training_data, batch_size<span class="op">=</span><span class="dv">64</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>test_loader  <span class="op">=</span> DataLoader(test_data,     batch_size<span class="op">=</span><span class="dv">64</span>, shuffle<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Podgląd kilku przykładowych obrazków:</p>
+<div id="cell-18" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> np.random.randint(<span class="dv">0</span>, <span class="bu">len</span>(training_data), <span class="dv">6</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axs.flat):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    img, label <span class="op">=</span> training_data[idx[i]]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    ax.imshow(img[<span class="dv">0</span>], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Etykieta: </span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_6_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="implementacja" class="level3">
+<h3 class="anchored" data-anchor-id="implementacja">Implementacja</h3>
+<div id="cell-20" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LeNet5(nn.Module):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv1 <span class="op">=</span> nn.Conv2d(<span class="dv">1</span>, <span class="dv">6</span>, kernel_size<span class="op">=</span><span class="dv">5</span>, stride<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv2 <span class="op">=</span> nn.Conv2d(<span class="dv">6</span>, <span class="dv">16</span>, kernel_size<span class="op">=</span><span class="dv">5</span>, stride<span class="op">=</span><span class="dv">1</span>, padding<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pool <span class="op">=</span> nn.MaxPool2d(kernel_size<span class="op">=</span><span class="dv">2</span>, stride<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.act <span class="op">=</span> nn.ReLU()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc1 <span class="op">=</span> nn.Linear(<span class="dv">16</span> <span class="op">*</span> <span class="dv">5</span> <span class="op">*</span> <span class="dv">5</span>, <span class="dv">120</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc2 <span class="op">=</span> nn.Linear(<span class="dv">120</span>, <span class="dv">84</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc3 <span class="op">=</span> nn.Linear(<span class="dv">84</span>, <span class="dv">10</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.act(<span class="va">self</span>.conv1(x))         <span class="co"># --&gt; 6 x 28 x 28</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(x)                    <span class="co"># --&gt; 6 x 14 x 14</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.act(<span class="va">self</span>.conv2(x))         <span class="co"># --&gt; 16 x 10 x 10</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(x)                    <span class="co"># --&gt; 16 x 5 x 5</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> torch.flatten(x, <span class="dv">1</span>)             <span class="co"># --&gt; 400</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.act(<span class="va">self</span>.fc1(x))</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.act(<span class="va">self</span>.fc2(x))</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.fc3(x)                     <span class="co"># logity, 10 klas</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Uwaga historyczna.</strong> Oryginalna sieć LeCuna z 1998 roku używała funkcji aktywacji <code>tanh</code> (oraz wyspecjalizowanego, ręcznie zaprojektowanego mechanizmu łączenia kanałów między <code>conv1</code> a <code>conv2</code>). Tutaj zastępujemy <code>tanh</code> przez ReLU jako współczesny standard — różnica w wynikach na MNIST jest niewielka, ale ReLU znacznie lepiej skaluje się dla głębszych sieci. Decyzję tę zobaczymy w pełnej skali w wykładzie 7, gdy zajmiemy się pretrenowanymi sieciami z ReLU-podobnymi aktywacjami.</p>
+</section>
+<section id="gpu-jako-naturalne-środowisko-cnn-ów" class="level3">
+<h3 class="anchored" data-anchor-id="gpu-jako-naturalne-środowisko-cnn-ów">GPU jako naturalne środowisko CNN-ów</h3>
+<p>Konwolucja sprowadza się do ogromnej liczby niezależnych mnożeń i akumulacji (MAC — <em>multiply-accumulate</em>): dla każdego położenia okna, każdego kanału wejściowego i każdego filtra wykonujemy jedno mnożenie i jedną sumę. Te operacje są <strong>wzajemnie niezależne</strong> — żadna nie czeka na wynik innej — więc idealnie nadają się do zrównoleglenia. Procesor (CPU) ma kilkanaście rdzeni, karta graficzna (GPU) tysiące. Dlatego praktyczne trenowanie sieci konwolucyjnych odbywa się na GPU.</p>
+<p>PyTorch udostępnia spójny interfejs do urządzeń obliczeniowych. Standardowy idiom:</p>
+<div id="cell-22" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> <span class="st">"cuda"</span> <span class="cf">if</span> torch.cuda.is_available() <span class="cf">else</span> <span class="st">"cpu"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Trening na: </span><span class="sc">{</span>device<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Trening na: cpu</code></pre>
+</div>
+</div>
+<p>Aby skorzystać z GPU, trzeba przenieść na nie <strong>dwa rodzaje obiektów</strong>: model (z jego parametrami) i dane wejściowe. Modele przenosimy raz, zaraz po utworzeniu; dane — w każdej iteracji pętli treningowej, ponieważ <code>DataLoader</code> ładuje je do RAM-u CPU.</p>
+<div id="cell-24" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> LeNet5().to(device)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>loss_fn <span class="op">=</span> nn.CrossEntropyLoss()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> torch.optim.Adam(model.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>W praktycznych zastosowaniach (Colab z kartą T4, lokalna stacja z GPU) ten sam kod uruchomi się na GPU, jeśli jest dostępne — w przeciwnym razie spadnie na CPU. Dla LeNet-5 na MNIST różnica nie jest dramatyczna; dla głębszych sieci na ImageNet to różnica między godziną a tygodniem treningu.</p>
+</section>
+<section id="pętla-treningowa-z-ewaluacją-per-epoka" class="level3">
+<h3 class="anchored" data-anchor-id="pętla-treningowa-z-ewaluacją-per-epoka">Pętla treningowa z ewaluacją per epoka</h3>
+<p>W wykładzie 5 pisaliśmy pętlę treningową dla <code>make_moons</code>. Tutaj rozszerzamy ją o ewaluację na zbiorze testowym po każdej epoce, żeby śledzić, czy sieć generalizuje.</p>
+<div id="cell-26" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_one_epoch(model, loader, loss_fn, optimizer, device):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    model.train()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    total_loss, n <span class="op">=</span> <span class="fl">0.0</span>, <span class="dv">0</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X, y <span class="kw">in</span> loader:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        X, y <span class="op">=</span> X.to(device), y.to(device)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> model(X)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> loss_fn(pred, y)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        total_loss <span class="op">+=</span> loss.item() <span class="op">*</span> <span class="bu">len</span>(X)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        n <span class="op">+=</span> <span class="bu">len</span>(X)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> total_loss <span class="op">/</span> n</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate(model, loader, loss_fn, device):</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    total_loss, total_correct, n <span class="op">=</span> <span class="fl">0.0</span>, <span class="dv">0</span>, <span class="dv">0</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> X, y <span class="kw">in</span> loader:</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>            X, y <span class="op">=</span> X.to(device), y.to(device)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>            pred <span class="op">=</span> model(X)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>            total_loss <span class="op">+=</span> loss_fn(pred, y).item() <span class="op">*</span> <span class="bu">len</span>(X)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>            total_correct <span class="op">+=</span> (pred.argmax(dim<span class="op">=</span><span class="dv">1</span>) <span class="op">==</span> y).<span class="bu">sum</span>().item()</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>            n <span class="op">+=</span> <span class="bu">len</span>(X)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> total_loss <span class="op">/</span> n, total_correct <span class="op">/</span> n</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>n_epochs <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>hist_train_loss, hist_test_loss, hist_test_acc <span class="op">=</span> [], [], []</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_epochs <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    train_loss <span class="op">=</span> train_one_epoch(model, train_loader, loss_fn, optimizer, device)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    test_loss, test_acc <span class="op">=</span> evaluate(model, test_loader, loss_fn, device)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    hist_train_loss.append(train_loss)</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    hist_test_loss.append(test_loss)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    hist_test_acc.append(test_acc)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Epoka </span><span class="sc">{</span>epoch<span class="sc">}</span><span class="ss">: train_loss = </span><span class="sc">{</span>train_loss<span class="sc">:.4f}</span><span class="ss">, "</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"test_loss = </span><span class="sc">{</span>test_loss<span class="sc">:.4f}</span><span class="ss">, test_acc = </span><span class="sc">{</span>test_acc<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoka 1: train_loss = 0.2846, test_loss = 0.0932, test_acc = 0.9694
+Epoka 2: train_loss = 0.0822, test_loss = 0.0603, test_acc = 0.9811
+Epoka 3: train_loss = 0.0581, test_loss = 0.0440, test_acc = 0.9851
+Epoka 4: train_loss = 0.0453, test_loss = 0.0451, test_acc = 0.9849
+Epoka 5: train_loss = 0.0377, test_loss = 0.0357, test_acc = 0.9881</code></pre>
+</div>
+</div>
+<p>Krzywe uczenia — strata i dokładność w jednym wykresie obok siebie:</p>
+<div id="cell-28" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(<span class="bu">range</span>(<span class="dv">1</span>, n_epochs <span class="op">+</span> <span class="dv">1</span>), hist_train_loss, label<span class="op">=</span><span class="st">"train"</span>, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(<span class="bu">range</span>(<span class="dv">1</span>, n_epochs <span class="op">+</span> <span class="dv">1</span>), hist_test_loss,  label<span class="op">=</span><span class="st">"test"</span>,  marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Epoka"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Strata"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Krzywe straty"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].legend()</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(<span class="bu">range</span>(<span class="dv">1</span>, n_epochs <span class="op">+</span> <span class="dv">1</span>), hist_test_acc, marker<span class="op">=</span><span class="st">"o"</span>, color<span class="op">=</span><span class="st">"C2"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Epoka"</span>)<span class="op">;</span> axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Dokładność"</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Dokładność na zbiorze testowym"</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="fl">0.9</span>, <span class="fl">1.0</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_6_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Po pięciu epokach sieć osiąga dokładność rzędu 98–99% na zbiorze testowym MNIST. Strata treningowa konsekwentnie maleje; strata testowa również, ale wolniej — to typowy sygnał, że sieć stopniowo dopasowuje się do zbioru treningowego. Przy dłuższym treningu zaczęłaby się przeuczać.</p>
+</section>
+<section id="diagnostyka" class="level3">
+<h3 class="anchored" data-anchor-id="diagnostyka">Diagnostyka</h3>
+<p>Macierz pomyłek pokazuje, które cyfry sieć myli ze sobą:</p>
+<div id="cell-30" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix, accuracy_score</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>y_true, y_pred <span class="op">=</span> [], []</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">eval</span>()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X, y <span class="kw">in</span> test_loader:</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> X.to(device)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        pred <span class="op">=</span> model(X).argmax(dim<span class="op">=</span><span class="dv">1</span>).cpu().numpy()</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        y_true.extend(y.numpy())</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        y_pred.extend(pred)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>acc <span class="op">=</span> accuracy_score(y_true, y_pred)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>cm <span class="op">=</span> confusion_matrix(y_true, y_pred)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>sns.heatmap(cm, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">"d"</span>, cmap<span class="op">=</span><span class="st">"Blues"</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Predykcja"</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">"Prawdziwa etykieta"</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f"Macierz pomyłek (dokładność: </span><span class="sc">{</span>acc<span class="sc">:.4f}</span><span class="ss">)"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_6_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Większość błędów to zwykle mylenie cyfr o podobnym kształcie: 4↔︎9, 3↔︎5, 7↔︎1. Przyjrzyjmy się sześciu losowym błędnym klasyfikacjom:</p>
+<div id="cell-32" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>y_true_arr <span class="op">=</span> np.array(y_true)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>y_pred_arr <span class="op">=</span> np.array(y_pred)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>wrong_indices <span class="op">=</span> np.where(y_true_arr <span class="op">!=</span> y_pred_arr)[<span class="dv">0</span>]</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axs.flat:</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> np.random.choice(wrong_indices)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    img, _ <span class="op">=</span> test_data[idx]</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    ax.imshow(img[<span class="dv">0</span>], cmap<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Prawda: </span><span class="sc">{</span>y_true_arr[idx]<span class="sc">}</span><span class="ss">, predykcja: </span><span class="sc">{</span>y_pred_arr[idx]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wyklad_6_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Większość błędnie sklasyfikowanych przykładów to cyfry zapisane w sposób nietypowy lub niejednoznaczny — dla wielu z nich i człowiek miałby kłopot z jednoznacznym odczytem.</p>
+</section>
+</section>
+<section id="podsumowanie" class="level2">
+<h2 class="anchored" data-anchor-id="podsumowanie">Podsumowanie</h2>
+<p>Sieci konwolucyjne adresują dwa fundamentalne problemy MLP na obrazach: liczbę parametrów (przez współdzielenie wag w filtrze) i brak niezmienniczości translacyjnej (przez ekwiwariancję konwolucji i niezmienniczość poolingu). Architektura CNN buduje hierarchię cech: pierwsze warstwy wykrywają proste wzorce lokalne (krawędzie, kąty), kolejne — bardziej złożone (tekstury, fragmenty obiektów), a pole recepcyjne rośnie wraz z głębokością, pozwalając wyższym warstwom „widzieć” coraz większe fragmenty obrazu.</p>
+<p>LeNet-5 — sieć z 1998 roku — osiąga ~99% dokładności na MNIST z architekturą, która w całości mieści się w głowie. W kolejnym wykładzie zobaczymy, jak skalować ten pomysł do znacznie większych obrazów i znacznie głębszych sieci za pomocą <strong>transfer learningu</strong>: zamiast trenować CNN od zera, wykorzystamy sieci pretrenowane na ImageNet i dostroimy je do naszego zadania.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/BPwAD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
