@@ -8,6 +8,7 @@ project:
     - "wyklady/wyklad_3.ipynb"
     - "wyklady/wyklad_4.ipynb"
     - "wyklady/wyklad_5.ipynb"
+    - "wyklady/wyklad_6.ipynb"
     - "laby/lab_1.ipynb"
     - "laby/lab_2.ipynb"
     - "laby/lab_3.ipynb"
@@ -30,6 +31,7 @@ website:
           - "wyklady/wyklad_3.ipynb"
           - "wyklady/wyklad_4.ipynb"
           - "wyklady/wyklad_5.ipynb"
+          - "wyklady/wyklad_6.ipynb"
       - section: "Laboratoria"
         contents:
           - "laby/lab_1.ipynb"
