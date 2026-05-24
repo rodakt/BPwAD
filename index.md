@@ -40,6 +40,7 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 | 8. Trening modeli gradientem prostym w PyTorch | [🔗 HTML](laby/lab_8.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_8.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_8.ipynb) |
 | 9. Autograd, `nn.Module` i pierwsze sieci neuronowe | [🔗 HTML](laby/lab_9.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_9.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_9.ipynb) |
 | 10. Strojenie hiperparametrów MLP z Optuną | [🔗 HTML](laby/lab_10.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_10.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_10.ipynb) |
+| 11. Sieci konwolucyjne — własna architektura i modele pretrenowane | [🔗 HTML](laby/lab_11.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/laby/lab_11.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/laby/lab_11.ipynb) |
 
 ## Zaliczenie
 
@@ -62,4 +63,3 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 - [Dokumentacja NumPy](https://numpy.org/doc/stable/)
 - [Scikit-learn: User Guide](https://scikit-learn.org/stable/user_guide.html)
 - [Matplotlib: Tutorials](https://matplotlib.org/stable/tutorials/index.html)
-
