@@ -25,6 +25,7 @@ Przedmiot obejmuje praktyczne zastosowanie bibliotek Pythona w obliczeniach nume
 | 4. PyTorch - metoda gradientu prostego, tensory w PyTorch | [🔗 HTML](wyklady/wyklad_4.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_4.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_4.ipynb) |
 | 5. Różniczkowanie automatyczne i wsteczna propagacja | [🔗 HTML](wyklady/wyklad_5.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_5.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_5.ipynb) |
 | 6. Sieci konwolucyjne | [🔗 HTML](wyklady/wyklad_6.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_6.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_6.ipynb) |
+| 7. Transfer learning w fastai | [🔗 HTML](wyklady/wyklad_7.ipynb) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rodakt/BPwAD/blob/v2/wyklady/wyklad_7.ipynb) | [📥 .ipynb](https://raw.githubusercontent.com/rodakt/BPwAD/v2/wyklady/wyklad_7.ipynb) |
 
 ## Laboratoria
 
