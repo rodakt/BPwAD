@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-2269d3ea1d12f6324cc9284dfa77e372.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-c528c3cfdca7af4cbc868ca5bda2dd2c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -548,7 +548,7 @@ y = F(x) + x,
 <div id="cell-28" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optim.Adam(model.fc.parameters(), lr<span class="op">=</span><span class="fl">1e-3</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>):</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x, y <span class="kw">in</span> train_loader:</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        x, y <span class="op">=</span> x.to(device), y.to(device)</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        optimizer.zero_grad()</span>
@@ -627,7 +627,7 @@ y = F(x) + x,
 <p>Pod spodem ta jedna linijka rozkłada się na to, co napisaliśmy ręcznie w sekcji 7, plus jeden bonus.</p>
 <p><strong>Etap 1</strong> (długość ustalana parametrem <code>freeze_epochs</code>, domyślnie 1 epoka): wywołuje <code>learn.freeze()</code>, co ustawia <code>requires_grad=False</code> we wszystkich warstwach poza nową głową, a następnie trenuje przez <code>freeze_epochs</code> epok z LR równym <code>base_lr</code>.</p>
 <p><strong>Etap 2</strong> (długość <code>epochs</code>): wywołuje <code>learn.unfreeze()</code>, co odmraża wszystkie warstwy, a następnie trenuje przez <code>epochs</code> epok z <strong>dyskryminacyjnym LR</strong>: bardzo małym dla wczesnych warstw backbone’u, większym dla nowej głowy. Wewnętrznie fastai dzieli parametry ResNeta na trzy grupy (wczesne warstwy backbone’u, środkowe warstwy backbone’u, nowa głowa) i przypisuje im learning rate’y na skali geometrycznej między <code>base_lr/100</code> a <code>base_lr/2</code>. To, co fastai konstruuje pod spodem, to <strong>ta sama lista słowników z <code>params</code> i <code>lr</code></strong>, którą zbudowaliśmy ręcznie w sekcji 7 — tylko dla trzech grup zamiast dwóch, i z LR-ami obliczonymi automatycznie z <code>base_lr</code>. Tej konstrukcji nie wywołujemy sami; <code>fine_tune()</code> buduje ją za nas.</p>
-<p><strong>One-cycle policy.</strong> Bonus, którego sekcja 7 nie pokazywała: w obu etapach LR nie jest stały. Jest harmonogramowany według polityki jednego cyklu (Smith 2017): LR rośnie liniowo od ułamka <code>base_lr</code> do <code>base_lr</code> w pierwszej połowie treningu, a potem opada do bardzo małej wartości w drugiej połowie. Ten harmonogram poprawia konwergencję i daje się tłumaczyć dwojako — w pierwszej fazie pomaga sieci wydostać się z marnego lokalnego minimum, w drugiej pomaga jej “osadzić się” w głębokim, dobrym minimum. W czystym PyTorchu implementuje się to przez <code>torch.optim.lr_scheduler.OneCycleLR</code>; w fastai dzieje się to automatycznie wewnątrz <code>fine_tune()</code>.</p>
+<p><strong>One-cycle policy.</strong> Bonus, którego sekcja 7 nie pokazywała: w obrębie każdego etapu LR nie jest stały, lecz harmonogramowany polityką jednego cyklu (<a href="https://arxiv.org/abs/1803.09820">Smith 2018</a> — inna praca niż range test z sekcji 8). Znaleziona przez <code>lr_find</code> wartość <code>base_lr</code> pełni tu rolę <strong>szczytu</strong> harmonogramu: LR startuje od ułamka <code>base_lr</code>, rośnie do <code>base_lr</code> w początkowej części cyklu (domyślnie ~25% kroków), a potem kosinusowo opada do wartości bliskiej zeru. Intuicja jest dwojaka — faza narastania pomaga sieci wydostać się z marnego minimum, faza opadania pozwala jej „osadzić się” w dobrym. W czystym PyTorchu robi to <code>torch.optim.lr_scheduler.OneCycleLR</code>; w fastai dzieje się to automatycznie wewnątrz <code>fine_tune()</code>.</p>
 <p>Zauważmy, jak ułożone są warstwy abstrakcji. Jedna linijka <code>fine_tune(3, base_lr=1e-3)</code> to: dwie pętle treningowe z wykładu 5, dyskryminacyjny LR z sekcji 7, plus harmonogram one-cycle.</p>
 </section>
 <section id="praktyczny-przykład-oxford-iiit-pets" class="level2">
@@ -850,7 +850,7 @@ y = F(x) + x,
 </div>
 </div>
 </div>
-<p>I dopiero tu, dopiero w tym porównaniu — siedemdziesiąt punktów procentowych różnicy między modelem pretrenowanym a modelem od zera, przy identycznej reszcie pipeline’u — widać sens transfer learningu.</p>
+<p>W tym porównaniu — 80 punktów procentowych różnicy między modelem pretrenowanym a modelem od zera, przy identycznej reszcie pipeline’u — widać sens transfer learningu.</p>
 </section>
 <section id="interpretacja-wyników" class="level2">
 <h2 class="anchored" data-anchor-id="interpretacja-wyników">Interpretacja wyników</h2>
