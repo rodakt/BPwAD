@@ -21,6 +21,7 @@ project:
     - "laby/lab_9.ipynb"
     - "laby/lab_10.ipynb"
     - "laby/lab_11.ipynb"
+    - "laby/lab_12.ipynb"
 
 website:
   title: "Biblioteki Python w analizie danych"
